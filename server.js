@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const errorHandler = require('./middleware/ErrorHandler.js')(app)
 
 const path = require("path");
 // database
@@ -29,6 +28,12 @@ app.use(signup);
 const login = require("./routes/login.js");
 app.use(login);
 
+// Error handling middleware (should be last)
+const errorHandler = require('./middleware/ErrorHandler');
+app.use(errorHandler.AppError);
+app.use(errorHandler.catchAsync);
+app.use(errorHandler.errorHandler);
+
 // const ShopLogin = require("./routess/shopLogin.js");
 // const showshpsrequists = require("./routess/showshpsrequists.js");
 // const acceptshop = require("./routess/acceptshop.js");
@@ -52,5 +57,3 @@ app.use(login);
 // app.use(requist);
 // app.use(locations);
 
-// Error handling middleware (should be last)
-app.use(errorHandler);
