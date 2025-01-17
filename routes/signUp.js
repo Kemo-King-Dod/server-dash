@@ -52,7 +52,7 @@ router.post('/user', catchAsync(async (req, res) => {
 
     res.status(201).json({
         error: false,
-        message: 'تم التسجيل بنجاح',
+        message: 'ت التسجيل بنجاح',
         token,
         user: {
             id: newUser._id,
