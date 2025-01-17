@@ -25,7 +25,7 @@ io.on("connection", connect);
 const loadphoto = require("./routes/loadPhoto.js");
 app.use(loadphoto);
 
-const signup = require("./routes/signup.js");
+const signup = require("./routes/signUp.js");
 app.use(signup);
 
 
