@@ -15,9 +15,7 @@ app.use(express.static(path.join(__dirname, "uploads")));
 const expressserver = app.listen(4000, () => {
   console.log("server is listening on port 4000");
 });
-app.listen(4000, () => {
-  console.log("server is listening on port 4000");
-});
+
 const io = createserver(expressserver);
 io.on("connection", connect);
 

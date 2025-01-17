@@ -1,7 +1,7 @@
 const { Server } = require("socket.io");
 const Shop = require("../database/store");
 const User = require("../database/users");
-const Driver = require("../database/drivers")
+const Driver = require("../database/driver")
 const jwt = require("jsonwebtoken");
 
 let isconnected;
