@@ -8,13 +8,13 @@ const Store = require('../database/store');
 // User Signup
 router.post('/user', async (req, res) => {
     try {
-        const { name, password, phone, locations } = req.body;
-
+        const { name, password, phone, locations , fcmToken} = req.body;
+        
         // Check if user already exists
         const existingUser = await User.findOne({ phone });
         if (existingUser) {
             return res.status(400).json({
-                success: false,
+                error: true,
                 message: 'رقم الهاتف مسجل مسبقاً'
             });
         }
@@ -37,13 +37,14 @@ router.post('/user', async (req, res) => {
             notifications: [],
             favorate_items: [],
             favorate_stors: [],
-            userType: "Customer"
+            userType: "Customer",
+            fcmToken: fcmToken
         });
 
         await newUser.save();
 
         res.status(201).json({
-            success: true,
+            error: false,
             message: 'تم التسجيل بنجاح',
             user: {
                 id: newUser._id,
@@ -55,7 +56,7 @@ router.post('/user', async (req, res) => {
     } catch (error) {
         console.error('User signup error:', error);
         res.status(500).json({
-            success: false,
+            error: true,
             message: 'حدث خطأ أثناء التسجيل'
         });
     }
@@ -77,7 +78,7 @@ router.post('/driver', async (req, res) => {
         const existingDriver = await Driver.findOne({ phone });
         if (existingDriver) {
             return res.status(400).json({
-                success: false,
+                error: true,
                 message: 'رقم الهاتف مسجل مسبقاً'
             });
         }
@@ -106,13 +107,14 @@ router.post('/driver', async (req, res) => {
             is_there_order: false,
             current_order: {},
             funds: 0,
-            userType: "Driver"
+            userType: "Driver",
+            fcmToken: fcmToken
         });
 
         await newDriver.save();
 
         res.status(201).json({
-            success: true,
+            error: false,
             message: 'تم التسجيل بنجاح',
             driver: {
                 id: newDriver._id,
@@ -124,7 +126,7 @@ router.post('/driver', async (req, res) => {
     } catch (error) {
         console.error('Driver signup error:', error);
         res.status(500).json({
-            success: false,
+            error: true,
             message: 'حدث خطأ أثناء التسجيل'
         });
     }
@@ -151,7 +153,7 @@ router.post('/store', async (req, res) => {
         const existingStore = await Store.findOne({ phone });
         if (existingStore) {
             return res.status(400).json({
-                success: false,
+                error: true,
                 message: 'رقم الهاتف مسجل مسبقاً'
             });
         }
@@ -186,13 +188,14 @@ router.post('/store', async (req, res) => {
             register_history: new Date(),
             notifications: [],
             funds: 0,
-            userType: "Store"
+            userType: "Store",
+            fcmToken: fcmToken
         });
 
         await newStore.save();
 
         res.status(201).json({
-            success: true,
+            error: false,
             message: 'تم التسجيل بنجاح',
             store: {
                 id: newStore._id,
@@ -204,7 +207,7 @@ router.post('/store', async (req, res) => {
     } catch (error) {
         console.error('Store signup error:', error);
         res.status(500).json({
-            success: false,
+            error: true,
             message: 'حدث خطأ أثناء التسجيل'
         });
     }

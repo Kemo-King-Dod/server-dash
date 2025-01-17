@@ -55,6 +55,9 @@ const users = new Schema({
     },
     userType: {
         type: String
+    },
+    fcmToken:{
+        type: String
     }
 })
 
