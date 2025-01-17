@@ -24,11 +24,11 @@ const stores = new Schema({
         require: [true, 'السعر مطلوب'],
         length: 2
     },
-    license_number:{
+    license_number: {
         type: String,
         require: [true, 'رقم الرخصة مطلوب']
     },
-    license_picture:{
+    license_picture: {
         type: String,
         require: [true, 'صورة الرخصة مطلوبة']
     },
@@ -36,11 +36,11 @@ const stores = new Schema({
         type: Object,
         require: [true, 'الموقع مطلوب']
     },
-    address:{
+    address: {
         type: String,
         require: [true, 'العنوان مطلوب']
     },
-    store_picture:{
+    store_picture: {
         type: String,
         require: [true, 'صورة المتجر مطلوبة']
     },
@@ -48,10 +48,10 @@ const stores = new Schema({
         type: String,
         default: "waiting"
     },
-    items:{
+    items: {
         type: Array
     },
-    connection:{
+    connection: {
         type: Boolean,
         default: false
     },
@@ -59,10 +59,10 @@ const stores = new Schema({
         type: String,
         default: false
     },
-    orders:{
+    orders: {
         type: Array
     },
-    Retrenchments_numbers:{
+    Retrenchments_numbers: {
         type: Array
     },
     total_commission: {
@@ -71,44 +71,47 @@ const stores = new Schema({
     money_record: {
         type: Array
     },
-    discription:{
+    discription: {
         type: String
     },
-    notifications_condition:{
+    notifications_condition: {
         type: Boolean,
-        default:true
+        default: true
     },
     open_condition: {
         type: Boolean,
         default: false
     },
-    register_history:{
+    register_history: {
         type: Date
     },
-    opentimeam:{
+    opentimeam: {
         type: Date,
         default: null
     },
-    closetimeam:{
+    closetimeam: {
         type: Date,
         default: null
     },
-    opentimepm:{
+    opentimepm: {
         type: Date,
         default: null
     },
-    closetimepm:{
+    closetimepm: {
         type: Date,
         default: null
     },
-    notifications:{
+    notifications: {
         type: Array,
         default: null
     },
     // رصيد
-    funds:{
+    funds: {
         type: Number,
         default: null
+    },
+    userType: {
+        type: String
     }
 })
 

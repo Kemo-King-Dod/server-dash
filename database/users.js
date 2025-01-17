@@ -53,6 +53,9 @@ const users = new Schema({
     favorate_stors:{
         type: Array
     },
+    userType: {
+        type: String
+    }
 })
 
 module.exports = mongoose.model('User', users)

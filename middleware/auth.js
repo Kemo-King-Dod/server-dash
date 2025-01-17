@@ -8,17 +8,8 @@ const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
 
 const auth = async (req, res, next) => {
     try {
-        // Get the requested user type from the route parameter or query
-        const requiredType = req.params.type || req.query.type;
-        if (!requiredType) {
-            return res.status(400).json({
-                success: false,
-                message: 'نوع المستخدم مطلوب'
-            });
-        }
+        const token = req.header('Authorization')
 
-        const token = req.header('Authorization')?.replace('Bearer ', '');
-        
         if (!token) {
             return res.status(401).json({
                 success: false,
@@ -27,9 +18,9 @@ const auth = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, JWT_SECRET);
-        
+
         // Check if the token type matches the required type
-        if (decoded.type !== requiredType) {
+        if (decoded.type !== req.body.type) {
             return res.status(403).json({
                 success: false,
                 message: 'غير مصرح لك بالوصول'
@@ -37,7 +28,7 @@ const auth = async (req, res, next) => {
         }
 
         let user;
-        
+
         // Find user based on type
         switch (decoded.type) {
             case 'user':

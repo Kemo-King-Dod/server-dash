@@ -36,7 +36,8 @@ router.post('/user', async (req, res) => {
             money_record: [],
             notifications: [],
             favorate_items: [],
-            favorate_stors: []
+            favorate_stors: [],
+            userType: "Customer"
         });
 
         await newUser.save();
@@ -104,7 +105,8 @@ router.post('/driver', async (req, res) => {
             activity_condition: true,
             is_there_order: false,
             current_order: {},
-            funds: 0
+            funds: 0,
+            userType: "Driver"
         });
 
         await newDriver.save();
@@ -183,7 +185,8 @@ router.post('/store', async (req, res) => {
             open_condition: false,
             register_history: new Date(),
             notifications: [],
-            funds: 0
+            funds: 0,
+            userType: "Store"
         });
 
         await newStore.save();

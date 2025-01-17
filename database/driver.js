@@ -70,6 +70,9 @@ const drivers = new Schema({
     },
     funds:{
         type: Number
+    },
+    userType: {
+        type: String
     }
 })
 

@@ -28,6 +28,9 @@ app.use(loadphoto);
 const signup = require("./routes/signUp.js");
 app.use(signup);
 
+const login = require("./routes/login.js");
+app.use(login);
+
 
 // const ShopLogin = require("./routess/shopLogin.js");
 // const showshpsrequists = require("./routess/showshpsrequists.js");
