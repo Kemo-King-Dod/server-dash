@@ -27,10 +27,10 @@ const upload = multer({
 })
 
 app.post('/upload', upload.single('photo'), (req, res) => {
-  if(req.body.password !== 'kemokan') {
-    console.log('Unauthorized')
-    return res.status(401).send('Unauthorized')
-  }
+  // if(req.body.password !== 'kemokan') {
+  //   console.log('Unauthorized')
+  //   return res.status(401).send('Unauthorized')
+  // }
   if (!req.file) {
     return res.status(400).send('No file uploaded.')
   }

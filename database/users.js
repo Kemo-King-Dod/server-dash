@@ -18,7 +18,7 @@ const users = new Schema({
     locations: {
         type: Array
     },
-    register_condition: {
+    registerCondition: {
         type: String,
         require: [true, 'الموقع مطلوب'],
         default: "waiting"
@@ -34,23 +34,23 @@ const users = new Schema({
         require: [true, 'الإتصال مطلوب'],
         default: false
     },
-    connection_id: {
+    connectionId: {
         type: String
     },
-    money_record: {
+    moneyRecord: {
         type: Array
     },
-    notifications_condition:{
+    notificationsCondition:{
         type: Boolean,
         default:true
     },
     notifications:{
         type: Array
     },
-    favorate_items:{
+    favorateItems:{
         type: Array
     },
-    favorate_stors:{
+    favorateStors:{
         type: Array
     },
     userType: {

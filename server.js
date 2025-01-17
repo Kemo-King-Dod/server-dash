@@ -29,7 +29,6 @@ app.use(signup);
 const login = require("./routes/login.js");
 app.use(login);
 
-
 // const ShopLogin = require("./routess/shopLogin.js");
 // const showshpsrequists = require("./routess/showshpsrequists.js");
 // const acceptshop = require("./routess/acceptshop.js");
@@ -52,3 +51,6 @@ app.use(login);
 // app.use(addtocart);
 // app.use(requist);
 // app.use(locations);
+
+// Error handling middleware (should be last)
+app.use(errorHandler);

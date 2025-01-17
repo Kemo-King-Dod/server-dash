@@ -19,18 +19,19 @@ const stores = new Schema({
         type: String,
         require: [true, 'النوع مطلوب']
     },
-    delivery_cost_by_kilo: {
+    deliveryCostByKilo: {
         type: String,
         require: [true, 'السعر مطلوب'],
+        default: 10,
         length: 2
     },
-    license_number: {
+    idNumber: {
+        type: String,
+        require: [true, 'رقم الهوية مطلوب']
+    },
+    licenseNumber: {
         type: String,
         require: [true, 'رقم الرخصة مطلوب']
-    },
-    license_picture: {
-        type: String,
-        require: [true, 'صورة الرخصة مطلوبة']
     },
     location: {
         type: Object,
@@ -40,11 +41,14 @@ const stores = new Schema({
         type: String,
         require: [true, 'العنوان مطلوب']
     },
-    store_picture: {
+    onerName:{
+        type: String
+    },
+    Picture: {
         type: String,
         require: [true, 'صورة المتجر مطلوبة']
     },
-    register_condition: {
+    registerCondition: {
         type: String,
         default: "waiting"
     },
@@ -55,34 +59,34 @@ const stores = new Schema({
         type: Boolean,
         default: false
     },
-    connection_id: {
+    connectionId: {
         type: String,
         default: false
     },
     orders: {
         type: Array
     },
-    Retrenchments_numbers: {
+    RetrenchmentsNumbers: {
         type: Array
     },
-    total_commission: {
+    totalCommission: {
         type: Number
     },
-    money_record: {
+    moneyRecord: {
         type: Array
     },
     discription: {
         type: String
     },
-    notifications_condition: {
+    notificationsCondition: {
         type: Boolean,
         default: true
     },
-    open_condition: {
+    openCondition: {
         type: Boolean,
         default: false
     },
-    register_history: {
+    registerHistory: {
         type: Date
     },
     opentimeam: {

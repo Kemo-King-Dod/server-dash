@@ -1,48 +1,68 @@
 const express = require("express")
 const route = express.Router()
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 const Store = require("../database/store")
+const User = require("../database/users")
+const Driver = require("../database/driver")
 
-const sign = function (id) {
-  return jwt.sign({ id }, "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman");
-};
+const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman"
+
+const sign = function (id, type) {
+    return jwt.sign({ id, type }, JWT_SECRET)
+}
 
 route.post("/login", async (req, res) => {
-  let exist = await Store.findOne({ phone: req.body.phone });
-  if (!exist) exist = await User.findOne({ phone: req.body.phone });
-  if (!exist) exist = await Driver.findOne({ phone: req.body.phone });
-  if (!exist) {
-    res.send({
-      error: true,
-      data: " رقم الهاتف غير موجود",
-    })
-  } else {
-    const valid = await bcrypt.compare(req.body.password, exist.password);
-    if (!valid) {
-      res.send({
-        error: true,
-        data: "كلمة المرور غير صحيحة",
-      })
-    } else {
-      let user;
-      if (exist.userType == "Store")
-        user = {
-          condition: exist.condition,
-          userType: exist.userType,
-        }
-      else if (exist.userType == "Driver")
-        user = {
-          userType: exist.userType,
-        }
-      else
-        user = {
-          userType: exist.userType,
-        }
-      const data = sign(exist._id);
-      res.status(200).send({ error: false, token: data, user });
-    }
-  }
-});
+    try {
+        const { phone, password } = req.body
 
+        // Find user across all collections
+        let exist = await Store.findOne({ phone })
+        if (!exist) exist = await User.findOne({ phone })
+        if (!exist) exist = await Driver.findOne({ phone })
+
+        if (!exist) {
+            return res.status(400).json({
+                error: true,
+                message: "رقم الهاتف غير موجود"
+            })
+        }
+
+        // Verify password
+        const valid = await bcrypt.compare(password, exist.password)
+        if (!valid) {
+            return res.status(400).json({
+                error: true,
+                message: "كلمة المرور غير صحيحة"
+            })
+        }
+
+        // Generate response based on user type
+        const userType = exist.userType
+        const token = sign(exist._id, userType)
+
+        const response = {
+            error: false,
+            token,
+            user: {
+                id: exist._id,
+                name: exist.name,
+                phone: exist.phone,
+                userType,
+                registerCondition: exist.registerCondition,
+                picture: userType == "Store"? exist.Picture : null
+            }
+        }
+
+        res.status(200).json(response)
+
+    } catch (error) {
+        console.error('Login error:', error)
+        res.status(500).json({
+            error: true,
+            message: "حدث خطأ أثناء تسجيل الدخول"
+        })
+    }
+})
 
 module.exports = route

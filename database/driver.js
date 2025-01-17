@@ -15,15 +15,15 @@ const drivers = new Schema({
         length: 10,
         require: [true, 'رقم الهاتف مطلوب']
     },
-    license_number:{
+    licenseNumber:{
         type: String,
         require: [true, 'رقم الرخصة مطلوب']
     },
-    license_picture:{
+    licensePicture:{
         type: String,
         require: [true, 'صورة الرخصة مطلوبة']
     },
-    register_condition: {
+    registerCondition: {
         type: String,
         require: [true, 'الموقع مطلوب'],
         default: "waiting"
@@ -33,16 +33,16 @@ const drivers = new Schema({
         require: [true, 'الإتصال مطلوب'],
         default: false
     },
-    connection_id: {
+    connectionId: {
         type: String
     },
-    total_commission: {
+    totalCommission: {
         type: Number
     },
-    money_record: {
+    moneyRecord: {
         type: Array
     },
-    notifications_condition:{
+    notificationsCondition:{
         type: Boolean,
         default:true
     },
@@ -52,20 +52,20 @@ const drivers = new Schema({
     orders:{
         type: Array
     },
-    viacle_type:{
+    viacleType:{
         type: String
     },
-    join_date:{
+    joinDate:{
         type: Date
     },
-    activity_condition:{
+    activityCondition:{
         type:Boolean,
         default: true
     },
-    is_there_order:{
+    isThereOrder:{
         type: Boolean
     },
-    current_order: {
+    currentOrder: {
         type: Object
     },
     funds:{
