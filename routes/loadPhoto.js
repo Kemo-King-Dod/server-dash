@@ -26,7 +26,7 @@ const upload = multer({
   }
 })
 
-app.post('/upload', auth, upload.single('photo'), (req, res) => {
+app.post('/upload', upload.single('photo'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({
       error: true,
