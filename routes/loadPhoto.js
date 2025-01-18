@@ -12,13 +12,13 @@ const storage = multer.diskStorage({
   }
 })
 
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   fileFilter: function (req, file, cb) {
     const filetypes = /jpeg|jpg|png/
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
     const mimetype = filetypes.test(file.mimetype)
-    
+
     if (extname && mimetype) {
       return cb(null, true)
     }
@@ -31,8 +31,12 @@ app.post('/upload', upload.single('photo'), (req, res) => {
   //   console.log('Unauthorized')
   //   return res.status(401).send('Unauthorized')
   // }
+  console.log(req.file)
   if (!req.file) {
-    return res.status(400).send('No file uploaded.')
+    return res.status(400).json({
+      error: true,
+      path: 'No file uploaded.'
+    })
   }
   res.json({
     error: false,
