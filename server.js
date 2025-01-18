@@ -19,10 +19,13 @@ const io = createserver(expressserver);
 io.on("connection", connect);
 
 // Error handling middleware (should be last)
-// const errorHandler = require('./middleware/ErrorHandler');
-// app.use(errorHandler.AppError);
-// app.use(errorHandler.catchAsync);
-// app.use(errorHandler.errorHandler);
+const errorHandler = require('./middleware/ErrorHandler');
+app.use(errorHandler.AppError);
+app.use(errorHandler.catchAsync);
+app.use(errorHandler.errorHandler);
+
+const notificationRoutes = require('./routes/notification');
+app.use('/api/notifications', notificationRoutes);
 
 const loadphoto = require("./routes/loadPhoto.js");
 app.use(loadphoto);
@@ -33,6 +36,11 @@ app.use(signup);
 const login = require("./routes/login.js");
 app.use(login);
 
+const cart = require("./routes/cart.js");
+app.use(cart);
+
+const favorite = require("./routes/favorite.js");
+app.use(favorite);
 
 
 const admin = require("./routes/admin.js");

@@ -3,65 +3,61 @@ const router = express.Router();
 const User = require('../database/users');
 const Driver = require('../database/driver');
 const Store = require('../database/store');
-const auth = require('../middleware/auth')
-
+const {auth} = require('../middleware/auth')
 
 router.post('/adminGetStores', auth, async (req, res) => {
-    const stores = await Store.find()
-    res.status(200).json({
-        error: false,
-        data: stores
-    })
-})
-
-router.post('/adminGetDrivers', auth, async (req, res) => {
-    const drivers = await Driver.find()
-    res.status(200).json({
-        error: false,
-        data: drivers
-    })
-})
-
-router.post('/adminGetUsers', auth, async (req, res) => {
-    const users = await User.find()
-    res.status(200).json({
-        error: false,
-        data: users
-    })
-})
-
-
-router.post('/adminacceptstore', auth, async (req, res) => {
-    if (!req.body.userId) {
-        return res.status(400).json({
-            error: true,
-            message: 'User ID is required'
-        })
-    }
-
     try {
-        await Store.updateOne(
-            { _id: req.body.userId },
-            { registerCondition: 'active' }
-        )
-
-        res.json({
+        const stores = await Store.find()
+        res.status(200).json({
             error: false,
-            message: 'Registration approved successfully'
+            data: stores
         })
     } catch (error) {
         res.status(500).json({
             error: true,
-            message: 'Error updating registration status'
+            message: 'حدث خطأ في تحميل البيانات'
         })
     }
 })
 
-router.post('/admindenystore', auth, async (req, res) => {
+router.post('/adminGetDrivers', auth, async (req, res) => {
     try {
+        const drivers = await Driver.find()
+        res.status(200).json({
+            error: false,
+            data: drivers
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: 'حدث خطأ في تحميل البيانات'
+        })
+    }
+})
+
+router.post('/adminGetUsers', auth, async (req, res) => {
+    try {
+        const users = await User.find()
+        res.status(200).json({
+            error: false,
+            data: users
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: 'حدث خطأ في تحميل البيانات'
+        })
+    }
+})
+
+
+router.post('/adminacceptordenystore', auth, async (req, res) => {
+    try {
+        const { targetUserId } = req.body;
+
         await Store.updateOne(
-            { _id: req.body.userId },
-            { registerCondition: 'denied' }
+            { _id: targetUserId },
+            { registerCondition: req.body.condition }
         )
 
         res.json({
@@ -71,7 +67,49 @@ router.post('/admindenystore', auth, async (req, res) => {
     } catch (error) {
         res.status(500).json({
             error: true,
-            message: 'Error updating registration status'
+            message: 'حدث خطأ في تحميل حالة التسجيل'
+        })
+    }
+})
+
+router.post('/adminacceptordenyuser', auth, async (req, res) => {
+    try {
+        const { targetUserId } = req.body;
+
+        await User.updateOne(
+            { _id: targetUserId },
+            { registerCondition: req.body.condition }
+        )
+
+        res.json({
+            error: false,
+            message: 'تم إلغاء التسجيل'
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: 'حدث خطأ في تحميل حالة التسجيل'
+        })
+    }
+})
+
+router.post('/adminacceptordenydriver', auth, async (req, res) => {
+    try {
+        const { targetUserId } = req.body;
+
+        await Driver.updateOne(
+            { _id: targetUserId },
+            { registerCondition: req.body.condition }
+        )
+
+        res.json({
+            error: false,
+            message: 'تم إلغاء التسجيل'
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: 'حدث خطأ في تحميل حالة التسجيل'
         })
     }
 })

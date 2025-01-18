@@ -44,9 +44,6 @@ const users = new Schema({
         type: Boolean,
         default:true
     },
-    notifications:{
-        type: Array
-    },
     favorateItems:{
         type: Array
     },

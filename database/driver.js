@@ -42,13 +42,6 @@ const drivers = new Schema({
     moneyRecord: {
         type: Array
     },
-    notificationsCondition:{
-        type: Boolean,
-        default:true
-    },
-    notifications:{
-        type: Array
-    },
     orders:{
         type: Array
     },

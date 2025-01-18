@@ -108,10 +108,6 @@ const stores = new Schema({
         type: Date,
         default: null
     },
-    notifications: {
-        type: Array,
-        default: null
-    },
     // رصيد
     funds: {
         type: Number,

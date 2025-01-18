@@ -40,7 +40,7 @@ router.post('/user', async (req, res) => {
             password: hashedPassword,
             phone,
             locations: locations || [],
-            registerCondition: "waiting",
+            registerCondition: "active",
             orders: [],
             cart: [],
             connection: false,
@@ -69,7 +69,6 @@ router.post('/user', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('User signup error:', error);
         return res.status(500).json({
             error: true,
             data: 'حدث خطأ أثناء التسجيل'
@@ -140,7 +139,6 @@ router.post('/driver', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Driver signup error:', error);
         return res.status(500).json({
             error: true,
             data: 'حدث خطأ أثناء التسجيل'
@@ -219,7 +217,6 @@ router.post('/store', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Store signup error:', error);
         return res.status(500).json({
             error: true,
             data: 'حدث خطأ أثناء التسجيل'

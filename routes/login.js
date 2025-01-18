@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken")
 const Store = require("../database/store")
 const User = require("../database/users")
 const Driver = require("../database/driver")
+const Admin = require("../database/admin")
 
 const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman"
 
@@ -17,14 +18,15 @@ route.post("/login", async (req, res) => {
         const { phone, password } = req.body
 
         // Find user across all collections
-        let exist = await Store.findOne({ phone })
+        let exist = await Admin.findOne({ phone })
+        if (!exist) exist = await Store.findOne({ phone })
         if (!exist) exist = await User.findOne({ phone })
         if (!exist) exist = await Driver.findOne({ phone })
 
         if (!exist) {
             return res.status(400).json({
                 error: true,
-                message: "رقم الهاتف غير موجود"
+                data: "رقم الهاتف غير موجود"
             })
         }
 
@@ -33,7 +35,7 @@ route.post("/login", async (req, res) => {
         if (!valid) {
             return res.status(400).json({
                 error: true,
-                message: "كلمة المرور غير صحيحة"
+                data: "كلمة المرور غير صحيحة"
             })
         }
 
@@ -43,14 +45,16 @@ route.post("/login", async (req, res) => {
 
         const response = {
             error: false,
-            token,
-            user: {
-                id: exist._id,
-                name: exist.name,
-                phone: exist.phone,
-                userType,
-                registerCondition: exist.registerCondition,
-                picture: userType == "Store"? exist.Picture : null
+            data: {
+                token,
+                user: {
+                    id: exist._id,
+                    name: exist.name,
+                    phone: exist.phone,
+                    userType,
+                    registerCondition: exist.registerCondition,
+                    picture: userType == "Store" ? exist.Picture : null
+                }
             }
         }
 
@@ -60,7 +64,7 @@ route.post("/login", async (req, res) => {
         console.error('Login error:', error)
         res.status(500).json({
             error: true,
-            message: "حدث خطأ أثناء تسجيل الدخول"
+            data: "حدث خطأ أثناء تسجيل الدخول"
         })
     }
 })
