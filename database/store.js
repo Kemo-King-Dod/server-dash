@@ -41,10 +41,16 @@ const stores = new Schema({
         type: String,
         require: [true, 'العنوان مطلوب']
     },
-    onerName:{
+    ownerName:{
         type: String
     },
-    Picture: {
+    ownerPhone:{
+        type: String
+    },
+    city:{
+        type: String
+    },
+    picture: {
         type: String,
         require: [true, 'صورة المتجر مطلوبة']
     },

@@ -19,16 +19,16 @@ router.post('/user', async (req, res) => {
     if (!name || !password || !phone) {
         res.status(400).json({
             error: false,
-            massage: 'جميع الحقول مطلوبة'
+            data: 'جميع الحقول مطلوبة'
         })
         res.end()
     }
-    
+
     const existingUser = await User.findOne({ phone });
     if (existingUser) {
         res.status(400).json({
             error: false,
-            massage: 'رقم الهاتف مسجل مسبقاً'
+            data: 'رقم الهاتف مسجل مسبقاً'
         })
         res.end()
     }
@@ -59,23 +59,24 @@ router.post('/user', async (req, res) => {
 
     res.status(201).json({
         error: false,
-        message: 'تم التسجيل بنجاح',
-        token,
-        user: {
-            id: newUser._id,
-            name: newUser.name,
-            phone: newUser.phone,
-            userType: "Customer",
-            registerCondition: newUser.registerCondition
+        data: {
+            token,
+            user: {
+                id: newUser._id,
+                name: newUser.name,
+                phone: newUser.phone,
+                userType: "Customer",
+                registerCondition: newUser.registerCondition
+            }
         }
     });
 });
 
 // Driver Signup
 router.post('/driver', async (req, res) => {
-    const { 
-        name, 
-        password, 
+    const {
+        name,
+        password,
         phone,
         licenseNumber,
         licensePicture,
@@ -86,7 +87,7 @@ router.post('/driver', async (req, res) => {
     if (!name || !password || !phone || !licenseNumber || !licensePicture || !viacleType) {
         res.status(400).json({
             error: false,
-            massage: 'جميع الحقول مطلوبة'
+            data: 'جميع الحقول مطلوبة'
         })
         res.end()
     }
@@ -95,7 +96,7 @@ router.post('/driver', async (req, res) => {
     if (existingDriver) {
         res.status(400).json({
             error: false,
-            massage: 'رقم الهاتف مسجل مسبقاً'
+            data: 'رقم الهاتف مسجل مسبقاً'
         })
         res.end()
     }
@@ -132,38 +133,41 @@ router.post('/driver', async (req, res) => {
 
     res.status(201).json({
         error: false,
-        message: 'تم التسجيل بنجاح',
-        token,
-        user: {
-            id: newDriver._id,
-            name: newDriver.name,
-            phone: newDriver.phone,
-            userType: "Driver",
-            registerCondition: newDriver.registerCondition
+        data: {
+            token,
+            user: {
+                id: newDriver._id,
+                name: newDriver.name,
+                phone: newDriver.phone,
+                userType: "Driver",
+                registerCondition: newDriver.registerCondition
+            }
         }
     });
 });
 
 // Store Signup
 router.post('/store', async (req, res) => {
-    const { 
-        name, 
-        password, 
+    const {
+        name,
+        password,
         phone,
         storeType,
         idNumber,
         licenseNumber,
-        onerName,
+        ownerName,
+        ownerPhone,
+        city,
         location,
         address,
-        Picture,
+        picture,
         fcmToken
     } = req.body;
 
-    if (!name || !password || !phone || !storeType || !idNumber || !onerName || !licenseNumber || !location || !address || !Picture) {
+    if (!name || !password || !phone || !storeType || !idNumber || !ownerName || !ownerPhone || !city || !licenseNumber || !location || !address || !picture) {
         res.status(400).json({
             error: false,
-            massage: 'جميع الحقول مطلوبة'
+            data: 'جميع الحقول مطلوبة'
         })
         res.end()
     }
@@ -172,7 +176,7 @@ router.post('/store', async (req, res) => {
     if (existingStore) {
         res.status(400).json({
             error: false,
-            massage: 'رقم الهاتف مسجل مسبقاً'
+            data: 'رقم الهاتف مسجل مسبقاً'
         })
         res.end()
     }
@@ -188,10 +192,12 @@ router.post('/store', async (req, res) => {
         deliveryCostByKilo,
         idNumber,
         licenseNumber,
-        onerName,
+        ownerName,
+        ownerPhone,
+        city,
         location,
         address,
-        Picture,
+        picture,
         description: '',
         registerCondition: "waiting",
         items: [],
@@ -216,15 +222,16 @@ router.post('/store', async (req, res) => {
 
     res.status(201).json({
         error: false,
-        message: 'تم التسجيل بنجاح',
-        token,
-        user: {
-            id: newStore._id,
-            name: newStore.name,
-            phone: newStore.phone,
-            userType: "Store",
-            registerCondition: newStore.registerCondition,
-            Picture: newStore.Picture
+        data: {
+            token,
+            user: {
+                id: newStore._id,
+                name: newStore.name,
+                phone: newStore.phone,
+                userType: "Store",
+                registerCondition: newStore.registerCondition,
+                picture: newStore.picture
+            }
         }
     });
 });
