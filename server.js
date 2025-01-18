@@ -19,10 +19,10 @@ const io = createserver(expressserver);
 io.on("connection", connect);
 
 // Error handling middleware (should be last)
-const errorHandler = require('./middleware/ErrorHandler');
-app.use(errorHandler.AppError);
-app.use(errorHandler.catchAsync);
-app.use(errorHandler.errorHandler);
+// const errorHandler = require('./middleware/ErrorHandler');
+// app.use(errorHandler.AppError);
+// app.use(errorHandler.catchAsync);
+// app.use(errorHandler.errorHandler);
 
 const loadphoto = require("./routes/loadPhoto.js");
 app.use(loadphoto);
