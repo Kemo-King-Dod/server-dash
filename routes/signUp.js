@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../database/users');
 const Driver = require('../database/driver');
 const Store = require('../database/store');
-const { catchAsync, AppError } = require('../middleware/ErrorHandler');
 
 const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
 
@@ -14,16 +13,24 @@ const sign = function (id, type) {
 };
 
 // User Signup
-router.post('/user', catchAsync(async (req, res) => {
+router.post('/user', async (req, res) => {
     const { name, password, phone, locations, fcmToken } = req.body;
 
     if (!name || !password || !phone) {
-        throw new AppError(400, 'جميع الحقول مطلوبة');
+        res.status(400).json({
+            error: false,
+            massage: 'جميع الحقول مطلوبة'
+        })
+        res.end()
     }
     
     const existingUser = await User.findOne({ phone });
     if (existingUser) {
-        throw new AppError(400, 'رقم الهاتف مسجل مسبقاً');
+        res.status(400).json({
+            error: false,
+            massage: 'رقم الهاتف مسجل مسبقاً'
+        })
+        res.end()
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -62,10 +69,10 @@ router.post('/user', catchAsync(async (req, res) => {
             registerCondition: newUser.registerCondition
         }
     });
-}));
+});
 
 // Driver Signup
-router.post('/driver', catchAsync(async (req, res) => {
+router.post('/driver', async (req, res) => {
     const { 
         name, 
         password, 
@@ -77,12 +84,20 @@ router.post('/driver', catchAsync(async (req, res) => {
     } = req.body;
 
     if (!name || !password || !phone || !licenseNumber || !licensePicture || !viacleType) {
-        throw new AppError(400, 'جميع الحقول مطلوبة');
+        res.status(400).json({
+            error: false,
+            massage: 'جميع الحقول مطلوبة'
+        })
+        res.end()
     }
 
     const existingDriver = await Driver.findOne({ phone });
     if (existingDriver) {
-        throw new AppError(400, 'رقم الهاتف مسجل مسبقاً');
+        res.status(400).json({
+            error: false,
+            massage: 'رقم الهاتف مسجل مسبقاً'
+        })
+        res.end()
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -127,10 +142,10 @@ router.post('/driver', catchAsync(async (req, res) => {
             registerCondition: newDriver.registerCondition
         }
     });
-}));
+});
 
 // Store Signup
-router.post('/store', catchAsync(async (req, res) => {
+router.post('/store', async (req, res) => {
     const { 
         name, 
         password, 
@@ -146,12 +161,20 @@ router.post('/store', catchAsync(async (req, res) => {
     } = req.body;
 
     if (!name || !password || !phone || !storeType || !idNumber || !onerName || !licenseNumber || !location || !address || !Picture) {
-        throw new AppError(400, 'جميع الحقول مطلوبة');
+        res.status(400).json({
+            error: false,
+            massage: 'جميع الحقول مطلوبة'
+        })
+        res.end()
     }
 
     const existingStore = await Store.findOne({ phone });
     if (existingStore) {
-        throw new AppError(400, 'رقم الهاتف مسجل مسبقاً');
+        res.status(400).json({
+            error: false,
+            massage: 'رقم الهاتف مسجل مسبقاً'
+        })
+        res.end()
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -204,6 +227,6 @@ router.post('/store', catchAsync(async (req, res) => {
             Picture: newStore.Picture
         }
     });
-}));
+});
 
 module.exports = router;
