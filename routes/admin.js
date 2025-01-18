@@ -31,4 +31,49 @@ router.post('/adminGetUsers', auth, async (req, res) => {
 })
 
 
+router.post('/adminacceptstore', auth, async (req, res) => {
+    if (!req.body.userId) {
+        return res.status(400).json({
+            error: true,
+            message: 'User ID is required'
+        })
+    }
+
+    try {
+        await Store.updateOne(
+            { _id: req.body.userId },
+            { registerCondition: 'active' }
+        )
+
+        res.json({
+            error: false,
+            message: 'Registration approved successfully'
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: 'Error updating registration status'
+        })
+    }
+})
+
+router.post('/admindenystore', auth, async (req, res) => {
+    try {
+        await Store.updateOne(
+            { _id: req.body.userId },
+            { registerCondition: 'denied' }
+        )
+
+        res.json({
+            error: false,
+            message: 'تم إلغاء التسجيل'
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: 'Error updating registration status'
+        })
+    }
+})
+
 module.exports = router

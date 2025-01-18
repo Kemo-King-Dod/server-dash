@@ -26,12 +26,7 @@ const upload = multer({
   }
 })
 
-app.post('/upload', upload.single('photo'), (req, res) => {
-  // if(req.body.password !== 'kemokan') {
-  //   console.log('Unauthorized')
-  //   return res.status(401).send('Unauthorized')
-  // }
-  console.log(req.file)
+app.post('/upload', auth, upload.single('photo'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({
       error: true,
