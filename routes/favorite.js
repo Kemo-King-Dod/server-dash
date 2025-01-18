@@ -1,56 +1,99 @@
 const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
-const User = require('../models/User');
+const User = require('../database/users');
 
-// Get all favorites for a user
+// Get all favorites
 router.get('/', auth, async (req, res) => {
-  try {
-    const userId = req.userId;
-    const favorites = await Favorite.find({ userId });
-    res.json(favorites);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching favorites', error: error.message });
-  }
-});
+    try {
+        const userId = req.userId;
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                data: 'المستخدم غير موجود'
+            });
+        }
 
-// Add a new favorite
-router.post('/', auth, async (req, res) => {
-  try {
-    const { itemId } = req.body;
-    const userId = req.userId;
-
-    const newFavorite = new Favorite({
-      userId,
-      itemId,
-    });
-
-    await newFavorite.save();
-    res.status(201).json(newFavorite);
-  } catch (error) {
-    res.status(500).json({ message: 'Error adding favorite', error: error.message });
-  }
-});
-
-// Remove a favorite
-router.delete('/:id', auth, async (req, res) => {
-  try {
-    const favoriteId = req.params.id;
-    const userId = req.userId;
-
-    const result = await Favorite.findOneAndDelete({
-      _id: favoriteId,
-      userId: userId
-    });
-
-    if (!result) {
-      return res.status(404).json({ message: 'Favorite not found' });
+        res.status(200).json({
+            error: false,
+            data: user.favorateItems
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            data: 'حدث خطأ في جلب المفضلة'
+        });
     }
+});
 
-    res.json({ message: 'Favorite removed successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error removing favorite', error: error.message });
-  }
+// Add to favorites
+router.post('/', auth, async (req, res) => {
+    try {
+        const { itemId } = req.body;
+        const userId = req.userId;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                data: 'المستخدم غير موجود'
+            });
+        }
+
+        if (!user.favorateItems.includes(itemId)) {
+            user.favorateItems.push(itemId);
+            await user.save();
+        }
+
+        res.status(200).json({
+            error: false,
+            data: user.favorateItems
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            data: 'حدث خطأ في إضافة المنتج للمفضلة'
+        });
+    }
+});
+
+// Remove from favorites
+router.delete('/:id', auth, async (req, res) => {
+    try {
+        const itemId = req.params.id;
+        const userId = req.userId;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                data: 'المستخدم غير موجود'
+            });
+        }
+
+        const favoriteIndex = user.favorateItems.indexOf(itemId);
+        if (favoriteIndex === -1) {
+            return res.status(404).json({
+                error: true,
+                data: 'المنتج غير موجود في المفضلة'
+            });
+        }
+
+        user.favorateItems.splice(favoriteIndex, 1);
+        await user.save();
+
+        res.status(200).json({
+            error: false,
+            data: 'تم حذف المنتج من المفضلة بنجاح'
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            data: 'حدث خطأ في حذف المنتج من المفضلة'
+        });
+    }
 });
 
 module.exports = router;

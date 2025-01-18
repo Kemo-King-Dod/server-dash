@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const users = new Schema({
+const admin = new Schema({
     name: {
         type: String,
         require: [true, 'الإسم مطلوب']
@@ -23,4 +23,4 @@ const users = new Schema({
     }
 })
 
-module.exports = mongoose.model('User', users)
+module.exports = mongoose.model('Admin', admin)

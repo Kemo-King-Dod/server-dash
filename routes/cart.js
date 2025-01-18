@@ -1,60 +1,106 @@
 const express = require('express');
 const router = express.Router();
-const {auth} = require('../middleware/auth')
+const { auth } = require('../middleware/auth');
+const User = require('../database/users');
 
 // Get all cart items
-router.post('/getfromcart',auth , async (req, res) => {
+router.post('/getfromcart', auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const cartItems = await Cart.find({ userId });
+        const user = await User.findById(userId);
         
-        res.status(200).json(cartItems);
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                data: 'المستخدم غير موجود'
+            });
+        }
+        
+        res.status(200).json({
+            error: false,
+            data: user.cart
+        });
     } catch (error) {
-        res.status(500).json({ message: 'حدث خطأ أثناء جلب عناصر السلة', error: error.message });
+        res.status(500).json({
+            error: true,
+            data: 'حدث خطأ أثناء جلب عناصر السلة'
+        });
     }
 });
 
 // Add item to cart
-router.post('/addtocart',auth , async (req, res) => {
+router.post('/addtocart', auth, async (req, res) => {
     try {
         const { productId, quantity } = req.body;
         const userId = req.userId;
 
-        let cartItem = await Cart.findOne({ userId, productId });
-
-        if (cartItem) {
-            cartItem.quantity += quantity;
-            await cartItem.save();
-        } else {
-            cartItem = new Cart({
-                userId,
-                productId,
-                quantity
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                data: 'المستخدم غير موجود'
             });
-            await cartItem.save();
         }
 
-        res.status(200).json({ message: 'تمت إضافة المنتج إلى السلة بنجاح', cartItem });
+        const existingCartItem = user.cart.find(item => item.productId.toString() === productId);
+
+        if (existingCartItem) {
+            existingCartItem.quantity += quantity;
+        } else {
+            user.cart.push({ productId, quantity });
+        }
+        
+        await user.save();
+        res.status(200).json({
+            error: false,
+            data: {
+                message: 'تمت إضافة المنتج إلى السلة بنجاح',
+                cart: user.cart
+            }
+        });
     } catch (error) {
-        res.status(500).json({ message: 'حدث خطأ أثناء إضافة المنتج إلى السلة', error: error.message });
+        res.status(500).json({
+            error: true,
+            data: 'حدث خطأ أثناء إضافة المنتج إلى السلة'
+        });
     }
 });
 
 // Remove item from cart
-router.delete('/removefromcart',auth , async (req, res) => {
+router.delete('/removefromcart/:productId', auth, async (req, res) => {
     try {
         const { productId } = req.params;
         const userId = req.userId;
 
-        const result = await Cart.findOneAndDelete({ userId, productId });
-
-        if (!result) {
-            return res.status(404).json({ message: 'المنتج غير موجود في السلة' });
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                data: 'المستخدم غير موجود'
+            });
         }
 
-        res.status(200).json({ message: 'تم حذف المنتج من السلة بنجاح' });
+        const cartItemIndex = user.cart.findIndex(item => item.productId.toString() === productId);
+
+        if (cartItemIndex === -1) {
+            return res.status(404).json({
+                error: true,
+                data: 'المنتج غير موجود في السلة'
+            });
+        }
+
+        user.cart.splice(cartItemIndex, 1);
+        await user.save();
+
+        res.status(200).json({
+            error: false,
+            data: 'تم حذف المنتج من السلة بنجاح'
+        });
     } catch (error) {
-        res.status(500).json({ message: 'حدث خطأ أثناء حذف المنتج من السلة', error: error.message });
+        res.status(500).json({
+            error: true,
+            data: 'حدث خطأ أثناء حذف المنتج من السلة'
+        });
     }
 });
 

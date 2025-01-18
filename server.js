@@ -24,8 +24,8 @@ app.use(errorHandler.AppError);
 app.use(errorHandler.catchAsync);
 app.use(errorHandler.errorHandler);
 
-const notificationRoutes = require('./routes/notification');
-app.use('/api/notifications', notificationRoutes);
+// const notificationRoutes = require('./routes/notification');
+// app.use('/api/notifications', notificationRoutes);
 
 const loadphoto = require("./routes/loadPhoto.js");
 app.use(loadphoto);
