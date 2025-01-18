@@ -44,9 +44,6 @@ const stores = new Schema({
     ownerName:{
         type: String
     },
-    ownerPhone:{
-        type: String
-    },
     city:{
         type: String
     },

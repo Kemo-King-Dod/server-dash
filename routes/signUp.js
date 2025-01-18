@@ -156,7 +156,6 @@ router.post('/store', async (req, res) => {
         idNumber,
         licenseNumber,
         ownerName,
-        ownerPhone,
         city,
         location,
         address,
@@ -164,7 +163,7 @@ router.post('/store', async (req, res) => {
         fcmToken
     } = req.body;
 
-    if (!name || !password || !phone || !storeType || !idNumber || !ownerName || !ownerPhone || !city || !licenseNumber || !location || !address || !picture) {
+    if (!name || !password || !phone || !storeType || !idNumber || !ownerName || !city || !licenseNumber || !location || !address || !picture) {
         res.status(400).json({
             error: false,
             data: 'جميع الحقول مطلوبة'
@@ -193,7 +192,6 @@ router.post('/store', async (req, res) => {
         idNumber,
         licenseNumber,
         ownerName,
-        ownerPhone,
         city,
         location,
         address,
