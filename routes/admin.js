@@ -6,6 +6,7 @@ const Store = require('../database/store');
 const { auth } = require('../middleware/auth')
 
 router.get('/adminGetStores', auth, async (req, res) => {
+    console.log(1)
     try {
         const stores = await Store.find({}, { password: false })
         console.log(stores[i].picture)
