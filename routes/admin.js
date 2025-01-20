@@ -54,13 +54,12 @@ router.get('/adminGetUsers', auth, async (req, res) => {
 })
 
 
-router.post('/adminacceptordenystore', auth, async (req, res) => {
+router.post('/adminStoreState', auth, async (req, res) => {
     try {
-        const { targetUserId } = req.body;
-
+        const { targetUserId, state } = req.body;
         await Store.updateOne(
             { _id: targetUserId },
-            { registerCondition: req.body.condition }
+            { registerCondition: state }
         )
 
         res.json({
@@ -68,20 +67,21 @@ router.post('/adminacceptordenystore', auth, async (req, res) => {
             message: 'تم إلغاء التسجيل'
         })
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({
             error: true,
-            message: 'حدث خطأ في تحميل حالة التسجيل'
+            message: error.message
         })
     }
 })
 
-router.post('/adminacceptordenyuser', auth, async (req, res) => {
+router.post('/adminDriverState', auth, async (req, res) => {
     try {
-        const { targetUserId } = req.body;
+        const { targetUserId, state } = req.body;
 
         await User.updateOne(
             { _id: targetUserId },
-            { registerCondition: req.body.condition }
+            { registerCondition: state }
         )
 
         res.json({
@@ -89,20 +89,21 @@ router.post('/adminacceptordenyuser', auth, async (req, res) => {
             message: 'تم إلغاء التسجيل'
         })
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({
             error: true,
-            message: 'حدث خطأ في تحميل حالة التسجيل'
+            message: error.message
         })
     }
 })
 
-router.post('/adminacceptordenydriver', auth, async (req, res) => {
+router.post('/adminUserState', auth, async (req, res) => {
     try {
-        const { targetUserId } = req.body;
+        const { targetUserId, state } = req.body;
 
         await Driver.updateOne(
             { _id: targetUserId },
-            { registerCondition: req.body.condition }
+            { registerCondition: state }
         )
 
         res.json({
@@ -110,9 +111,10 @@ router.post('/adminacceptordenydriver', auth, async (req, res) => {
             message: 'تم إلغاء التسجيل'
         })
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({
             error: true,
-            message: 'حدث خطأ في تحميل حالة التسجيل'
+            message: error.message
         })
     }
 })
