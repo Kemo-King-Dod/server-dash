@@ -9,6 +9,7 @@ router.get('/adminGetStores', auth, async (req, res) => {
     try {
         const stores = await Store.find({}, { password: false })
         console.log(stores[i].picture)
+        console.log(stores[i])
         // for (var i = 0; i < stores.length; i++) {
         //     Reflect.deleteProperty(stores[i], 'password')
         // }
