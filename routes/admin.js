@@ -6,23 +6,17 @@ const Store = require('../database/store');
 const { auth } = require('../middleware/auth')
 
 router.get('/adminGetStores', auth, async (req, res) => {
-    console.log(1)
     try {
         const stores = await Store.find({}, { password: false })
-        console.log(stores[0].picture)
-        console.log(stores[0])
-        // for (var i = 0; i < stores.length; i++) {
-        //     Reflect.deleteProperty(stores[i], 'password')
-        // }
-        console.log(stores)
         res.status(200).json({
             error: false,
             data: stores
         })
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({
             error: true,
-            message: 'حدث خطأ في تحميل البيانات'
+            message: error.message
         })
     }
 })
@@ -30,17 +24,15 @@ router.get('/adminGetStores', auth, async (req, res) => {
 router.get('/adminGetDrivers', auth, async (req, res) => {
     try {
         const drivers = await Driver.find({}, { password: false })
-        // for (var i = 0; i < drivers.length; i++) {
-        //     Reflect.deleteProperty(drivers[i], 'password')
-        // }
         res.status(200).json({
             error: false,
             data: drivers
         })
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({
             error: true,
-            message: 'حدث خطأ في تحميل البيانات'
+            message: error.message
         })
     }
 })
@@ -48,17 +40,15 @@ router.get('/adminGetDrivers', auth, async (req, res) => {
 router.get('/adminGetUsers', auth, async (req, res) => {
     try {
         const users = await User.find({}, { password: false })
-        // for (var i = 0; i < users.length; i++) {
-        //     Reflect.deleteProperty(users[i], 'password')
-        // }
         res.status(200).json({
             error: false,
             data: users
         })
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({
             error: true,
-            message: 'حدث خطأ في تحميل البيانات'
+            message: error.message
         })
     }
 })
