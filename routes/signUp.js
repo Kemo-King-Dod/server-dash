@@ -149,9 +149,12 @@ router.post('/driver', async (req, res) => {
 // Store Signup
 router.post('/store', async (req, res) => {
     try {
+        console.log(req.body)
         const { name, password, phone, storeType, idNumber, licenseNumber, ownerName, city, location, address, picture, fcmToken } = req.body;
 
         if (!name || !password || !phone || !storeType || !idNumber || !ownerName || !city || !licenseNumber || !location || !address || !picture) {
+        console.log(1)
+        console.log(1)
             return res.status(400).json({
                 error: false,
                 data: 'جميع الحقول مطلوبة'
@@ -160,6 +163,7 @@ router.post('/store', async (req, res) => {
 
         const existingStore = await Store.findOne({ phone });
         if (existingStore) {
+        console.log(2)
             return res.status(400).json({
                 error: false,
                 data: 'رقم الهاتف مسجل مسبقاً'
@@ -202,8 +206,9 @@ router.post('/store', async (req, res) => {
         await newStore.save();
         const token = sign(newStore._id, "Store");
 
+        console.log(5)
         return res.status(201).json({
-            error: false,
+        error: false,
             data: {
                 token,
                 user: {
@@ -217,6 +222,7 @@ router.post('/store', async (req, res) => {
             }
         });
     } catch (error) {
+        console.log(4)
         return res.status(500).json({
             error: true,
             data: 'حدث خطأ أثناء التسجيل'
