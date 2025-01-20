@@ -34,8 +34,25 @@ const stores = new Schema({
         require: [true, 'رقم الرخصة مطلوب']
     },
     location: {
-        type: Object,
-        require: [true, 'الموقع مطلوب']
+        type: {
+            latitude: {
+                type: Number,
+                required: true
+            },
+            longitude: {
+                type: Number,
+                required: true
+            },
+            accuracy: {
+                type: Number,
+                required: true
+            },
+            altitude: {
+                type: Number,
+                required: true
+            }
+        },
+        required: [true, 'الموقع مطلوب']
     },
     address: {
         type: String,
