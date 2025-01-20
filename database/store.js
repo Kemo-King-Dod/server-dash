@@ -42,14 +42,6 @@ const stores = new Schema({
             longitude: {
                 type: Number,
                 required: true
-            },
-            accuracy: {
-                type: Number,
-                required: true
-            },
-            altitude: {
-                type: Number,
-                required: true
             }
         },
         required: [true, 'الموقع مطلوب']
