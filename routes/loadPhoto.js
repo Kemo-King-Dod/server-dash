@@ -39,8 +39,4 @@ app.post('/upload', upload.single('photo'), (req, res) => {
   })
 })
 
-app.get('/uploads/:id', (req,res)=>{
-  res.sendFile(path.join(__dirname.split('routes')[0],'uploads',req.params.id))
-})
-
 module.exports = app
