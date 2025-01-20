@@ -20,7 +20,7 @@ const stores = new Schema({
         require: [true, 'النوع مطلوب']
     },
     deliveryCostByKilo: {
-        type: Double,
+        type: Number,
         require: [true, 'السعر مطلوب'],
         default: 5.0,
         length: 2
