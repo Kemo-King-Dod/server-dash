@@ -60,9 +60,9 @@ router.post('/addToFavorive', auth, async (req, res) => {
 });
 
 // Remove from favorites
-router.delete('/deletefromfavorive', auth, async (req, res) => {
+router.delete('/deleteFromFavorive', auth, async (req, res) => {
     try {
-        const itemId = req.params.id;
+        const itemId = req.body.id;
         const userId = req.userId;
 
         const user = await User.findById(userId);
