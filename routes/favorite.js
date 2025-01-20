@@ -4,7 +4,7 @@ const { auth } = require('../middleware/auth');
 const User = require('../database/users');
 
 // Get all favorites
-router.get('/', auth, async (req, res) => {
+router.get('/getfavorive', auth, async (req, res) => {
     try {
         const userId = req.userId;
         const user = await User.findById(userId);
@@ -29,7 +29,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Add to favorites
-router.post('/', auth, async (req, res) => {
+router.post('/addfavorive', auth, async (req, res) => {
     try {
         const { itemId } = req.body;
         const userId = req.userId;

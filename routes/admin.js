@@ -8,6 +8,7 @@ const {auth} = require('../middleware/auth')
 router.post('/adminGetStores', auth, async (req, res) => {
     try {
         const stores = await Store.find()
+        console.log(stores)
         res.status(200).json({
             error: false,
             data: stores
