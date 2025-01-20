@@ -3,14 +3,14 @@ const router = express.Router();
 const User = require('../database/users');
 const Driver = require('../database/driver');
 const Store = require('../database/store');
-const {auth} = require('../middleware/auth')
+const { auth } = require('../middleware/auth')
 
 router.get('/adminGetStores', auth, async (req, res) => {
     try {
-        const stores = await Store.find()
-        for(var i = 0; i < stores.length; i++){
-            Reflect.deleteProperty(stores[i], 'password')
-        }
+        const stores = await Store.find({}, { password: false })
+        // for (var i = 0; i < stores.length; i++) {
+        //     Reflect.deleteProperty(stores[i], 'password')
+        // }
         console.log(stores)
         res.status(200).json({
             error: false,
@@ -26,10 +26,10 @@ router.get('/adminGetStores', auth, async (req, res) => {
 
 router.get('/adminGetDrivers', auth, async (req, res) => {
     try {
-        const drivers = await Driver.find()
-        for(var i = 0; i < drivers.length; i++){
-            Reflect.deleteProperty(drivers[i], 'password')
-        }
+        const drivers = await Driver.find({}, { password: false })
+        // for (var i = 0; i < drivers.length; i++) {
+        //     Reflect.deleteProperty(drivers[i], 'password')
+        // }
         res.status(200).json({
             error: false,
             data: drivers
@@ -44,10 +44,10 @@ router.get('/adminGetDrivers', auth, async (req, res) => {
 
 router.get('/adminGetUsers', auth, async (req, res) => {
     try {
-        const users = await User.find()
-        for(var i = 0; i < users.length; i++){
-            Reflect.deleteProperty(users[i], 'password')
-        }
+        const users = await User.find({}, { password: false })
+        // for (var i = 0; i < users.length; i++) {
+        //     Reflect.deleteProperty(users[i], 'password')
+        // }
         res.status(200).json({
             error: false,
             data: users
