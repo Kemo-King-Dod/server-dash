@@ -28,6 +28,7 @@ const upload = multer({
 
 app.post('/upload', upload.single('photo'), (req, res) => {
   if (!req.file) {
+    console.log('No file uploaded.')
     return res.status(400).json({
       error: true,
       path: 'No file uploaded.'
