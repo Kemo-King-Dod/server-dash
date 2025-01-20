@@ -5,7 +5,7 @@ const Driver = require('../database/driver');
 const Store = require('../database/store');
 const {auth} = require('../middleware/auth')
 
-router.post('/adminGetStores', auth, async (req, res) => {
+router.get('/adminGetStores', auth, async (req, res) => {
     try {
         const stores = await Store.find()
         console.log(stores)
@@ -21,7 +21,7 @@ router.post('/adminGetStores', auth, async (req, res) => {
     }
 })
 
-router.post('/adminGetDrivers', auth, async (req, res) => {
+router.get('/adminGetDrivers', auth, async (req, res) => {
     try {
         const drivers = await Driver.find()
         res.status(200).json({
@@ -36,7 +36,7 @@ router.post('/adminGetDrivers', auth, async (req, res) => {
     }
 })
 
-router.post('/adminGetUsers', auth, async (req, res) => {
+router.get('/adminGetUsers', auth, async (req, res) => {
     try {
         const users = await User.find()
         res.status(200).json({

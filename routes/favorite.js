@@ -29,7 +29,7 @@ router.get('/getfavorive', auth, async (req, res) => {
 });
 
 // Add to favorites
-router.post('/addfavorive', auth, async (req, res) => {
+router.post('/addToFavorive', auth, async (req, res) => {
     try {
         const { itemId } = req.body;
         const userId = req.userId;
@@ -60,7 +60,7 @@ router.post('/addfavorive', auth, async (req, res) => {
 });
 
 // Remove from favorites
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/deletefromfavorive', auth, async (req, res) => {
     try {
         const itemId = req.params.id;
         const userId = req.userId;
