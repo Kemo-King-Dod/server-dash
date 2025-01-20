@@ -222,7 +222,7 @@ router.post('/store', async (req, res) => {
             }
         });
     } catch (error) {
-        console.log(4)
+        console.log(error.message)
         return res.status(500).json({
             error: true,
             data: 'حدث خطأ أثناء التسجيل'
