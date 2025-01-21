@@ -20,6 +20,7 @@ async function read() {
 
 route.post("/additems", auth, async (req, res) => {
     console.log(req.body)
+    console.log('--------------------------------------------')
     try {
         const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
         const { name, price, desc, options } = req.body;
@@ -27,17 +28,18 @@ route.post("/additems", auth, async (req, res) => {
         if (!token) {
             return res.status(401).json({
                 error: true,
-                data: "Token not provided"
+                message: "Token not provided"
             });
         }
 
         const the_store = await Store.findOne({ _id: await jwt.verify(token, "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman").id });
 
         if (!the_store || the_store.registerCondition !== "accepted") {
+            console.log()
             return res.status(403).json({
                 error: true,
                 operation: "addProduct",
-                data: "غير مصرح"
+                message: "غير مصرح"
             });
         }
 
@@ -69,13 +71,14 @@ route.post("/additems", auth, async (req, res) => {
         res.status(200).json({
             error: false,
             operation: "addProduct",
-            data: newItem
+            message: newItem
         });
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({
             error: true,
             operation: "addProduct",
-            data: "حدث خطأ في السيرفر"
+            message: "حدث خطأ في السيرفر"
         });
     }
 });
@@ -93,14 +96,14 @@ route.post("/updateitem", auth, async (req, res) => {
         res.status(200).json({
             error: false,
             operation: "editProduct",
-            data: "تم التعديل بنجاح",
+            message: "تم التعديل بنجاح",
         });
     } catch (error) {
         console.log(error.message)
         res.status(200).json({
             error: false,
             operation: "editProduct",
-            data: error.message,
+            message: error.message,
         });
     }
 });
@@ -110,14 +113,14 @@ route.patch("/deleteitem", auth, async (req, res) => {
         res.status(200).json({
             error: false,
             operation: "deleteProduct",
-            data: "تم الحذف بنجاح",
+            message: "تم الحذف بنجاح",
         });
     } catch (error) {
         console.log(error.message)
         res.status(200).json({
             error: false,
             operation: "deleteProduct",
-            data: error.message,
+            message: error.message,
         });
     }
 });
