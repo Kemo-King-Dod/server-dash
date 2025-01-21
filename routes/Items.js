@@ -20,8 +20,17 @@ async function read() {
 
 
 route.post("/additems", auth, async (req, res) => {
+    console.log(req.body)
     try {
-        const { token, name, price, desc, options } = req.body;
+        const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
+        const { name, price, desc, options } = req.body;
+
+        if (!token) {
+            return res.status(401).json({
+                error: true,
+                data: "Token not provided"
+            });
+        }
 
         const the_store = await Store.findOne({ _id: await jwt.verify(token, "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman").id });
 
