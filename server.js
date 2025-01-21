@@ -46,7 +46,8 @@ app.use(favorite);
 const admin = require("./routes/admin.js");
 app.use(admin);
 
-console.log("hello")
+const items = require("./routes/Items.js");
+app.use(items);
 
 
 // const ShopLogin = require("./routess/shopLogin.js");
