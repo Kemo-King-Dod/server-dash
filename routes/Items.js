@@ -35,7 +35,7 @@ route.post("/additems", auth, async (req, res) => {
         const the_store = await Store.findOne({ _id: await jwt.verify(token, "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman").id });
 
         if (!the_store || the_store.registerCondition !== "accepted") {
-            console.log()
+            console.log('غير مصرح')
             return res.status(403).json({
                 error: true,
                 operation: "addProduct",

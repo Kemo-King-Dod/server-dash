@@ -27,6 +27,8 @@ const upload = multer({
 })
 
 app.post('/upload', upload.single('photo'), (req, res) => {
+  console.log('reatch ')
+  console.log(req.file)
   if(!req.body.password || req.body.password !== 'Chackmate@9876') {
     return res.status(401).json({
       error: true,
