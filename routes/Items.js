@@ -61,7 +61,7 @@ route.post("/additems", auth, async (req, res) => {
             { _id: the_store.id },
             { $push: { items: newItem._id } }
         );
-
+        console.log(newItem);
         the_items++;
         await fs.writeFile(
             path.join(__dirname, "..", "data", "data.txt"),
