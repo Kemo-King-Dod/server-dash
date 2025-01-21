@@ -3,9 +3,8 @@ const route = express.Router();
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const fs = require("fs").promises;
-
 const items = require("../database/items");
-const Store = require("../database/store"); // Instead of Shop
+const Store = require("../database/store");
 const { auth } = require("../middleware/auth");
 
 let the_items
