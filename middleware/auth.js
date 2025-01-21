@@ -9,7 +9,7 @@ const auth = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({
                 error: true,
-                data: 'يرجى تسجيل الدخول'
+                message: 'يرجى تسجيل الدخول'
             });
         }
 
@@ -19,7 +19,7 @@ const auth = async (req, res, next) => {
     } catch (error) {
         res.status(401).json({
             error: true,
-            data: 'يرجى الدخول'
+            message: 'يرجى الدخول'
         });
     }
 };

@@ -37,6 +37,7 @@ route.post("/additems", auth, async (req, res) => {
         if (!the_store || the_store.registerCondition !== "accepted") {
             return res.status(403).json({
                 error: true,
+                operation: "addProduct",
                 data: "غير مصرح"
             });
         }
@@ -68,11 +69,13 @@ route.post("/additems", auth, async (req, res) => {
 
         res.status(200).json({
             error: false,
+            operation: "addProduct",
             data: newItem
         });
     } catch (error) {
         res.status(500).json({
             error: true,
+            operation: "addProduct",
             data: "حدث خطأ في السيرفر"
         });
     }
@@ -90,12 +93,14 @@ route.post("/updateitem", auth, async (req, res) => {
         });
         res.status(200).json({
             error: false,
+            operation: "editProduct",
             data: "تم التعديل بنجاح",
         });
     } catch (error) {
         console.log(error.message)
         res.status(200).json({
             error: false,
+            operation: "editProduct",
             data: error.message,
         });
     }
@@ -105,12 +110,14 @@ route.patch("/deleteitem", auth, async (req, res) => {
         await items.findByIdAndDelete(req.body.id);
         res.status(200).json({
             error: false,
+            operation: "deleteProduct",
             data: "تم الحذف بنجاح",
         });
     } catch (error) {
         console.log(error.message)
         res.status(200).json({
             error: false,
+            operation: "deleteProduct",
             data: error.message,
         });
     }
