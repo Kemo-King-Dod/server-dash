@@ -27,10 +27,16 @@ const upload = multer({
 })
 
 app.post('/upload', upload.single('photo'), (req, res) => {
+  if(!req.body.password || req.body.password !== 'Chackmate@9876') {
+    return res.status(401).json({
+      error: true,
+      message: 'يجب إدخال كلمة المرور'
+    })
+  }
   if (!req.file) {
     return res.status(400).json({
       error: true,
-      path: 'No file uploaded.'
+      path: 'لم يتم تحميل ملفات'
     })
   }
   res.json({
