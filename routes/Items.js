@@ -10,8 +10,7 @@ const { auth } = require("../middleware/auth");
 
 
 let Random = [];
-let data1 = [];
-let data2 = [{},{},{},{}];
+let data = [];
 let the_items
 
 read();
@@ -153,34 +152,28 @@ route.get("/getAllItems", async (req, res) => {
         for (let i = 0; i < 4; i++) {
             Random[i] = Math.trunc(Math.random() * multiplay);
             checknum(i, the_items, multiplay);
-            data1[i] = await items.findOne({ num: Random[i] });
-            while (data1[i] == null) {
+            data[i] = await items.findOne({ num: Random[i] });
+            while (data[i] == null) {
                 Random[i] = Math.trunc(Math.random() * multiplay);
-                data1[i] = await items.findOne({ num: Random[i] });
+                data[i] = await items.findOne({ num: Random[i] });
             }
         }
         for (var i = 0; i < 4; i++) {
-            Object.assign(data2[i], {
-                ...data1[i],
-                isFavorite: false
-            });
-            console.log(data2[i].isFavorite);
-            console.log(data2[i]);
+            data[i]._doc.isFavorite = false
         }
-
         if (id) {
             const user = await User.findOne({ _id: id })
             for (var i = 0; i < 4; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
-                    if (user.favorateItems[j] == data2[i]._id) {
-                        data2[i].isFavorite = true
+                    if (user.favorateItems[j] == data[i]._id) {
+                        data[i]._doc.isFavorite = true
                         continue
                     }
                 }
             }
         }
-        console.log(data2)
-        res.json({ error: false, items: data2 });
+        console.log(data)
+        res.json({ error: false, items: data });
     } catch (error) {
         console.log(error.message)
         res.status(401).json({
