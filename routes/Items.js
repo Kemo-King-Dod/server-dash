@@ -160,6 +160,25 @@ route.get("/getAllItems", async (req, res) => {
         }
         for (var i = 0; i < 4; i++) {
             data[i].isFavorite = false
+            console.log(data[0].isFavorite);
+
+            data[i]["isFavorite"] = false
+            console.log(data[0].isFavorite);
+
+            Object.defineProperty(data[i], 'isFavorite', {
+                get: function () {
+                    return this._isFavorite;
+                },
+                set: function (value) {
+                    this._isFavorite = value;
+                }
+            });
+            console.log(data[0].isFavorite);
+
+            Object.assign(data[i], {
+                isFavorite: false
+            });
+            console.log(data[0].isFavorite);
         }
         if (id) {
             const user = await User.findOne({ _id: id })
