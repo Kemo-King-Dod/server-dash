@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs").promises;
 const items = require("../database/items");
 const Store = require("../database/store");
+const User = require("../database/users");
 const { auth } = require("../middleware/auth");
 
 
@@ -24,7 +25,7 @@ async function read() {
 route.post("/additems", auth, async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
-        const { name, price, desc, options, addOns } = req.body;
+        const { name, price, desc, options, addOns, imageUrl } = req.body;
 
         if (!token) {
             return res.status(401).json({
@@ -50,7 +51,7 @@ route.post("/additems", auth, async (req, res) => {
             description: desc,
             options,
             addOns,
-            picture: req.file ? req.file.filename : null,
+            picture: imageUrl,
             storeid: the_store.id,
             store_register_condition: the_store.registerCondition,
             quantity: req.body.quantity || 0,
@@ -131,6 +132,18 @@ route.patch("/deleteitem", auth, async (req, res) => {
 route.get("/getAllItems", async (req, res) => {
     console.log(1)
     try {
+        var id = null
+        var isfav = new Array()
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        if (!token) {
+            isfav = [false, false, false, false]
+        }
+        else {
+            const decoded = jwt.verify(token, JWT_SECRET)
+            id = decoded.id
+        }
+
+
         let multiplay;
 
         read();
@@ -146,6 +159,23 @@ route.get("/getAllItems", async (req, res) => {
             while (data[i] == null) {
                 Random[i] = Math.trunc(Math.random() * multiplay);
                 data[i] = await items.findOne({ num: Random[i] });
+            }
+        }
+        if (id) {
+            await User.findOne({ _id: id })
+            for (var i = 0; i < 4; i++) {
+                for (var j = 0; j < User.favorateItems.length; j++) {
+                    if (User.favorateItems[j] == data[i]._id) {
+                        data[i].isFavorite = true
+                        continue
+                    }
+                    data[i].isFavorite = false
+                }
+            }
+        }
+        else {
+            for (var i = 0; i < 4; i++) {
+                data[i].isFavorite = false
             }
         }
         console.log(data)
