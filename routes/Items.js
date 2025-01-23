@@ -127,7 +127,7 @@ route.patch("/deleteitem", auth, async (req, res) => {
     }
 });
 
-route.get("/getallitems", async (req, res) => {
+route.get("/getAllItems", async (req, res) => {
     let multiplay;
 
     read();
@@ -136,7 +136,7 @@ route.get("/getallitems", async (req, res) => {
     else if (the_items < 100) multiplay = 100;
     else if (the_items < 1000) multiplay = 1000;
     else multiplay = 10000;
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < req.body.limmit; i++) {
         Random[i] = Math.trunc(Math.random() * multiplay);
         checknum(i, the_items, multiplay);
         data[i] = await items.findOne({ num: Random[i] });
