@@ -132,8 +132,6 @@ route.patch("/deleteitem", auth, async (req, res) => {
 
 route.get("/getAllItems", async (req, res) => {
     try {
-        Random = []
-        data = []
         var id = null
         const token = req.header('Authorization')?.replace('Bearer ', '');
         if (token) {
@@ -148,13 +146,13 @@ route.get("/getAllItems", async (req, res) => {
         const allItems = await items.find({});
         
         // If we have less than 4 items total, return all of them
-        if (allItems.length <= 4) {
-            data = allItems;
-        } else {
-            // Randomly select 4 unique items
-            const shuffled = allItems.sort(() => 0.5 - Math.random());
-            data = shuffled.slice(0, 4);
-        }
+        // if (allItems.length <= 4) {
+        //     data = allItems;
+        // } else {
+        //     // Randomly select 4 unique items
+        //     const shuffled = allItems.sort(() => 0.5 - Math.random());
+        // }
+        data = shuffled.slice(0, 4);
 
         // Add isFavorite property to each item
         for (var i = 0; i < data.length; i++) {
@@ -180,23 +178,5 @@ route.get("/getAllItems", async (req, res) => {
     }
 });
 
-const checknum = function (i, min, multiplay) {
-    try {
-        while (Random[i] >= min) {
-            Random[i] = Math.trunc(Math.random() * multiplay);
-        }
-        for (let j = 0; j < i; j++) {
-            while (Random[i] === Random[j] || Random[i] >= min) {
-                Random[i] = Math.trunc(Math.random() * multiplay);
-            }
-        }
-    } catch (error) {
-        console.log(error.message)
-        res.status(401).json({
-            error: true,
-            message: error.message
-        });
-    }
-}
 
 module.exports = route;
