@@ -46,10 +46,10 @@ route.post("/additems", auth, async (req, res) => {
         }
 
         const item = {
-            name,
-            price,
+            name: name,
+            price: price,
             description: desc,
-            options,
+            options: options,
             picture: req.file ? req.file.filename : null,
             storeid: the_store.id,
             store_register_condition: the_store.registerCondition,
