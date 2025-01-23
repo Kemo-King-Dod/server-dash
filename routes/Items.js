@@ -25,8 +25,8 @@ async function read() {
 route.post("/additems", auth, async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
-        const { name, price, desc, options, addOns, imageUrl } = req.body;
-
+        const { name, price, description, stock, category, options, addOns, imageUrl } = req.body;
+        console.log(imageUrl)
         if (!token) {
             return res.status(401).json({
                 error: true,
@@ -48,13 +48,14 @@ route.post("/additems", auth, async (req, res) => {
         const item = {
             name,
             price,
-            description: desc,
+            description: description,
             options,
             addOns,
-            picture: imageUrl,
+            stock,
+            category,
+            imageUrl: imageUrl,
             storeid: the_store.id,
             store_register_condition: the_store.registerCondition,
-            quantity: req.body.quantity || 0,
             is_retrenchment: req.body.is_retrenchment || false,
             retrenchment_percent: req.body.retrenchment_percent || 0,
             num: the_items

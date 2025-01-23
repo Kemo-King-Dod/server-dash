@@ -5,10 +5,13 @@ const items = new Schema({
     name: {
         type: String
     },
-    type: {
+    category: {
         type: String
     },
-    storeid: {
+    imageUrl:{
+        type: String
+    },
+    storeId: {
         type: Schema.Types.ObjectId
     },
     store_register_condition: {
@@ -26,7 +29,7 @@ const items = new Schema({
     addOns: {
         type: Array
     },
-    quantity: {
+    stock: {
         type: Number
     },
     is_retrenchment: {
