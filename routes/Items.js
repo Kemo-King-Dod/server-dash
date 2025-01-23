@@ -24,7 +24,7 @@ async function read() {
 route.post("/additems", auth, async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
-        const { name, price, desc, options } = req.body;
+        const { name, price, desc, options ,addOns} = req.body;
 
         if (!token) {
             return res.status(401).json({
