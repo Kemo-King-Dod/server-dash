@@ -132,6 +132,8 @@ route.patch("/deleteitem", auth, async (req, res) => {
 
 route.get("/getAllItems", async (req, res) => {
     try {
+        Random = []
+        data = []
         var id = null
         const token = req.header('Authorization')?.replace('Bearer ', '');
         if (token) {
