@@ -140,6 +140,7 @@ route.get("/getAllItems", async (req, res) => {
             isfav = [false, false, false, false]
         }
         else {
+            const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
             const decoded = jwt.verify(token, JWT_SECRET)
             id = decoded.id
         }
