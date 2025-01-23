@@ -131,7 +131,6 @@ route.patch("/deleteitem", auth, async (req, res) => {
 });
 
 route.get("/getAllItems", async (req, res) => {
-    console.log(1)
     try {
         var id = null
         const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -165,9 +164,11 @@ route.get("/getAllItems", async (req, res) => {
                 for (var j = 0; j < user.favorateItems.length; j++) {
                     if (user.favorateItems[j] == data[i]._id) {
                         data[i].isFavorite = true
+                        console.log(1)
                         continue
                     }
                     data[i].isFavorite = false
+                    console.log(2)
                 }
             }
         }
