@@ -142,42 +142,37 @@ route.get("/getAllItems", async (req, res) => {
             id = decoded.id
         }
 
+        await read();
 
-        let multiplay;
-
-        read();
-
-        if (the_items < 10) multiplay = 10;
-        else if (the_items < 100) multiplay = 100;
-        else if (the_items < 1000) multiplay = 1000;
-        else multiplay = 10000;
-        for (let i = 0; i < 4; i++) {
-            Random[i] = Math.trunc(Math.random() * multiplay);
-            checknum(i, the_items, multiplay);
-            data[i] = await items.findOne({ num: Random[i] });
-            while (data[i] == null) {
-                Random[i] = Math.trunc(Math.random() * multiplay);
-                data[i] = await items.findOne({ num: Random[i] });
-            }
+        // Get all available items
+        const allItems = await items.find({});
+        
+        // If we have less than 4 items total, return all of them
+        if (allItems.length <= 4) {
+            data = allItems;
+        } else {
+            // Randomly select 4 unique items
+            const shuffled = allItems.sort(() => 0.5 - Math.random());
+            data = shuffled.slice(0, 4);
         }
-        for (var i = 0; i < 4; i++) {
-            data[i]._doc.isFavorite = false
+
+        // Add isFavorite property to each item
+        for (var i = 0; i < data.length; i++) {
+            data[i]._doc.isFavorite = false;
         }
+
         if (id) {
-            const user = await User.findOne({ _id: id })
-            for (var i = 0; i < 4; i++) {
-                for (var j = 0; j < user.favorateItems.length; j++) {
-                    if (user.favorateItems[j] == data[i]._id) {
-                        data[i]._doc.isFavorite = true
-                        continue
-                    }
+            const user = await User.findOne({ _id: id });
+            for (var i = 0; i < data.length; i++) {
+                if (user.favorateItems.includes(data[i]._id)) {
+                    data[i]._doc.isFavorite = true;
                 }
             }
         }
-        console.log(data)
+
         res.json({ error: false, items: data });
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
         res.status(401).json({
             error: true,
             message: error.message
