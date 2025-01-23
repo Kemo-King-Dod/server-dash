@@ -149,7 +149,7 @@ route.get("/getAllItems", async (req, res) => {
             }
         }
         console.log(data)
-        res.json({ error: false, data: data });
+        res.json({ error: false, items: data });
     } catch (error) {
         console.log(error.message)
         res.status(401).json({
