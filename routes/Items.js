@@ -55,7 +55,8 @@ route.post("/additems", auth, async (req, res) => {
             store_register_condition: the_store.registerCondition,
             quantity: req.body.quantity || 0,
             is_retrenchment: req.body.is_retrenchment || false,
-            retrenchment_percent: req.body.retrenchment_percent || 0
+            retrenchment_percent: req.body.retrenchment_percent || 0,
+            num: the_items
         };
 
         const newItem = await items.create(item);

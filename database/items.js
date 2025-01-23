@@ -2,40 +2,43 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const items = new Schema({
-    name:{
-        type:String
+    name: {
+        type: String
     },
-    type:{
-        type:String
+    type: {
+        type: String
     },
-    storeid:{
+    storeid: {
         type: Schema.Types.ObjectId
     },
     store_register_condition: {
         type: String
     },
-    description:{
-        type:String
+    description: {
+        type: String
     },
-    price:{
-        type:Number
+    price: {
+        type: Number
     },
-    options:{
+    options: {
         type: Array
     },
-    addOns:{
+    addOns: {
         type: Array
     },
     quantity: {
         type: Number
     },
-    is_retrenchment:{
+    is_retrenchment: {
         type: Boolean
     },
-    retrenchment_percent:{
+    retrenchment_percent: {
+        type: Number
+    },
+    num: {
         type: Number
     }
 })
 
 
-module.exports = mongoose.model('Item',items)
+module.exports = mongoose.model('Item', items)
