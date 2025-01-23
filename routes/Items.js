@@ -134,12 +134,8 @@ route.get("/getAllItems", async (req, res) => {
     console.log(1)
     try {
         var id = null
-        var isfav = new Array()
         const token = req.header('Authorization')?.replace('Bearer ', '');
-        if (!token) {
-            isfav = [false, false, false, false]
-        }
-        else {
+        if (token) {
             const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
             const decoded = jwt.verify(token, JWT_SECRET)
             id = decoded.id
@@ -164,10 +160,10 @@ route.get("/getAllItems", async (req, res) => {
             }
         }
         if (id) {
-            await User.findOne({ _id: id })
+            const user = await User.findOne({ _id: id })
             for (var i = 0; i < 4; i++) {
-                for (var j = 0; j < User.favorateItems.length; j++) {
-                    if (User.favorateItems[j] == data[i]._id) {
+                for (var j = 0; j < user.favorateItems.length; j++) {
+                    if (user.favorateItems[j] == data[i]._id) {
                         data[i].isFavorite = true
                         continue
                     }
