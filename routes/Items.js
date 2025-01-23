@@ -145,6 +145,7 @@ route.get("/getallitems", async (req, res) => {
             data[i] = await items.findOne({ num: Random[i] });
         }
     }
+    console.log(data)
     res.json({ error: false, data: data });
 });
 
