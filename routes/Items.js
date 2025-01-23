@@ -11,7 +11,7 @@ const { auth } = require("../middleware/auth");
 
 let Random = [];
 let data1 = [];
-let data2 = [];
+let data2 = [{},{},{},{}];
 let the_items
 
 read();
