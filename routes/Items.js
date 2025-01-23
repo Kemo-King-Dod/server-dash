@@ -158,23 +158,18 @@ route.get("/getAllItems", async (req, res) => {
                 data[i] = await items.findOne({ num: Random[i] });
             }
         }
+        for (var i = 0; i < 4; i++) {
+            data[i].isFavorite = false
+        }
         if (id) {
             const user = await User.findOne({ _id: id })
             for (var i = 0; i < 4; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
                     if (user.favorateItems[j] == data[i]._id) {
                         data[i].isFavorite = true
-                        console.log(1)
                         continue
                     }
-                    data[i].isFavorite = false
-                    console.log(2)
                 }
-            }
-        }
-        else {
-            for (var i = 0; i < 4; i++) {
-                data[i].isFavorite = false
             }
         }
         console.log(data)
