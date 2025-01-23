@@ -152,7 +152,7 @@ route.get("/getAllItems", async (req, res) => {
         //     // Randomly select 4 unique items
         //     const shuffled = allItems.sort(() => 0.5 - Math.random());
         // }
-        data = shuffled.slice(0, 4);
+        data = allItems.slice(0, 4);
 
         // Add isFavorite property to each item
         for (var i = 0; i < data.length; i++) {
