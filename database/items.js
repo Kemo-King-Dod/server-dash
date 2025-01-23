@@ -23,6 +23,9 @@ const items = new Schema({
     options:{
         type: Array
     },
+    addOns:{
+        type: Array
+    },
     quantity: {
         type: Number
     },

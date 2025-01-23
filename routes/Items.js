@@ -6,7 +6,6 @@ const fs = require("fs").promises;
 const items = require("../database/items");
 const Store = require("../database/store");
 const { auth } = require("../middleware/auth");
-const mongoose = require("mongoose");
 
 
 let Random = [];
@@ -46,10 +45,11 @@ route.post("/additems", auth, async (req, res) => {
         }
 
         const item = {
-            name: name,
-            price: price,
+            name,
+            price,
             description: desc,
-            options: options,
+            options,
+            addOns,
             picture: req.file ? req.file.filename : null,
             storeid: the_store.id,
             store_register_condition: the_store.registerCondition,
