@@ -11,7 +11,7 @@ const items = new Schema({
     imageUrl:{
         type: String
     },
-    storeId: {
+    storeID: {
         type: Schema.Types.ObjectId
     },
     store_register_condition: {

@@ -54,7 +54,7 @@ route.post("/additems", auth, async (req, res) => {
             stock,
             category,
             imageUrl: imageUrl,
-            storeid: the_store.id,
+            storeID: the_store.id,
             store_register_condition: the_store.registerCondition,
             is_retrenchment: req.body.is_retrenchment || false,
             retrenchment_percent: req.body.retrenchment_percent || 0,
