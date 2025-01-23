@@ -24,7 +24,7 @@ async function read() {
 route.post("/additems", auth, async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
-        const { name, price, desc, options ,addOns} = req.body;
+        const { name, price, desc, options, addOns } = req.body;
 
         if (!token) {
             return res.status(401).json({
@@ -129,40 +129,53 @@ route.patch("/deleteitem", auth, async (req, res) => {
 });
 
 route.get("/getAllItems", async (req, res) => {
-    let multiplay;
+    console.log(1)
+    try {
+        let multiplay;
 
-    read();
+        read();
 
-    if (the_items < 10) multiplay = 10;
-    else if (the_items < 100) multiplay = 100;
-    else if (the_items < 1000) multiplay = 1000;
-    else multiplay = 10000;
-    for (let i = 0; i < 4; i++) {
-        Random[i] = Math.trunc(Math.random() * multiplay);
-        checknum(i, the_items, multiplay);
-        data[i] = await items.findOne({ num: Random[i] });
-        while (data[i] == null) {
+        if (the_items < 10) multiplay = 10;
+        else if (the_items < 100) multiplay = 100;
+        else if (the_items < 1000) multiplay = 1000;
+        else multiplay = 10000;
+        for (let i = 0; i < 4; i++) {
             Random[i] = Math.trunc(Math.random() * multiplay);
+            checknum(i, the_items, multiplay);
             data[i] = await items.findOne({ num: Random[i] });
+            while (data[i] == null) {
+                Random[i] = Math.trunc(Math.random() * multiplay);
+                data[i] = await items.findOne({ num: Random[i] });
+            }
         }
+        console.log(data)
+        res.json({ error: false, data: data });
+    } catch (error) {
+        console.log(error.message)
+        res.status(401).json({
+            error: true,
+            message: error.message
+        });
     }
-    console.log(data)
-    res.json({ error: false, data: data });
 });
 
 const checknum = function (i, min, multiplay) {
-    while (Random[i] >= min) {
-        Random[i] = Math.trunc(Math.random() * multiplay);
-    }
-    for (let j = 0; j < i; j++) {
-        while (Random[i] === Random[j] || Random[i] >= min) {
+    try {
+        while (Random[i] >= min) {
             Random[i] = Math.trunc(Math.random() * multiplay);
         }
+        for (let j = 0; j < i; j++) {
+            while (Random[i] === Random[j] || Random[i] >= min) {
+                Random[i] = Math.trunc(Math.random() * multiplay);
+            }
+        }
+    } catch (error) {
+        console.log(error.message)
+        res.status(401).json({
+            error: true,
+            message: error.message
+        });
     }
 }
-
-module.exports = route;
-
-
 
 module.exports = route;
