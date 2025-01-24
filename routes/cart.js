@@ -87,6 +87,7 @@ router.get('/getfromcart', auth, async (req, res) => {
                 }
             }
         }
+        console.log(thedata)
         res.status(200).json({
             error: false,
             data: thedata
