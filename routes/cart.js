@@ -30,7 +30,7 @@ router.get('/getfromcart', auth, async (req, res) => {
 
 
             // find shop
-            const store = Store.findById(item.storeID);
+            const store = await Store.findById(item.storeID);
             if (thedata.length == 0) {
                 thedata.push({
                     shopId: item.storeID,
@@ -67,7 +67,7 @@ router.get('/getfromcart', auth, async (req, res) => {
                         break;
                     }
                 }
-                if (found == false) {
+                if (!found) {
                     thedata.push({
                         shopId: item.storeID,
                         shopName: store.name,
@@ -87,7 +87,8 @@ router.get('/getfromcart', auth, async (req, res) => {
                 }
             }
         }
-        console.log(thedata)
+        console.log(thedata[0])
+        console.log(thedata[0].items)
         res.status(200).json({
             error: false,
             data: thedata
