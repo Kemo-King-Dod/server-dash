@@ -43,8 +43,8 @@ router.get('/getfromcart', auth, async (req, res) => {
                         name: item.name,
                         price: item.price,
                         quantity: 1,
-                        options: item.options,
-                        addOnes: item.addOns,
+                        options: user.cart[i].cartItem.options,
+                        addOnes: user.cart[i].cartItem.addOns,
                         shopId: item.storeID
                     }]
                 });
@@ -59,8 +59,8 @@ router.get('/getfromcart', auth, async (req, res) => {
                             name: item.name,
                             price: item.price,
                             quantity: 1,
-                            options: item.options,
-                            addOnes: item.addOns,
+                            options: user.cart[i].cartItem.options,
+                            addOnes: user.cart[i].cartItem.addOns,
                             shopId: item.storeID
                         });
                         found = true;
@@ -79,8 +79,8 @@ router.get('/getfromcart', auth, async (req, res) => {
                             name: item.name,
                             price: item.price,
                             quantity: 1,
-                            options: item.options,
-                            addOnes: item.addOns,
+                            options: user.cart[i].cartItem.options,
+                            addOnes: user.cart[i].cartItem.addOns,
                             shopId: item.storeID
                         }]
                     });
