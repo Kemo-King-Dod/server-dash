@@ -3,7 +3,7 @@ const router = express.Router();
 const { auth } = require('../middleware/auth');
 const User = require('../database/users');
 const Item = require('../database/items');
-const Shop = require('../database/store');
+const Store = require('../database/store');
 
 // Get all cart items
 router.get('/getfromcart', auth, async (req, res) => {
@@ -17,68 +17,79 @@ router.get('/getfromcart', auth, async (req, res) => {
                 data: 'المستخدم غير موجود'
             });
         }
+        var thedata = []
 
-        // Group items by shopId
-        const shopGroups = {};
+        for (var i = 0; i < user.cart.length; i++) {
+            const item = await Item.findById(user.cart[i].cartItem.id);
 
-        // Process each cart item
-        for (const cartEntry of user.cart) {
-            try {
-                const cartItem = cartEntry.cartItem;
+            // adjust price in the cart from items
+            if(user.cart[i].cartItem.price != item.price){
+                user.cart[i].cartItem.price = item.price
+                await user.save()
+            }
 
-                const itemInDB = await Item.findById(cartItem.id);
 
-                if (itemInDB) {
-                    // Update price if different
-                    if (cartItem.price !== itemInDB.price) {
-                        cartItem.price = itemInDB.price;
-                        await user.save();
-                    }
-
-                    // Get shop data if not already fetched
-                    if (!shopGroups[itemInDB.shopId]) {
-                        const shop = await Shop.findById(itemInDB.shopId);
-                        if (shop) {
-                            shopGroups[itemInDB.shopId] = {
-                                shopId: shop._id,
-                                shopName: shop.name,
-                                shopImage: shop.image,
-                                deliveryFee: shop.deliveryFee,
-                                items: []
-                            };
-                        }
-                    }
-
-                    // Add formatted item to shop group
-                    if (shopGroups[itemInDB.shopId]) {
-                        shopGroups[itemInDB.shopId].items.push({
-                            id: itemInDB._id,
-                            image: itemInDB.image,
-                            name: itemInDB.name,
-                            price: itemInDB.price,
-                            quantity: cartItem.quantity || 1,
-                            options: cartItem.options || '',
-                            addOnes: cartItem.addOnes || '',
-                            shopId: itemInDB.shopId
-                        });
-                    }
-                    console.log(shopGroups[itemInDB.shopId])
-                }
-            } catch (error) {
-                console.log(error.message)
-                res.status(200).json({
-                    error: true,
-                    message: error.message
+            // find shop
+            const store = Store.findById(item.storeID);
+            if (thedata.length == 0) {
+                thedata.push({
+                    shopId: item.storeID,
+                    shopName: store.name,
+                    shopImage: store.picture,
+                    deliveryFee: store.deliveryCostByKilo,
+                    items: [{
+                        id: item._id,
+                        image: item.imageUrl,
+                        name: item.name,
+                        price: item.price,
+                        quantity: 1,
+                        options: item.options,
+                        addOnes: item.addOns,
+                        shopId: item.storeID
+                    }]
                 });
             }
+            else {
+                var found = false;
+                for (var j = 0; j < thedata.length; j++) {
+                    if (thedata[j].shopId == item.storeID) {
+                        thedata[j].items.push({
+                            id: item._id,
+                            image: item.imageUrl,
+                            name: item.name,
+                            price: item.price,
+                            quantity: 1,
+                            options: item.options,
+                            addOnes: item.addOns,
+                            shopId: item.storeID
+                        });
+                        found = true;
+                        break;
+                    }
+                }
+                if (found == false) {
+                    thedata.push({
+                        shopId: item.storeID,
+                        shopName: store.name,
+                        shopImage: store.picture,
+                        deliveryFee: store.deliveryCostByKilo,
+                        items: [{
+                            id: item._id,
+                            image: item.imageUrl,
+                            name: item.name,
+                            price: item.price,
+                            quantity: 1,
+                            options: item.options,
+                            addOnes: item.addOns,
+                            shopId: item.storeID
+                        }]
+                    });
+                }
+            }
         }
-
-        const formattedCart = await Object.values(shopGroups);
-        console.log(formattedCart)
-
         res.status(200).json({
             error: false,
-            data: formattedCart
+            data: thedata
         });
 
     } catch (error) {
