@@ -2,25 +2,82 @@ const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
 const User = require('../database/users');
+const Item = require('../database/items');
+const Shop = require('../database/store');
 
 // Get all cart items
-router.post('/getfromcart', auth, async (req, res) => {
+router.get('/getfromcart', auth, async (req, res) => {
     try {
         const userId = req.userId;
         const user = await User.findById(userId);
-        
+
         if (!user) {
             return res.status(404).json({
                 error: true,
                 data: 'المستخدم غير موجود'
             });
         }
-        
+
+        // Group items by shopId
+        const shopGroups = {};
+
+        // Process each cart item
+        for (const cartEntry of user.cart) {
+            try {
+                const cartItem = cartEntry.cartItem;
+                const itemInDB = await Item.findById(cartItem.id);
+                
+                if (itemInDB) {
+                    // Update price if different
+                    if (cartItem.price !== itemInDB.price) {
+                        cartItem.price = itemInDB.price;
+                        await user.save();
+                    }
+
+                    // Get shop data if not already fetched
+                    if (!shopGroups[itemInDB.shopId]) {
+                        const shop = await Shop.findById(itemInDB.shopId);
+                        if (shop) {
+                            shopGroups[itemInDB.shopId] = {
+                                shopId: shop._id,
+                                shopName: shop.name,
+                                shopImage: shop.image,
+                                deliveryFee: shop.deliveryFee,
+                                items: []
+                            };
+                        }
+                    }
+
+                    // Add formatted item to shop group
+                    if (shopGroups[itemInDB.shopId]) {
+                        shopGroups[itemInDB.shopId].items.push({
+                            id: itemInDB._id,
+                            image: itemInDB.image,
+                            name: itemInDB.name,
+                            price: itemInDB.price,
+                            quantity: cartItem.quantity || 1,
+                            options: cartItem.options || '',
+                            addOnes: cartItem.addOnes || '',
+                            shopId: itemInDB.shopId
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log('Error processing cart item:', error.message);
+                continue;
+            }
+        }
+
+        const formattedCart = Object.values(shopGroups);
+        console.log(formattedCart)
+
         res.status(200).json({
             error: false,
-            data: user.cart
+            data: formattedCart
         });
+
     } catch (error) {
+        console.log('Error in getfromcart:', error.message);
         res.status(500).json({
             error: true,
             data: 'حدث خطأ أثناء جلب عناصر السلة'
@@ -38,20 +95,20 @@ router.post('/addtocart', auth, async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 error: true,
-                operation:"null",
+                operation: "null",
                 data: 'المستخدم غير موجود'
             });
         }
 
         user.cart.push({ cartItem });
         await user.save();
-        
+
         // const existingCartItem = user.cart.find(item => item.productId.toString() === productId);
         // if (existingCartItem) {
         //     existingCartItem.quantity += quantity;
         // } else {
         // }
-        
+
         res.status(200).json({
             error: false,
             data: {
