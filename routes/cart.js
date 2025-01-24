@@ -25,15 +25,9 @@ router.get('/getfromcart', auth, async (req, res) => {
         for (const cartEntry of user.cart) {
             try {
                 const cartItem = cartEntry.cartItem;
-                
-                // Skip invalid item IDs
-                if (!cartItem || !cartItem.id || cartItem.id.trim() === '') {
-                    console.log('Skipping invalid cart item:', cartItem);
-                    continue;
-                }
 
                 const itemInDB = await Item.findById(cartItem.id);
-                
+
                 if (itemInDB) {
                     // Update price if different
                     if (cartItem.price !== itemInDB.price) {
@@ -68,26 +62,18 @@ router.get('/getfromcart', auth, async (req, res) => {
                             shopId: itemInDB.shopId
                         });
                     }
-                } else {
-                    // Remove invalid item from cart
-                    user.cart = user.cart.filter(item => 
-                        item.cartItem && item.cartItem.id !== cartItem.id
-                    );
-                    await user.save();
-                    console.log('Removed invalid item from cart:', cartItem.id);
+                    console.log(shopGroups[itemInDB.shopId])
                 }
             } catch (error) {
-                console.log('Error processing cart item:', error.message);
-                // Remove problematic cart item
-                user.cart = user.cart.filter(item => 
-                    item.cartItem && item.cartItem.id !== cartEntry.cartItem.id
-                );
-                await user.save();
-                continue;
+                console.log(error.message)
+                res.status(200).json({
+                    error: true,
+                    message: error.message
+                });
             }
         }
 
-        const formattedCart = Object.values(shopGroups);
+        const formattedCart = await Object.values(shopGroups);
         console.log(formattedCart)
 
         res.status(200).json({
@@ -96,10 +82,10 @@ router.get('/getfromcart', auth, async (req, res) => {
         });
 
     } catch (error) {
-        console.log('Error in getfromcart:', error.message);
+        console.log(error.message);
         res.status(500).json({
             error: true,
-            data: 'حدث خطأ أثناء جلب عناصر السلة'
+            message: error.message
         });
     }
 });
