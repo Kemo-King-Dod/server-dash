@@ -25,6 +25,13 @@ router.get('/getfromcart', auth, async (req, res) => {
         for (const cartEntry of user.cart) {
             try {
                 const cartItem = cartEntry.cartItem;
+                
+                // Skip invalid item IDs
+                if (!cartItem || !cartItem.id || cartItem.id.trim() === '') {
+                    console.log('Skipping invalid cart item:', cartItem);
+                    continue;
+                }
+
                 const itemInDB = await Item.findById(cartItem.id);
                 
                 if (itemInDB) {
@@ -61,9 +68,21 @@ router.get('/getfromcart', auth, async (req, res) => {
                             shopId: itemInDB.shopId
                         });
                     }
+                } else {
+                    // Remove invalid item from cart
+                    user.cart = user.cart.filter(item => 
+                        item.cartItem && item.cartItem.id !== cartItem.id
+                    );
+                    await user.save();
+                    console.log('Removed invalid item from cart:', cartItem.id);
                 }
             } catch (error) {
                 console.log('Error processing cart item:', error.message);
+                // Remove problematic cart item
+                user.cart = user.cart.filter(item => 
+                    item.cartItem && item.cartItem.id !== cartEntry.cartItem.id
+                );
+                await user.save();
                 continue;
             }
         }
