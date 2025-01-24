@@ -31,37 +31,41 @@ router.post('/getfromcart', auth, async (req, res) => {
 // Add item to cart
 router.post('/addtocart', auth, async (req, res) => {
     try {
-        const { productId, quantity } = req.body;
+        const { cartItem } = req.body;
         const userId = req.userId;
 
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({
                 error: true,
+                operation:"null",
                 data: 'المستخدم غير موجود'
             });
         }
 
-        const existingCartItem = user.cart.find(item => item.productId.toString() === productId);
-
-        if (existingCartItem) {
-            existingCartItem.quantity += quantity;
-        } else {
-            user.cart.push({ productId, quantity });
-        }
-        
+        user.cart.push({ cartItem });
         await user.save();
+        
+        // const existingCartItem = user.cart.find(item => item.productId.toString() === productId);
+        // if (existingCartItem) {
+        //     existingCartItem.quantity += quantity;
+        // } else {
+        // }
+        
         res.status(200).json({
             error: false,
             data: {
                 message: 'تمت إضافة المنتج إلى السلة بنجاح',
+                operation: 'success',
                 cart: user.cart
             }
         });
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({
             error: true,
-            data: 'حدث خطأ أثناء إضافة المنتج إلى السلة'
+            operation: 'null',
+            data: error.message
         });
     }
 });

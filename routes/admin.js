@@ -61,7 +61,6 @@ router.post('/adminStoreState', auth, async (req, res) => {
             { _id: targetUserId },
             { registerCondition: state }
         )
-        
         res.json({
             error: false,
             message: 'تم إلغاء التسجيل'
