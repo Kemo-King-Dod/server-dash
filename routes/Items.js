@@ -186,6 +186,15 @@ route.get("/getAllItems", async (req, res) => {
 route.get('/getStoreItems/:id', auth, async (req, res) => {
     try {
         var id = req.params.id
+        var userid = null
+
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        if (token) {
+            const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
+            const decoded = await jwt.verify(token, JWT_SECRET)
+            userid = decoded.id
+        }
+
         const allItems = []
         const allItemswithfavorits = []
 
@@ -207,8 +216,8 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
             allItemswithfavorits[i] = {isFavorite: false,...allItems[i]}
         }
 
-        if (id) {
-            const user = await User.findOne({ _id: id });
+        if (userid) {
+            const user = await User.findOne({ _id: userid });
             for (var i = 0; i < allItems.length; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
                     if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
