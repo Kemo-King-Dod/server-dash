@@ -2,7 +2,7 @@
 node_modules/
 
 # igonre uploads
-uploads/*
+uploads/
 
 # Environment variables
 .env
