@@ -7,7 +7,7 @@ const { auth } = require('../middleware/auth')
 
 router.get('/GetStores', auth, async (req, res) => {
     try {
-        const stores = await Store.find({}, { password: false })
+        const stores = await Store.find()
         res.status(200).json({
             error: false,
             data: stores
