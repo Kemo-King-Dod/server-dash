@@ -211,13 +211,19 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
         }
 
         for (let i = 0; i < theitems.length; i++) {
-            console.log("-------------------------------")
-            console.log(theitems[i])
-            console.log("-------------------------------")
+            allItems.push(theitems[i])
         }
 
-        for (let i = 0; i < theitems.length; i++) {
-            allItems.push(theitems[i])
+        // Add isFavorite property to each item
+        for (var i = 0; i < allItems.length; i++) {
+            allItemswithfavorits[i] = { isFavorite: false, ...allItems[i] }
+        }
+        
+        for (let i = 0; i < allItems.length; i++) {
+            if (allItems == null) {
+                allItems.splice(i, 1)
+                continue
+            }
         }
 
         for (let i = 0; i < allItems.length; i++) {
@@ -226,21 +232,10 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
             console.log("*******************************")
         }
 
-
-
-        // Add isFavorite property to each item
-        for (var i = 0; i < allItems.length; i++) {
-            allItemswithfavorits[i] = { isFavorite: false, ...allItems[i] }
-        }
-
         if (userid) {
             const user = await User.findOne({ _id: userid });
             for (var i = 0; i < allItems.length; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
-                    if (allItems == null) {
-                        allItems.splice(i, 1)
-                        continue
-                    }
                     if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
                         allItemswithfavorits[i].isFavorite = true;
                     }
