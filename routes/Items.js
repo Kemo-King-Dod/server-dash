@@ -237,6 +237,10 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
             const user = await User.findOne({ _id: userid });
             for (var i = 0; i < allItems.length; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
+                    if (allItems == null) {
+                        allItems.splice(i, 1)
+                        continue
+                    }
                     if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
                         allItemswithfavorits[i].isFavorite = true;
                     }
