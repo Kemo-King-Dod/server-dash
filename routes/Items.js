@@ -7,6 +7,7 @@ const items = require("../database/items");
 const Store = require("../database/store");
 const User = require("../database/users");
 const { auth } = require("../middleware/auth");
+const { fork } = require("child_process");
 
 
 let Random = [];
@@ -162,10 +163,15 @@ route.get("/getAllItems", async (req, res) => {
         if (id) {
             const user = await User.findOne({ _id: id });
             for (var i = 0; i < data.length; i++) {
-                if (user.favorateItems.includes(data[i]._id)) {
+                for (var j = 0; j < user.favorateItems.length; j++) {
+                if (user.favorateItems[j]._id.toString() == data[i]._id.toString()) {
                     data[i]._doc.isFavorite = true;
                 }
             }
+        }
+        }
+        for (let i = 0; i < data.length; i++) {
+            console.log(data[i]._doc.isFavorite);
         }
 
         res.json({ error: false, items: data });
