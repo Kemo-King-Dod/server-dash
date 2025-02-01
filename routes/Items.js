@@ -189,15 +189,14 @@ route.get('/getStoreItems', async (req, res) => {
         const token = req.header('Authorization')?.replace('Bearer ', '');
         if (token) {
             const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
-            const decoded = jwt.verify(token, JWT_SECRET)
+            const decoded = await jwt.verify(token, JWT_SECRET)
             id = decoded.id
         }
 
-        const StoreItems = []
         const allItems = []
 
         // Get Store 
-        const store = await Store.findById(id)
+        const store = await Store.findOne({ _id: id })
 
         // Get all store items
         console.log(store)
@@ -208,8 +207,8 @@ route.get('/getStoreItems', async (req, res) => {
             )
         }
 
-        
-        
+
+
 
         // Add isFavorite property to each item
         for (var i = 0; i < allItems.length; i++) {
