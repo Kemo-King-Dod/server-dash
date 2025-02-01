@@ -199,8 +199,16 @@ route.get('/getStoreItems', async (req, res) => {
         const store = await Store.findOne({ _id: id })
 
         // Get all store items
+        console.log(id)
+        console.log('----------------------------------------------')
+        console.log('----------------------------------------------')
         console.log(store)
-        console.log(store.items)
+        console.log('----------------------------------------------')
+        console.log('----------------------------------------------')
+        
+
+
+        
         for (let i = 0; i < store.items.length; i++) {
             allItems.push(
                 await items.findById(store.items[i])
