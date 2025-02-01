@@ -5,7 +5,7 @@ const Driver = require('../database/driver');
 const Store = require('../database/store');
 const { auth } = require('../middleware/auth')
 
-router.get('/getStores',  async (req, res) => {
+router.get('/getStores', auth,  async (req, res) => {
     try {
         const stores = await Store.find({}, { password: false },{ items: false })
         console.log(stores)
