@@ -185,10 +185,11 @@ route.get("/getAllItems", async (req, res) => {
 
 route.get('/getStoreItems/:id', auth, async (req, res) => {
     try {
+        var id = req.params.id
         const allItems = []
 
         // Get Store 
-        const store = await Store.findOne({ _id: req.params.id })
+        const store = await Store.findOne({ _id: id })
 
         // Get all store items
         console.log(id)
