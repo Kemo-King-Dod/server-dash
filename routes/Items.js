@@ -183,20 +183,12 @@ route.get("/getAllItems", async (req, res) => {
     }
 });
 
-route.get('/getStoreItems', async (req, res) => {
+route.get('/getStoreItems/:id', auth, async (req, res) => {
     try {
-        var id = req.body.id
-        // const token = req.header('Authorization')?.replace('Bearer ', '');
-        // if (token) {
-        //     const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
-        //     const decoded = await jwt.verify(token, JWT_SECRET)
-        //     id = decoded.id
-        // }
-
         const allItems = []
 
         // Get Store 
-        const store = await Store.findOne({ _id: id })
+        const store = await Store.findOne({ _id: req.params.id })
 
         // Get all store items
         console.log(id)
