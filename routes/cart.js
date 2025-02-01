@@ -44,7 +44,7 @@ router.get("/getfromcart", auth, async (req, res) => {
               price: item.price,
               quantity: 1,
               options: user.cart[i].cartItem.options,
-              addOnes: user.cart[i].cartItem.addOns,
+              addOns: user.cart[i].cartItem.addOns,
               shopId: item.storeID,
             },
           ],
@@ -60,7 +60,7 @@ router.get("/getfromcart", auth, async (req, res) => {
               price: item.price,
               quantity: 1,
               options: user.cart[i].cartItem.options,
-              addOnes: user.cart[i].cartItem.addOns,
+              addOns: user.cart[i].cartItem.addOns,
               shopId: item.storeID,
             });
             found = true;
@@ -81,7 +81,7 @@ router.get("/getfromcart", auth, async (req, res) => {
                 price: item.price,
                 quantity: 1,
                 options: user.cart[i].cartItem.options,
-                addOnes: user.cart[i].cartItem.addOns,
+                addOns: user.cart[i].cartItem.addOns,
                 shopId: item.storeID,
               },
             ],
