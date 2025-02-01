@@ -187,21 +187,12 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
     try {
         var id = req.params.id
         const allItems = []
+        const allItemswithfavorits = []
 
         // Get Store 
         const store = await Store.findOne({ _id: id })
 
-        // Get all store items
-        console.log(id)
-        console.log('----------------------------------------------')
-        console.log('----------------------------------------------')
-        console.log(store)
-        console.log('----------------------------------------------')
-        console.log('----------------------------------------------')
-        
-
-
-        
+        // Get all store items        
         for (let i = 0; i < store.items.length; i++) {
             allItems.push(
                 await items.findById(store.items[i])
@@ -213,7 +204,7 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
 
         // Add isFavorite property to each item
         for (var i = 0; i < allItems.length; i++) {
-            allItems[i].isFavorite = false;
+            allItemswithfavorits[i] = {isFavorite: false,...allItems[i]}
         }
 
         if (id) {
