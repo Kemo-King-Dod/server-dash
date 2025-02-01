@@ -5,7 +5,7 @@ const Driver = require('../database/driver');
 const Store = require('../database/store');
 const { auth } = require('../middleware/auth')
 
-router.get('/addAddress', auth, async (req, res) => {
+router.post('/addAddress', auth, async (req, res) => {
     try {
         const user = await User.findOne({ _id: id })
         user.locations.push({
@@ -30,7 +30,7 @@ router.get('/addAddress', auth, async (req, res) => {
     }
 })
 
-router.get('/deleteAddress', auth, async (req, res) => {
+router.patch('/deleteAddress', auth, async (req, res) => {
     try {
         const user = await User.findOne({ _id: id })
 
