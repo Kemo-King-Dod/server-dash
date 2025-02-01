@@ -204,15 +204,27 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
         for (let i = 0; i < store.items.length; i++)
             console.log(store.items[i])
 
-        // Get all store items        
+        // Get all store items 
+        const theitems = []
         for (let i = 0; i < store.items.length; i++) {
-            allItems.push(
-                await items.findById(store.items[i].toString())
-            )
+            theitems[i] = await items.findById(store.items[i].toString())
         }
 
-        for (let i = 0; i < allItems.length; i++)
+        for (let i = 0; i < theitems.length; i++) {
+            console.log("-------------------------------")
+            console.log(theitems[i])
+            console.log("-------------------------------")
+        }
+
+        for (let i = 0; i < theitems.length; i++) {
+            allItems.push(theitems[i])
+        }
+
+        for (let i = 0; i < allItems.length; i++) {
+            console.log("*******************************")
             console.log(allItems[i])
+            console.log("*******************************")
+        }
 
 
 
