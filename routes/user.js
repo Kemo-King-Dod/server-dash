@@ -7,7 +7,7 @@ const { auth } = require('../middleware/auth')
 
 router.post('/addAddress', auth, async (req, res) => {
     try {
-        const user = await User.findOne({ _id: id })
+        const user = await User.findOne({ _id: req.userId })
         user.locations.push({
             title: req.body.name,
             description: req.body.description,
@@ -22,17 +22,17 @@ router.post('/addAddress', auth, async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error.message)
+        console.log(error)
         res.status(500).json({
             error: true,
-            message: error.message
+            message: error
         })
     }
 })
 
 router.patch('/deleteAddress', auth, async (req, res) => {
     try {
-        const user = await User.findOne({ _id: id })
+        const user = await User.findOne({ _id: req.userId })
 
         for (var i = 0; i < user.locations.length; i++) {
             if (user.locations.title == req.body.title) {
@@ -48,10 +48,10 @@ router.patch('/deleteAddress', auth, async (req, res) => {
 
 
     } catch (error) {
-        console.log(error.message)
+        console.log(error)
         res.status(500).json({
             error: true,
-            message: error.message
+            message: error
         })
     }
 })
