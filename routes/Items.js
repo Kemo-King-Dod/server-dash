@@ -228,7 +228,7 @@ route.get('/getStoreItems', async (req, res) => {
             console.log(allItems[i]._doc.isFavorite);
         }
 
-        res.json({ error: false, items: allItems });
+        res.json({ error: false, data: allItems });
     } catch (error) {
         console.log(error.message);
         res.status(401).json({
