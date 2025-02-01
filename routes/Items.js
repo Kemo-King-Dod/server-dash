@@ -208,12 +208,14 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
             )
         }
 
+        for (let i = 0; i < allItems.length; i++)
+            console.log(allItems[i])
 
 
 
         // Add isFavorite property to each item
         for (var i = 0; i < allItems.length; i++) {
-            allItemswithfavorits[i] = {isFavorite: false,...allItems[i]}
+            allItemswithfavorits[i] = { isFavorite: false, ...allItems[i] }
         }
 
         if (userid) {
@@ -221,13 +223,10 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
             for (var i = 0; i < allItems.length; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
                     if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
-                        allItems[i].isFavorite = true;
+                        allItemswithfavorits[i].isFavorite = true;
                     }
                 }
             }
-        }
-        for (let i = 0; i < allItems.length; i++) {
-            console.log(allItems[i].isFavorite);
         }
 
         res.json({ error: false, data: allItems });
