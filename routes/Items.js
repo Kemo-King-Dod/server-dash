@@ -207,7 +207,7 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
         // Get all store items        
         for (let i = 0; i < store.items.length; i++) {
             allItems.push(
-                await items.findById(store.items[i])
+                await items.findById(store.items[i].toString())
             )
         }
 
