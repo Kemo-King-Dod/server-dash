@@ -152,7 +152,7 @@ route.get("/getAllItems", async (req, res) => {
         //     // Randomly select 4 unique items
         //     const shuffled = allItems.sort(() => 0.5 - Math.random());
         // }
-        data = allItems.slice(0, 4);
+        data = allItems.slice(0, 5);
 
         // Add isFavorite property to each item
         for (var i = 0; i < data.length; i++) {
@@ -168,9 +168,6 @@ route.get("/getAllItems", async (req, res) => {
                     }
                 }
             }
-        }
-        for (let i = 0; i < data.length; i++) {
-            console.log(data[i]._doc.isFavorite);
         }
 
         res.json({ error: false, items: data });
@@ -195,8 +192,7 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
             userid = decoded.id
         }
 
-        var allItems = []
-        var allItemswithfavorits = []
+        const allItems = []
 
         // Get Store 
         const store = await Store.findOne({ _id: id })
@@ -214,26 +210,20 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
 
         // Add isFavorite property to each item
         for (var i = 0; i < allItems.length; i++) {
-            allItemswithfavorits[i] = { isFavorite: false, ...allItems[i] }
+            allItems[i]._doc.isFavorite = false;
         }
 
-
-        for (let i = 0; i < allItems.length; i++) {
-            console.log("*******************************")
-            console.log(allItems[i])
-            console.log("*******************************")
-        }
-
-        if (userid) {
-            const user = await User.findOne({ _id: userid });
+        if (id) {
+            const user = await User.findOne({ _id: id });
             for (var i = 0; i < allItems.length; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
                     if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
-                        allItemswithfavorits[i].isFavorite = true;
+                        allItems[i]._doc.isFavorite = true;
                     }
                 }
             }
         }
+
 
         res.json({ error: false, data: allItems });
     } catch (error) {
