@@ -230,7 +230,7 @@ route.get('/getStoreItems', async (req, res) => {
 
         res.json({ error: false, data: allItems });
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
         res.status(401).json({
             error: true,
             message: error.message
