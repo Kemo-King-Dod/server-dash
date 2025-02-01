@@ -49,6 +49,16 @@ app.use(admin);
 const items = require("./routes/Items.js");
 app.use(items);
 
+const store = require("./routes/store.js");
+app.use(store);
+
+const user = require("./routes/user.js");
+app.use(user);
+
+const orders = require("./routes/orders.js");
+app.use(orders);
+
+
 
 // const ShopLogin = require("./routess/shopLogin.js");
 // const showshpsrequists = require("./routess/showshpsrequists.js");
