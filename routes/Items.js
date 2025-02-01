@@ -213,8 +213,8 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
             allItems[i]._doc.isFavorite = false;
         }
 
-        if (id) {
-            const user = await User.findOne({ _id: id });
+        if (userid) {
+            const user = await User.findOne({ _id: userid });
             for (var i = 0; i < allItems.length; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
                     if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
