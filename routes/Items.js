@@ -208,20 +208,15 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
         }
 
         for (let i = 0; i < theitems.length; i++) {
-            allItems.push(theitems[i])
+            if (theitems[i])
+                allItems.push(theitems[i])
         }
 
         // Add isFavorite property to each item
         for (var i = 0; i < allItems.length; i++) {
             allItemswithfavorits[i] = { isFavorite: false, ...allItems[i] }
         }
-        
-        for (let i = 0; i < allItems.length; i++) {
-            if (allItems == null) {
-                allItems.splice(i, 1)
-                continue
-            }
-        }
+
 
         for (let i = 0; i < allItems.length; i++) {
             console.log("*******************************")
