@@ -7,7 +7,6 @@ const items = require("../database/items");
 const Store = require("../database/store");
 const User = require("../database/users");
 const { auth } = require("../middleware/auth");
-const { fork } = require("child_process");
 
 
 let Random = [];
@@ -145,7 +144,7 @@ route.get("/getAllItems", async (req, res) => {
 
         // Get all available items
         const allItems = await items.find({});
-        
+
         // If we have less than 4 items total, return all of them
         // if (allItems.length <= 4) {
         //     data = allItems;
@@ -164,11 +163,11 @@ route.get("/getAllItems", async (req, res) => {
             const user = await User.findOne({ _id: id });
             for (var i = 0; i < data.length; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
-                if (user.favorateItems[j]._id.toString() == data[i]._id.toString()) {
-                    data[i]._doc.isFavorite = true;
+                    if (user.favorateItems[j]._id.toString() == data[i]._id.toString()) {
+                        data[i]._doc.isFavorite = true;
+                    }
                 }
             }
-        }
         }
         for (let i = 0; i < data.length; i++) {
             console.log(data[i]._doc.isFavorite);
@@ -183,6 +182,61 @@ route.get("/getAllItems", async (req, res) => {
         });
     }
 });
+
+route.get('/getStoreItems', async (req, res) => {
+    try {
+        var id = null
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        if (token) {
+            const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
+            const decoded = jwt.verify(token, JWT_SECRET)
+            id = decoded.id
+        }
+
+        const StoreItems = []
+        const allItems = []
+
+        // Get Store 
+        const store = await Store.findById({_id: id})
+
+        // Get all store items
+        for (let i = 0; i < store.items.length; i++) {
+            allItems.push(
+                await items.findById(store.items[i])
+            )
+        }
+
+        
+        
+
+        // Add isFavorite property to each item
+        for (var i = 0; i < allItems.length; i++) {
+            allItems[i]._doc.isFavorite = false;
+        }
+
+        if (id) {
+            const user = await User.findOne({ _id: id });
+            for (var i = 0; i < allItems.length; i++) {
+                for (var j = 0; j < user.favorateItems.length; j++) {
+                    if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
+                        allItems[i]._doc.isFavorite = true;
+                    }
+                }
+            }
+        }
+        for (let i = 0; i < allItems.length; i++) {
+            console.log(allItems[i]._doc.isFavorite);
+        }
+
+        res.json({ error: false, items: allItems });
+    } catch (error) {
+        console.log(error.message);
+        res.status(401).json({
+            error: true,
+            message: error.message
+        });
+    }
+})
 
 
 module.exports = route;
