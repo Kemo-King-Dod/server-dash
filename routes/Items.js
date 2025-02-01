@@ -185,13 +185,13 @@ route.get("/getAllItems", async (req, res) => {
 
 route.get('/getStoreItems', async (req, res) => {
     try {
-        var id = null
-        const token = req.header('Authorization')?.replace('Bearer ', '');
-        if (token) {
-            const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
-            const decoded = await jwt.verify(token, JWT_SECRET)
-            id = decoded.id
-        }
+        var id = req.body.id
+        // const token = req.header('Authorization')?.replace('Bearer ', '');
+        // if (token) {
+        //     const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
+        //     const decoded = await jwt.verify(token, JWT_SECRET)
+        //     id = decoded.id
+        // }
 
         const allItems = []
 
