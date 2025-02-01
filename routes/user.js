@@ -9,14 +9,14 @@ router.post('/addAddress', auth, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.userId })
         user.locations.push({
-            title: req.body.name,
+            title: req.body.title,
             description: req.body.description,
             latitude: req.body.latitude,
             longitude: req.body.longitude
         })
 
         await user.save()
-        res.status(500).json({
+        res.status(200).json({
             error: false,
             data: 'تم حفظ الموقع بنجاح'
         })
