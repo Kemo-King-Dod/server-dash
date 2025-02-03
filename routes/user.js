@@ -1,19 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../database/users');
-const Driver = require('../database/driver');
-const Store = require('../database/store');
+const Driver = require('../database/driver')
+const Store = require('../database/store')
+const Addresse = require('../database/address')
 const { auth } = require('../middleware/auth')
 
 router.post('/addAddress', auth, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.userId })
-        user.locations.push({
+
+        const theaddress = await Addresse.create({
             title: req.body.title,
             description: req.body.description,
             latitude: req.body.latitude,
             longitude: req.body.longitude
         })
+
+
+        user.locations.push(theaddress)
 
         await user.save()
         res.status(200).json({
