@@ -41,6 +41,7 @@ router.patch('/deleteAddress', auth, async (req, res) => {
 
         for (var i = 0; i < user.locations.length; i++) {
             if (user.locations.title == req.body.title) {
+                await Addresse.deleteOne({_id: user.locations[i]._id})
                 user.locations.splice(i, 1)
                 break
             }
