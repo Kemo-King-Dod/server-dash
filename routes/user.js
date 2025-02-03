@@ -56,4 +56,24 @@ router.patch('/deleteAddress', auth, async (req, res) => {
     }
 })
 
+router.get('/getAddressess', auth, async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.userId })
+
+        res.status(200).json({
+            error: false,
+            data: user.locations
+        })
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            error: true,
+            message: error
+        })
+    }
+})
+
+
 module.exports = router
