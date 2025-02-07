@@ -48,31 +48,31 @@ async function connect(socket) {
   }
 
 
-  socket.on("UpdateUser", async (data) => {
+  socket.on("updateUser", async (data) => {
 
     // عمليات
     console.log(data)
-    console.log("UpdateUser")
+    console.log("updateUser")
 
 
   })
 
-  socket.on("UpdateStore", async (data) => {
+  socket.on("updateStore", async (data) => {
 
     // عمليات
     console.log(data)
-    console.log("UpdateStore")
+    console.log("updateStore")
     const store = await Store.findById(data.storeID)
     if (store.connection)
-      socket.to(store.connectionId).emit("UpdateStore", data)
+      socket.to(store.connectionId).emit("updateStore", data)
 
   })
 
-  socket.on("UpdateDriver", async (data) => {
+  socket.on("updateDriver", async (data) => {
 
     // عمليات
     console.log(data)
-    console.log("UpdateDriver")
+    console.log("updateDriver")
 
   })
 
