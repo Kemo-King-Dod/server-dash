@@ -5,6 +5,7 @@ const Store = require('../database/store');
 const User = require('../database/users');
 const Item = require('../database/items');
 const fs = require("fs").promises;
+const path = require('path')
 const { auth } = require('../middleware/auth')
 
 let ordersNum
