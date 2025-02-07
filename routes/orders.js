@@ -13,7 +13,7 @@ let ordersNum
 async function read() {
     const data = await fs.readFile(path.join(__dirname, "..", "data", "order.txt"))
     ordersNum = parseInt(data.toString())
-    await fs.writeFile(path.join(__dirname, "..", "data", "oredr.txt"), `${++ordersNum}`)
+    await fs.writeFile(path.join(__dirname, "..", "data", "order.txt"), `${++ordersNum}`)
     return ordersNum
 }
 
@@ -41,8 +41,8 @@ router.post('/addOrder', auth, async (req, res) => {
         // Create new order
         const order = new Order({
             order_id: await read(),
-            customer_id: req.userId,
-            store_id: req.body.StoreId,
+            customer_id: userId,
+            store_id: StoreId,
             driver_id: null,
             date: new Date(),
             items: itemsIds,
@@ -78,6 +78,7 @@ router.post('/addOrder', auth, async (req, res) => {
                 i--
             }
         }
+        await user.save()
 
         res.status(200).json({
             success: true,
