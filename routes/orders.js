@@ -22,7 +22,7 @@ router.post('/addOrder', auth, async (req, res) => {
     try {
         const itemsIds = []
         const userId = req.userId;
-        const StoreId = req.body.StoreId;
+        const StoreId = req.body.storeId;
         const AddressId = req.body.AddressId;
 
         const user = await User.findById(userId);
