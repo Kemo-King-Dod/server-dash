@@ -24,17 +24,13 @@ async function connect(socket) {
       "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman",
       async (err, data) => {
         if (err) {
-          res.status(403).json({
-            error: true,
-            data: "يرجى تسجيل الدخول",
-          });
-          res.end();
+          console.log('يرجى تسجيل الدخول')
         } else {
           let exist = await User.findOne({ _id: data.id });
           if (!exist) {
             exist = await Store.findOne({ _id: data.id });
             if (!exist) {
-              res.json({ error: true, data: "access denied" });
+              console.log('access denied')
             }
             await Store.updateOne(
               { _id: data.id },
@@ -85,17 +81,13 @@ async function connect(socket) {
         "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman",
         async (err, data) => {
           if (err) {
-            res.status(403).json({
-              error: true,
-              data: "يرجى تسجيل الدخول",
-            });
-            res.end();
+            console.log('يرجى تسجيل الدخول')
           } else {
             let exist = await Store.findOne({ _id: data.id });
             if (!exist) {
               exist = await User.findOne({ _id: data.id });
               if (!exist) {
-                res.json({ error: true, data: "access denied" });
+                console.log('access denied')
               }
               await User.updateOne(
                 { _id: data.id },
