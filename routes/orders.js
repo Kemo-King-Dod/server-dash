@@ -37,6 +37,7 @@ router.post('/addOrder', auth, async (req, res) => {
             }
         }
 
+        console.log(req.body)
         console.log(StoreId)
 
         // Create new order
