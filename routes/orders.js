@@ -20,7 +20,7 @@ async function read() {
 // Add new order
 router.post('/addOrder', auth, async (req, res) => {
     try {
-        const itemsIds = []
+        const itemsdata = []
         const userId = req.userId;
         const StoreId = req.body.storeId;
         const AddressId = req.body.AddressId;
@@ -32,7 +32,11 @@ router.post('/addOrder', auth, async (req, res) => {
         for (var i = 0; i < user.cart.length; i++) {
             if (user.cart[i].cartItem.storeID == StoreId) {
                 const item = await Item.findById(user.cart[i].cartItem.id)
-                itemsIds.push(item._id)
+                itemsdata.push({
+                    id: item._id, 
+                    options: user.cart[i].cartItem.options,
+                    addOns: user.cart[i].cartItem.addOns
+                })
                 totalprice += item.price
             }
         }
@@ -47,7 +51,7 @@ router.post('/addOrder', auth, async (req, res) => {
             store_id: StoreId,
             driver_id: null,
             date: new Date(),
-            items: itemsIds,
+            items: itemsdata,
             total_price: totalprice,
             status: 'pending',
             location: AddressId,

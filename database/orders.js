@@ -37,7 +37,7 @@ const orders = new Schema({
   },
   chat: {
     type: Object
-  }
+  },
 });
 
 module.exports = mongoose.model("Order", orders);
