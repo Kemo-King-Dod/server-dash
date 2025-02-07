@@ -31,6 +31,8 @@ router.post('/addOrder', auth, async (req, res) => {
         for (var i = 0; i < user.cart.length; i++) {
             if (user.cart[i].storeID == StoreId) {
                 const item = await Item.findById(user.cart[i].id)
+                console.log(user.cart[i].id)
+                console.log(item)
                 totalprice += item.price
             }
         }
