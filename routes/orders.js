@@ -20,7 +20,6 @@ async function read() {
 // Add new order
 router.post('/addOrder', auth, async (req, res) => {
     try {
-        console.log(1)
         const itemsIds = []
         const userId = req.userId;
         const StoreId = req.body.StoreId;
@@ -34,14 +33,9 @@ router.post('/addOrder', auth, async (req, res) => {
             if (user.cart[i].cartItem.storeID == StoreId) {
                 const item = await Item.findById(user.cart[i].cartItem.id)
                 itemsIds.push(item._id)
-                console.log(user.cart[i].cartItem.id)
-                console.log(item)
                 totalprice += item.price
             }
         }
-
-
-
 
 
         // Create new order
@@ -84,7 +78,6 @@ router.post('/addOrder', auth, async (req, res) => {
         });
 
     } catch (error) {
-        console.log(2)
         console.log(error)
         res.status(500).json({
             success: false,
