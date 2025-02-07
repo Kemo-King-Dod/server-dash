@@ -11,7 +11,7 @@ const { auth } = require('../middleware/auth')
 let ordersNum
 
 async function read() {
-    const data = await fs.readFile(path.join(__dirname, "..", "data", "oredr.txt"))
+    const data = await fs.readFile(path.join(__dirname, "..", "data", "order.txt"))
     ordersNum = parseInt(data.toString())
     await fs.writeFile(path.join(__dirname, "..", "data", "oredr.txt"),`${++ordersNum}`)
     return ordersNum
