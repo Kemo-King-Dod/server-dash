@@ -46,7 +46,7 @@ router.post('/addOrder', auth, async (req, res) => {
 
         // Create new order
         const order = new Order({
-            order_id: read(),
+            order_id: await read(),
             customer_id: req.userId,
             store_id: req.body.StoreId,
             driver_id: null,
