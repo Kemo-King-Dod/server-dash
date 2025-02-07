@@ -14,14 +14,14 @@ router.get('/getFavoriveitems', auth, async (req, res) => {
         for (var i = 0; i < user.favorateItems.length; i++) {
             user.favorateItems[i].isFavorite = true;
         }
-        
+
 
         res.status(200).json({
             error: false,
             data: user.favorateItems
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(200).json({
             error: true,
             data: 'حدث خطأ في جلب المفضلة'
         });
@@ -52,7 +52,7 @@ router.post('/addToFavoriveitems', auth, async (req, res) => {
             data: user.favorateItems
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(200).json({
             error: true,
             data: 'حدث خطأ في إضافة المنتج للمفضلة'
         });
@@ -80,7 +80,7 @@ router.post('/deleteFromFavoriveitems', auth, async (req, res) => {
             data: 'تم حذف المنتج من المفضلة بنجاح'
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(200).json({
             error: true,
             data: 'حدث خطأ في حذف المنتج من المفضلة'
         });
@@ -92,15 +92,23 @@ router.post('/deleteFromFavoriveitems', auth, async (req, res) => {
 // shops
 router.get('/getFavorivestores', auth, async (req, res) => {
     try {
+        console.log('/getFavorivestores');
+
         const userId = req.userId;
         const user = await User.findById(userId);
+
+        for (var i = 0; i < user.favorateStors.length; i++) {
+            user.favorateStors[i].isFavorite = true;
+            user.favorateStors[i].password = '0';
+            user.favorateStors[i].items = null;
+        }
 
         res.status(200).json({
             error: false,
             data: user.favorateStors
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(200).json({
             error: true,
             data: 'حدث خطأ في جلب المفضلة'
         });
@@ -110,6 +118,7 @@ router.get('/getFavorivestores', auth, async (req, res) => {
 // Add to favorites
 router.post('/addToFavorivestores', auth, async (req, res) => {
     try {
+        console.log('/addToFavorivestores')
         const { id } = req.body;
         const userId = req.userId;
 
@@ -118,50 +127,74 @@ router.post('/addToFavorivestores', auth, async (req, res) => {
         if (!store) {
             res.status(200).json({
                 error: true,
-                message: 'العنصر غير موجود'
+                message: 'المحل غير موجود'
             });
         }
 
+        for (let i = 0; i < user.favorateStors.length; i++) {
+            if (user.favorateStors[i]._id.toString() == store._id.toString()) {
+                console.log(1)
+                throw new Error();
+            }
+        }
 
         user.favorateStors.push(store);
         await user.save();
 
+        console.log(2)
+
         res.status(200).json({
             error: false,
-            data: user.favorateStors
+            data: 'تمت الإضافة إلى المفضلة'
         });
     } catch (error) {
-        res.status(500).json({
+        console.log(3)
+        console.log(error.message)
+        res.status(200).json({
             error: true,
-            data: 'حدث خطأ في إضافة المنتج للمفضلة'
+            message: error.message
         });
     }
 });
 
 // Remove from favorites
-router.delete('/deleteFromFavorivestores', auth, async (req, res) => {
+router.post('/deleteFromFavorivestores', auth, async (req, res) => {
     try {
+        console.log('/deleteFromFavorivestores')
         const id = req.body.id;
         const userId = req.userId;
 
         const user = await User.findById(userId);
 
+        let flag = false
         for (let i = 0; i < user.favorateStors.length; i++) {
-            if (user.favorateStors[i]._id.toString() == id) {
+            if (user.favorateStors[i]._id.toString() == id.toString()) {
                 user.favorateStors.splice(i, 1)
+                flag = true
                 break
             }
         }
-        await user.save();
 
-        res.status(200).json({
-            error: false,
-            data: 'تم حذف المنتج من المفضلة بنجاح'
-        });
+        if (flag) {
+            await user.save()
+            res.status(200).json({
+                error: false,
+                data: 'تم حذف المحل من المفضلة بنجاح'
+            });
+        }
+        else {
+            res.status(200).json({
+                error: false,
+                data: 'المحل غير موجود في المفضلة'
+            });
+        }
+
+
+
     } catch (error) {
-        res.status(500).json({
+        res.status(200).json({
             error: true,
-            data: 'حدث خطأ في حذف المنتج من المفضلة'
+            data: 'حدث خطأ في حذف المحل من المفضلة'
         });
     }
 });

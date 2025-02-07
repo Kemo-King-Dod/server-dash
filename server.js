@@ -16,6 +16,8 @@ const expressserver = app.listen(4000, () => {
 });
 
 const io = createserver(expressserver);
+const { auth } = require("./middleware/auth.js");
+io.use(auth)
 io.on("connection", connect);
 
 // Error handling middleware (should be last)

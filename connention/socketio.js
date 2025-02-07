@@ -1,8 +1,9 @@
 const { Server } = require("socket.io");
-const Shop = require("../database/store");
+const Store = require("../database/store");
 const User = require("../database/users");
 const Driver = require("../database/driver")
 const jwt = require("jsonwebtoken");
+const { auth } = require("../middleware/auth");
 
 let isconnected;
 
@@ -14,41 +15,52 @@ function createserver(server) {
     },
   });
 }
-function connect(socket) {
-  socket.on("data", async (token) => {
-    if (token) {
-      await jwt.verify(
-        token,
-        "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman",
-        async (err, data) => {
-          if (err) {
-            res.status(403).json({
-              error: true,
-              data: "يرجى تسجيل الدخول",
-            });
-            res.end();
-          } else {
-            let exist = await Shop.findOne({ _id: data.id });
-            if (!exist) {
-              exist = await User.findOne({ _id: data.id });
-              if (!exist) {
-                res.json({ error: true, data: "access denied" });
-              }
-              await User.updateOne(
-                { _id: data.id },
-                { $set: { connection: true, connection_id: socket.id } }
-              );
-            } else {
-              await Shop.updateOne(
-                { _id: data.id },
-                { $set: { connection: true, connection_id: socket.id } }
-              );
-            }
-          }
-        }
-      );
+async function connect(socket) {
+  
+
+  console.log('User connected: ' + socket.id);
+  console.log(socket)
+  let exist = await Store.findOne({ _id: req.userId.id });
+  if (!exist) {
+    exist = await User.findOne({ _id: req.userId.id });
+    if (!exist) {
+      res.json({ error: true, data: "access denied" });
     }
-  });
+    User.connection = true
+    User.connection_id = socket.id
+    await User.save()
+  } else {
+    Store.connection = true
+    Store.connection_id = socket.id
+    await Store.save()
+  }
+
+
+  socket.on("UpdateUser", async (data) => {
+
+    // عمليات
+
+
+    socket.emit("UpdateUser", data.func)
+  })
+
+  socket.on("UpdateStore", async (data) => {
+
+    // عمليات
+
+
+    socket.emit("UpdateStore", data.func)
+  })
+
+  socket.on("UpdateDriver", async (data) => {
+
+    // عمليات
+
+
+    socket.emit("UpdateDriver", data.func)
+  })
+
+
 
   socket.on("reconnect", async (token) => {
     if (token) {
@@ -63,7 +75,7 @@ function connect(socket) {
             });
             res.end();
           } else {
-            let exist = await Shop.findOne({ _id: data.id });
+            let exist = await Store.findOne({ _id: data.id });
             if (!exist) {
               exist = await User.findOne({ _id: data.id });
               if (!exist) {
@@ -74,7 +86,7 @@ function connect(socket) {
                 { $set: { connection: true, connection_id: socket.id } }
               );
             } else {
-              await Shop.updateOne(
+              await Store.updateOne(
                 { _id: data.id },
                 { $set: { connection: true, connection_id: socket.id } }
               );
@@ -86,7 +98,7 @@ function connect(socket) {
   });
 
   socket.on("disconnect", async () => {
-    let exist = await Shop.findOne({ connection_id: socket.id });
+    let exist = await Store.findOne({ connection_id: socket.id });
     if (!exist) {
       exist = await User.findOne({ connection_id: socket.id });
       if (!exist) {
@@ -97,7 +109,7 @@ function connect(socket) {
         { $set: { connection: false, connection_id: null } }
       );
     } else {
-      await Shop.updateOne(
+      await Store.updateOne(
         { connection_id: socket.id },
         { $set: { connection: false, connection_id: null } }
       );
@@ -115,7 +127,7 @@ function connect(socket) {
           if (err) {
             return;
           } else {
-            let exist = await Shop.findOne({ _id: data.id });
+            let exist = await Store.findOne({ _id: data.id });
             if (!exist) {
               exist = await User.findOne({ _id: data.id });
               if (!exist) {
@@ -126,7 +138,7 @@ function connect(socket) {
                 { $set: { connection: true, connection_id: socket.id } }
               );
             } else {
-              await Shop.updateOne(
+              await Store.updateOne(
                 { _id: data.id },
                 { $set: { connection: true, connection_id: socket.id } }
               );
@@ -136,11 +148,26 @@ function connect(socket) {
       );
     }
   });
+  // انضمام المستخدم إلى غرفة خاصة
+  socket.on("joinRoom", (roomName) => {
+    socket.join(roomName);
+    console.log('User' + socket.id + ' joined room:' + roomName);
+  });
+
+  // مغادرة المستخدم للغرفة
+  socket.on("leaveRoom", (roomName) => {
+    socket.leave(roomName);
+    console.log('User' + socket.id + ' left room:' + roomName);
+  });
+
+  socket.on("disconnect", () => {
+    console.log('User disconnected:' + socket.id);
+  });
 }
 
 function isuserconnected(socket) {
   isconnected = setTimeout(async () => {
-    let exist = await Shop.findOne({ connection_id: socket.id });
+    let exist = await Store.findOne({ connection_id: socket.id });
     if (!exist) {
       exist = await User.findOne({ connection_id: socket.id });
       if (!exist) {
@@ -151,7 +178,7 @@ function isuserconnected(socket) {
         { $set: { connection: false, connection_id: null } }
       );
     } else {
-      await Shop.updateOne(
+      await Store.updateOne(
         { connection_id: socket.id },
         { $set: { connection: false, connection_id: null } }
       );
@@ -164,7 +191,5 @@ function userisstillconnected(socket) {
   isconnected = false;
   isuserconnected(socket);
 }
-
-async function disconnect(socket) {} 
 
 module.exports = { createserver, connect };
