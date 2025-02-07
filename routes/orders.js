@@ -24,15 +24,13 @@ router.post('/addOrder', auth, async (req, res) => {
         const AddressId = req.body.AddressId;
 
         const user = await User.findById(userId);
-        const store = await Store.findById(StoreId);
         let totalprice = 0
 
 
         for (var i = 0; i < user.cart.length; i++) {
             if (user.cart[i].storeID.toString() == StoreId.toString()) {
-                // const item = await Item.findById(user.cart[i].id)
-                // totalprice += item.price
-                totalprice += await Item.findById(user.cart[i].id).price
+                const item = await Item.findById(user.cart[i].id)
+                totalprice += item.price
             }
         }
 
@@ -61,13 +59,13 @@ router.post('/addOrder', auth, async (req, res) => {
 
         // Update store's orders array
         await Store.findByIdAndUpdate(
-            req.body.store_id,
+            StoreId,
             { $push: { orders: savedOrder._id } }
         );
 
         // Update user's orders array
         await User.findByIdAndUpdate(
-            req.body.customer_id,
+            userId,
             { $push: { orders: savedOrder._id } }
         );
 
