@@ -18,9 +18,9 @@ function createserver(server) {
 async function connect(socket) {
 
   console.log(socket.headers)
-  if (socket.headers.authorization) {
+  if (socket.handshake.headers.authorization) {
     await jwt.verify(
-      socket.headers.authorization,
+      socket.handshake.headers.authorization,
       "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman",
       async (err, data) => {
         if (err) {
