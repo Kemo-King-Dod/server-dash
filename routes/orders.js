@@ -3,28 +3,61 @@ const router = express.Router();
 const Order = require('../database/orders');
 const Store = require('../database/store');
 const User = require('../database/users');
+const Item = require('../database/items');
+const fs = require("fs").promises;
+const { auth } = require('../middleware/auth')
+
+let ordersNum
+
+async function read() {
+    const data = await fs.readFile(path.join(__dirname, "..", "data", "oredr.txt"))
+    ordersNum = parseInt(data.toString())
+    await fs.writeFile(path.join(__dirname, "..", "data", "oredr.txt"),`${ordersNum+1}`)
+    return ordersNum++
+}
 
 // Add new order
-router.post('/addOrder', async (req, res) => {
+router.post('/addOrder', auth, async (req, res) => {
     try {
+        const userId = req.userId;
+        const StoreId = req.body.StoreId;
+        const AddressId = req.body.AddressId;
+
+        const user = await User.findById(userId);
+        const store = await Store.findById(StoreId);
+        let totalprice = 0
+
+
+        for (var i = 0; i < user.cart.length; i++) {
+            if (user.cart[i].storeID.toString() == StoreId.toString()) {
+                // const item = await Item.findById(user.cart[i].id)
+                // totalprice += item.price
+                totalprice += await Item.findById(user.cart[i].id).price
+            }
+        }
+
+
+
+
+
         // Create new order
         const order = new Order({
-            order_id: req.body.order_id,
-            customer_id: req.body.customer_id,
-            store_id: req.body.store_id,
-            driver_id: req.body.driver_id,
+            order_id: read(),
+            customer_id: req.userId,
+            store_id: req.body.StoreId,
+            driver_id: null,
             date: new Date(),
-            items: req.body.items,
-            total_price: req.body.total_price,
+            items: itemsIds,
+            total_price: totalprice,
             status: 'pending',
-            location: req.body.location,
-            distenationPrice: req.body.distenationPrice,
-            reseve_code: req.body.reseve_code,
-            chat: req.body.chat
+            location: AddressId,
+            distenationPrice: Store.deliveryCostByKilo,
+            reseve_code: Math.random(10000000000),
+            chat: {}
         });
 
         // Save order
-        const savedOrder = await order.save();
+        await order.save();
 
         // Update store's orders array
         await Store.findByIdAndUpdate(
