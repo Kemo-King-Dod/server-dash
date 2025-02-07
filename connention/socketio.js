@@ -17,6 +17,7 @@ function createserver(server) {
 }
 async function connect(socket) {
 
+  console.log(socket.headers)
   if (socket.headers.authorization) {
     await jwt.verify(
       socket.headers.authorization,
@@ -50,7 +51,7 @@ async function connect(socket) {
     );
   }
 
-  
+
   socket.on("UpdateUser", async (data) => {
 
     // عمليات
