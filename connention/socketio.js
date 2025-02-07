@@ -17,13 +17,13 @@ function createserver(server) {
 }
 async function connect(socket) {
 
-  console.log(socket.headers)
   if (socket.handshake.headers.authorization) {
     await jwt.verify(
       socket.handshake.headers.authorization,
-      "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman",
+      "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
       async (err, data) => {
         if (err) {
+          console.log(err)
           console.log('يرجى تسجيل الدخول')
         } else {
           let exist = await User.findOne({ _id: data.id });
@@ -78,7 +78,7 @@ async function connect(socket) {
     if (token) {
       await jwt.verify(
         token,
-        "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman",
+        "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
         async (err, data) => {
           if (err) {
             console.log('يرجى تسجيل الدخول')
@@ -130,7 +130,7 @@ async function connect(socket) {
     if (token) {
       await jwt.verify(
         token,
-        "Our_Electric_Websight_In_#Sebha2024_Kamal_&_Sliman",
+        "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
         async (err, data) => {
           if (err) {
             return;
