@@ -33,9 +33,10 @@ router.post('/addOrder', auth, async (req, res) => {
             if (user.cart[i].cartItem.storeID == StoreId) {
                 const item = await Item.findById(user.cart[i].cartItem.id)
                 itemsdata.push({
-                    id: item._id, 
+                    id: item._id,
                     options: user.cart[i].cartItem.options,
-                    addOns: user.cart[i].cartItem.addOns
+                    addOns: user.cart[i].cartItem.addOns,
+                    quantity: 1 // update later
                 })
                 totalprice += item.price
             }
@@ -142,5 +143,25 @@ router.patch('/deleteOrder', async (req, res) => {
         });
     }
 });
+
+
+router.get('/getOrder', async (req, res) => {
+    try {
+        const userId = req.userId
+        const orders = await Order.find({ userId })
+
+        res.status(200).json({
+            success: true,
+            orders: orders
+        });
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            success: false,
+            message: 'Error adding order',
+            error: err.message
+        });
+    }
+})
 
 module.exports = router;
