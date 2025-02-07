@@ -77,6 +77,7 @@ router.post('/addOrder', auth, async (req, res) => {
         });
 
     } catch (error) {
+        console.log(2)
         res.status(500).json({
             success: false,
             message: 'Error adding order',
