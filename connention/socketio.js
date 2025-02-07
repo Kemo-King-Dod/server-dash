@@ -34,12 +34,12 @@ async function connect(socket) {
             }
             await Store.updateOne(
               { _id: data.id },
-              { $set: { connection: true, connection_id: socket.id } }
+              { $set: { connection: true, connectionId: socket.id } }
             );
           } else {
             await User.updateOne(
               { _id: data.id },
-              { $set: { connection: true, connection_id: socket.id } }
+              { $set: { connection: true, connectionId: socket.id } }
             );
           }
         }
@@ -91,12 +91,12 @@ async function connect(socket) {
               }
               await User.updateOne(
                 { _id: data.id },
-                { $set: { connection: true, connection_id: socket.id } }
+                { $set: { connection: true, connectionId: socket.id } }
               );
             } else {
               await Store.updateOne(
                 { _id: data.id },
-                { $set: { connection: true, connection_id: socket.id } }
+                { $set: { connection: true, connectionId: socket.id } }
               );
             }
           }
@@ -106,20 +106,20 @@ async function connect(socket) {
   });
 
   socket.on("disconnect", async () => {
-    let exist = await Store.findOne({ connection_id: socket.id });
+    let exist = await Store.findOne({ connectionId: socket.id });
     if (!exist) {
-      exist = await User.findOne({ connection_id: socket.id });
+      exist = await User.findOne({ connectionId: socket.id });
       if (!exist) {
         return;
       }
       await User.updateOne(
-        { connection_id: socket.id },
-        { $set: { connection: false, connection_id: null } }
+        { connectionId: socket.id },
+        { $set: { connection: false, connectionId: null } }
       );
     } else {
       await Store.updateOne(
-        { connection_id: socket.id },
-        { $set: { connection: false, connection_id: null } }
+        { connectionId: socket.id },
+        { $set: { connection: false, connectionId: null } }
       );
     }
   });
@@ -143,12 +143,12 @@ async function connect(socket) {
               }
               await User.updateOne(
                 { _id: data.id },
-                { $set: { connection: true, connection_id: socket.id } }
+                { $set: { connection: true, connectionId: socket.id } }
               );
             } else {
               await Store.updateOne(
                 { _id: data.id },
-                { $set: { connection: true, connection_id: socket.id } }
+                { $set: { connection: true, connectionId: socket.id } }
               );
             }
           }
@@ -175,20 +175,20 @@ async function connect(socket) {
 
 function isuserconnected(socket) {
   isconnected = setTimeout(async () => {
-    let exist = await Store.findOne({ connection_id: socket.id });
+    let exist = await Store.findOne({ connectionId: socket.id });
     if (!exist) {
-      exist = await User.findOne({ connection_id: socket.id });
+      exist = await User.findOne({ connectionId: socket.id });
       if (!exist) {
         return;
       }
       await User.updateOne(
-        { connection_id: socket.id },
-        { $set: { connection: false, connection_id: null } }
+        { connectionId: socket.id },
+        { $set: { connection: false, connectionId: null } }
       );
     } else {
       await Store.updateOne(
-        { connection_id: socket.id },
-        { $set: { connection: false, connection_id: null } }
+        { connectionId: socket.id },
+        { $set: { connection: false, connectionId: null } }
       );
     }
   }, 1000 * 20);
