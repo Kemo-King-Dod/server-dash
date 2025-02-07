@@ -51,6 +51,8 @@ async function connect(socket) {
   socket.on("UpdateUser", async (data) => {
 
     // عمليات
+    console.log(data)
+    console.log("UpdateUser")
 
 
     socket.emit("UpdateUser", data.func)
@@ -59,6 +61,12 @@ async function connect(socket) {
   socket.on("UpdateStore", async (data) => {
 
     // عمليات
+    console.log(data)
+    console.log("UpdateStore")
+    const store = await Store.findById(data)
+    if (store.connection)
+      socket.to(store.connectionId).emit("UpdateStore", data)
+
 
 
     socket.emit("UpdateStore", data.func)
@@ -67,6 +75,8 @@ async function connect(socket) {
   socket.on("UpdateDriver", async (data) => {
 
     // عمليات
+    console.log(data)
+    console.log("UpdateDriver")
 
 
     socket.emit("UpdateDriver", data.func)

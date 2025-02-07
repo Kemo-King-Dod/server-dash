@@ -145,15 +145,36 @@ router.patch('/deleteOrder', async (req, res) => {
 });
 
 
-router.get('/getOrder', async (req, res) => {
+router.get('/getOrdersForUser', async (req, res) => {
     try {
         const userId = req.userId
-        const orders = await Order.find({ userId })
+        const orders = await Order.find({ customer_id: userId })
 
         res.status(200).json({
             success: true,
             orders: orders
         });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            success: false,
+            message: 'Error adding order',
+            error: err.message
+        });
+    }
+})
+
+router.get('/getOrdersForStore', async (req, res) => {
+    try {
+        const userId = req.userId
+        const orders = await Order.find({ store_id: userId })
+
+        res.status(200).json({
+            success: true,
+            orders: orders
+        });
+
     } catch (err) {
         console.log(err)
         res.status(500).json({
