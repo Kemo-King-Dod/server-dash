@@ -37,6 +37,7 @@ router.post('/addOrder', auth, async (req, res) => {
             }
         }
 
+        console.log(StoreId)
 
         // Create new order
         const order = new Order({
@@ -56,6 +57,7 @@ router.post('/addOrder', auth, async (req, res) => {
 
         // Save order
         await order.save();
+        console.log(order)
 
         const theorderId = await Order.findOne({ order_id: ordersNum })
 
