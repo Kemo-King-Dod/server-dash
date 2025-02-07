@@ -13,7 +13,7 @@ async function read() {
     const data = await fs.readFile(path.join(__dirname, "..", "data", "oredr.txt"))
     ordersNum = parseInt(data.toString())
     await fs.writeFile(path.join(__dirname, "..", "data", "oredr.txt"),`${ordersNum+1}`)
-    return ordersNum++
+    return ordersNum
 }
 
 // Add new order
