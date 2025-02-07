@@ -19,6 +19,7 @@ async function read() {
 // Add new order
 router.post('/addOrder', auth, async (req, res) => {
     try {
+        console.log(1)
         const userId = req.userId;
         const StoreId = req.body.StoreId;
         const AddressId = req.body.AddressId;
