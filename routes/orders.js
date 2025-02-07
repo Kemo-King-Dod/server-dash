@@ -71,6 +71,14 @@ router.post('/addOrder', auth, async (req, res) => {
             { $push: { orders: theorderId._id } }
         );
 
+        // delete from cart
+        for (var i = 0; i < user.cart.length; i++) {
+            if (user.cart[i].cartItem.storeID == StoreId) {
+                user.cart.splice(i, 1)
+                i--
+            }
+        }
+
         res.status(200).json({
             success: true,
             message: 'Order added successfully',
