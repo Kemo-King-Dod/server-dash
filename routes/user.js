@@ -105,7 +105,7 @@ router.post('/alterUserPassword', auth, async (req, res) => {
     try {
         const userId = req.userId
         const user = await User.findById(userId)
-        if (bcrypt.compare(req.body.currentPassword, user.password)) {
+        if (await bcrypt.compare(req.body.currentPassword, user.password)) {
             const salt = await bcrypt.genSalt(10)
             user.password = await bcrypt.hash(req.body.newPassword, salt)
             await user.save()
