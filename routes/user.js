@@ -103,6 +103,7 @@ router.post('/alterUserName', auth, async (req, res) => {
 
 router.post('/alterUserPassword', auth, async (req, res) => {
     try {
+        console.log(1)
         const userId = req.userId
         const user = await User.findById(userId)
         console.log(user.password)
