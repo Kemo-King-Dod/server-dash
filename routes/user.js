@@ -103,11 +103,8 @@ router.post('/alterUserName', auth, async (req, res) => {
 
 router.post('/alterUserPassword', auth, async (req, res) => {
     try {
-        console.log(1)
         const userId = req.userId
         const user = await User.findById(userId)
-        console.log(user.password)
-        console.log(req.body.currentPassword)
         const valied = await bcrypt.compare(req.body.currentPassword, user.password)
         if (valied) {
             const salt = await bcrypt.genSalt(10)
