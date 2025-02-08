@@ -4,6 +4,7 @@ const User = require('../database/users');
 const Driver = require('../database/driver')
 const Store = require('../database/store')
 const Addresse = require('../database/address')
+const bcrypt = require('bcrypt')
 const { auth } = require('../middleware/auth')
 
 router.post('/addAddress', auth, async (req, res) => {
@@ -81,10 +82,8 @@ router.get('/getAddressess', auth, async (req, res) => {
     }
 })
 
-router.post('/alterPersonalData', auth, async (req, res) => {
+router.post('/alterUserName', auth, async (req, res) => {
     try {
-        console.log(1)
-        console.log(req.body)
         const userId = req.userId
         const user = await User.findById(userId)
         user.name = req.body.name
@@ -92,6 +91,26 @@ router.post('/alterPersonalData', auth, async (req, res) => {
         res.status(200).json({
             error: false,
             message: 'تم تحديث البيانات بنجاح'
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
+        })
+    }
+})
+
+router.post('/alterUserPassword', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const user = await User.findById(userId)
+        const salt = await bcrypt.genSalt(10)
+        user.password = await bcrypt.hash(req.body.password, salt)
+        await user.save()
+        res.status(200).json({
+            error: false,
+            message: 'تم تحديث كلمة المرور بنجاح'
         })
     } catch (err) {
         console.log(err)
