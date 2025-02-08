@@ -41,7 +41,7 @@ router.patch('/deleteAddress', auth, async (req, res) => {
 
         for (var i = 0; i < user.locations.length; i++) {
             if (user.locations[i]._id == req.body.id) {
-                await Addresse.deleteOne({_id: user.locations[i]._id})
+                await Addresse.deleteOne({ _id: user.locations[i]._id })
                 user.locations.splice(i, 1)
                 break
             }
@@ -72,11 +72,30 @@ router.get('/getAddressess', auth, async (req, res) => {
         })
 
 
-    } catch (error) {
-        console.log(error)
+    } catch (err) {
+        console.log(err)
         res.status(500).json({
             error: true,
-            message: error
+            message: err
+        })
+    }
+})
+
+router.post('/alterPersonalData', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const user = await User.findById(userId)
+        user.name = req.body.name
+        await user.save()
+        res.status(200).json({
+            error: false,
+            message: 'تم تحديث البيانات بنجاح'
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
         })
     }
 })
