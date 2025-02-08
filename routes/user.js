@@ -119,7 +119,7 @@ router.post('/alterUserPassword', auth, async (req, res) => {
         }
         else {
             res.status(200).json({
-                error: false,
+                error: true,
                 message: 'كلمة المرور الحالية غير صحيحة'
             })
         }
