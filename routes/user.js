@@ -83,6 +83,8 @@ router.get('/getAddressess', auth, async (req, res) => {
 
 router.post('/alterPersonalData', auth, async (req, res) => {
     try {
+        console.log(1)
+        console.log(req.body)
         const userId = req.userId
         const user = await User.findById(userId)
         user.name = req.body.name
