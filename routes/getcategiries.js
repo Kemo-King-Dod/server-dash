@@ -9,19 +9,19 @@ router.get('/categories', (req, res) => {
         const categiries = []
         categiries.push({
             name: 'athath.avif',
-            Image: path.join(__dirname,'..','data','pictures','athath.avif')
+            image: path.join(__dirname,'..','data','pictures','athath.avif')
         })
         categiries.push({
             name: 'bergar.avif',
-            Image: path.join(__dirname,'..','data','pictures','bergar.avif')
+            image: path.join(__dirname,'..','data','pictures','bergar.avif')
         })
         categiries.push({
             name: 'clothes.avif',
-            Image: path.join(__dirname,'..','data','pictures','clothes.avif')
+            image: path.join(__dirname,'..','data','pictures','clothes.avif')
         })
         categiries.push({
             name: 'tools.avif',
-            Image: path.join(__dirname,'..','data','pictures','tools.avif')
+            image: path.join(__dirname,'..','data','pictures','tools.avif')
         })
         console.log(categiries)
         res.status(200).send({
