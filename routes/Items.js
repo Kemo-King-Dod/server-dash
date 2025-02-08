@@ -26,7 +26,6 @@ route.post("/additems", auth, async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
         const { name, price, description, stock, category, options, addOns, imageUrl } = req.body;
-        console.log(imageUrl)
         if (!token) {
             return res.status(401).json({
                 error: true,
@@ -66,7 +65,6 @@ route.post("/additems", auth, async (req, res) => {
             { _id: the_store.id },
             { $push: { items: newItem._id } }
         );
-        console.log(newItem);
         the_items++;
         await fs.writeFile(
             path.join(__dirname, "..", "data", "data.txt"),

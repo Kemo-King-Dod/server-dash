@@ -58,6 +58,9 @@ app.use(user);
 const orders = require("./routes/orders.js");
 app.use(orders);
 
+const categiries = require("./routes/getcategiries.js");
+app.use(categiries);
+
 
 
 // const ShopLogin = require("./routess/shopLogin.js");
