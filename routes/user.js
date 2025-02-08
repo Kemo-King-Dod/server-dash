@@ -105,13 +105,22 @@ router.post('/alterUserPassword', auth, async (req, res) => {
     try {
         const userId = req.userId
         const user = await User.findById(userId)
-        if (await bcrypt.compare(req.body.currentPassword, user.password)) {
+        console.log(user.password)
+        console.log(req.body.currentPassword)
+        const valied = await bcrypt.compare(req.body.currentPassword, user.password)
+        if (valied) {
             const salt = await bcrypt.genSalt(10)
             user.password = await bcrypt.hash(req.body.newPassword, salt)
             await user.save()
             res.status(200).json({
                 error: false,
                 message: 'تم تحديث كلمة المرور بنجاح'
+            })
+        }
+        else {
+            res.status(200).json({
+                error: false,
+                message: 'كلمة المرور الحالية غير صحيحة'
             })
         }
     } catch (err) {
