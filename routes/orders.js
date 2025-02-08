@@ -89,7 +89,7 @@ router.post('/addOrder', auth, async (req, res) => {
         await user.save()
 
         res.status(200).json({
-            error: true,
+            error: false,
             message: 'Order added successfully',
             order: theorderId
         });
@@ -97,7 +97,7 @@ router.post('/addOrder', auth, async (req, res) => {
     } catch (error) {
         console.log(error)
         res.status(500).json({
-            error: false,
+            error: true,
             message: 'Error adding order',
             error: error.message
         });
@@ -110,7 +110,7 @@ router.patch('/deleteOrder', async (req, res) => {
         const order = await Order.findById(req.body.orderId);
         if (!order) {
             return res.status(404).json({
-                error: false,
+                error: true,
                 message: 'Order not found'
             });
         }
@@ -131,13 +131,13 @@ router.patch('/deleteOrder', async (req, res) => {
         await Order.findByIdAndDelete(req.body.orderId);
 
         res.status(200).json({
-            error: true,
+            error: false,
             message: 'Order deleted successfully'
         });
 
     } catch (error) {
         res.status(500).json({
-            error: false,
+            error: true,
             message: 'Error deleting order',
             error: error.message
         });
@@ -151,14 +151,14 @@ router.get('/getOrdersForUser', async (req, res) => {
         const orders = await Order.find({ customer_id: userId })
 
         res.status(200).json({
-            error: true,
+            error: false,
             orders: orders
         });
 
     } catch (err) {
         console.log(err)
         res.status(500).json({
-            error: false,
+            error: true,
             message: 'Error adding order',
             error: err.message
         });
@@ -171,14 +171,14 @@ router.get('/getOrdersForStore', async (req, res) => {
         const orders = await Order.find({ store_id: userId })
 
         res.status(200).json({
-            error: true,
+            error: false,
             orders: orders
         });
 
     } catch (err) {
         console.log(err)
         res.status(500).json({
-            error: false,
+            error: true,
             message: 'Error adding order',
             error: err.message
         });
