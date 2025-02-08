@@ -4,7 +4,7 @@ const router = express.Router();
 const path = require("path");
 
 
-router.get('/categiries', (req, res) => {
+router.get('/categories', (req, res) => {
     try {
         const categiries = []
         categiries.push({
