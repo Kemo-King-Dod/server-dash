@@ -23,6 +23,7 @@ router.get('/categiries', (req, res) => {
             name: 'tools.avif',
             Image: path.join(__dirname,'..','data','pictures','tools.avif')
         })
+        console.log(categiries)
         res.status(200).send({
             error: false,
             categories: categiries
