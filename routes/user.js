@@ -105,13 +105,15 @@ router.post('/alterUserPassword', auth, async (req, res) => {
     try {
         const userId = req.userId
         const user = await User.findById(userId)
-        const salt = await bcrypt.genSalt(10)
-        user.password = await bcrypt.hash(req.body.password, salt)
-        await user.save()
-        res.status(200).json({
-            error: false,
-            message: 'تم تحديث كلمة المرور بنجاح'
-        })
+        if (bcrypt.compare(req.body.currentPassword, user.password)) {
+            const salt = await bcrypt.genSalt(10)
+            user.password = await bcrypt.hash(req.body.newPassword, salt)
+            await user.save()
+            res.status(200).json({
+                error: false,
+                message: 'تم تحديث كلمة المرور بنجاح'
+            })
+        }
     } catch (err) {
         console.log(err)
         res.status(500).json({
