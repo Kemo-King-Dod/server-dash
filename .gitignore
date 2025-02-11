@@ -1,8 +1,8 @@
 # Node modules
 node_modules/
 
-# igonre uploads
-uploads/
+# # igonre uploads
+# uploads/
 
 # Environment variables
 .env
