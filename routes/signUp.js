@@ -161,6 +161,7 @@ router.post('/store', async (req, res) => {
                 error: true,
                 data: 'جميع الحقول مطلوبة'
             });
+            return
         }
 
         const existingStore = await Store.findOne({ phone });
@@ -170,6 +171,7 @@ router.post('/store', async (req, res) => {
                 error: true,
                 data: 'رقم الهاتف مسجل مسبقاً'
             });
+            return
         }
 
         const salt = await bcrypt.genSalt(10);
