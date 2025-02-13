@@ -191,9 +191,9 @@ route.get("/getAllItems", async (req, res) => {
     }
 });
 
-route.get('/getStoreItems/:id', auth, async (req, res) => {
+route.post('/getStoreItems', auth, async (req, res) => {
     try {
-        var id = req.params.id
+        var id = req.body.id
         var userid = null
 
         const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -234,6 +234,36 @@ route.get('/getStoreItems/:id', auth, async (req, res) => {
                 }
             }
         }
+
+
+        res.json({ error: false, data: allItems });
+    } catch (error) {
+        console.log(error);
+        res.status(401).json({
+            error: true,
+            message: error.message
+        });
+    }
+})
+
+route.get('/StoreItems', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const allItems = []
+
+        // Get Store 
+        const store = await Store.findOne({ _id: userId })
+
+        // Get all store items 
+        const theitems = []
+        for (let i = 0; i < store.items.length; i++) {
+            theitems[i] = await items.findOne({ _id: store.items[i].toString() })
+        }
+
+        for (let i = 0; i < theitems.length; i++) {
+            if (theitems[i])
+                allItems.push(theitems[i])
+        }       
 
 
         res.json({ error: false, data: allItems });
