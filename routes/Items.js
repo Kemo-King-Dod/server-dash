@@ -221,6 +221,7 @@ route.post('/getStoreItems', auth, async (req, res) => {
         }
 
 
+        console.log(req.headers)
         if(req.headers.visitor){
             res.json({ error: false, data: allItems });
             return
