@@ -21,12 +21,22 @@ async function read() {
     the_items = parseInt(data.toString())
 }
 
+// Add this helper function after the imports
+const deleteUploadedFile = async (filePath) => {
+  try {
+    if (!filePath) return;
+    await fs.unlink(filePath);
+  } catch (error) {
+    console.error('Error deleting file:', error);
+  }
+};
 
 route.post("/additems", auth, async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
         const { name, price, description, stock, category, options, addOns, imageUrl } = req.body;
         if (!token) {
+            await deleteUploadedFile(imageUrl);
             return res.status(401).json({
                 error: true,
                 message: "Token not provided"
@@ -36,12 +46,14 @@ route.post("/additems", auth, async (req, res) => {
         const the_store = await Store.findOne({ _id: await jwt.verify(token, "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman").id });
 
         if (!the_store || the_store.registerCondition !== "accepted") {
+            await deleteUploadedFile(imageUrl);
             console.log('غير مصرح')
             return res.status(403).json({
                 error: true,
                 operation: "addProduct",
                 message: "غير مصرح"
             });
+            
         }
 
         const item = {
@@ -77,6 +89,7 @@ route.post("/additems", auth, async (req, res) => {
             message: newItem
         });
     } catch (error) {
+        await deleteUploadedFile(req.body.imageUrl);
         console.log(error.message)
         res.status(500).json({
             error: true,

@@ -5,11 +5,21 @@ const jwt = require('jsonwebtoken');
 const User = require('../database/users');
 const Driver = require('../database/driver');
 const Store = require('../database/store');
+const fs = require('fs');
 
 const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
 
 const sign = function (id, type) {
     return jwt.sign({ id, type }, JWT_SECRET);
+};
+
+const deleteUploadedFile = async (filePath) => {
+    try {
+        if (!filePath) return;
+        await fs.unlink(filePath);
+    } catch (error) {
+        console.error('Error deleting file:', error);
+    }
 };
 
 // User Signup
@@ -151,27 +161,25 @@ router.post('/driver', async (req, res) => {
 // Store Signup
 router.post('/store', async (req, res) => {
     try {
-        console.log(req.body)
         const { name, password, phone, storeType, idNumber, licenseNumber, ownerName, city, location, address, picture, fcmToken } = req.body;
 
         if (!name || !password || !phone || !storeType || !idNumber || !ownerName || !city || !licenseNumber || !location || !address || !picture || picture == null) {
-        console.log(1)
-        console.log(1)
+            await deleteUploadedFile(picture);
             res.status(400).json({
                 error: true,
                 data: 'جميع الحقول مطلوبة'
             });
-            return
+            return;
         }
 
         const existingStore = await Store.findOne({ phone });
         if (existingStore) {
-        console.log(2)
+            await deleteUploadedFile(picture);
             res.status(400).json({
                 error: true,
                 data: 'رقم الهاتف مسجل مسبقاً'
             });
-            return
+            return;
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -210,9 +218,8 @@ router.post('/store', async (req, res) => {
         await newStore.save();
         const token = sign(newStore._id, "Store");
 
-        console.log(5)
         res.status(201).json({
-        error: false,
+            error: false,
             data: {
                 token,
                 user: {
@@ -226,6 +233,7 @@ router.post('/store', async (req, res) => {
             }
         });
     } catch (error) {
+        await deleteUploadedFile(req.body.picture);
         console.log(error.message)
         res.status(500).json({
             error: true,
