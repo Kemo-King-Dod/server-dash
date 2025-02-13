@@ -220,6 +220,12 @@ route.post('/getStoreItems', auth, async (req, res) => {
                 allItems.push(theitems[i])
         }
 
+
+        if(req.body.visitor){
+            res.json({ error: false, data: allItems });
+            return
+        }
+
         // Add isFavorite property to each item
         for (var i = 0; i < allItems.length; i++) {
             allItems[i]._doc.isFavorite = false;

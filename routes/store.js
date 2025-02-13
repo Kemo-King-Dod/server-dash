@@ -5,11 +5,19 @@ const Driver = require('../database/driver');
 const Store = require('../database/store');
 const { auth } = require('../middleware/auth')
 
-router.get('/getStores', auth,  async (req, res) => {
+router.get('/getStores', auth, async (req, res) => {
     try {
 
         const id = req.userId
         const stores = await Store.find({}, { password: 0, items: 0 })
+
+        if (req.body.visitor) {
+            res.status(200).json({
+                error: false,
+                data: stores
+            })
+            return
+        }
 
         // Add isFavorite property to each item
         for (var i = 0; i < stores.length; i++) {
@@ -20,7 +28,6 @@ router.get('/getStores', auth,  async (req, res) => {
             const user = await User.findOne({ _id: id });
             for (var i = 0; i < stores.length; i++) {
                 for (var j = 0; j < user.favorateStors.length; j++) {
-                    if (favorateStors[j] == null) continue
                     if (user.favorateStors[j]._id.toString() == stores[i]._id.toString()) {
                         stores[i]._doc.isFavorite = true;
                     }
