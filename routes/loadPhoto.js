@@ -16,8 +16,6 @@ const upload = multer({
   storage: storage,
   fileFilter: function (req, file, cb) {
     try {
-      console.log(req.file)
-      console.log(file)
       const filetypes = /jpeg|jpg|png|bmp|webp|tiff|svg|heic|heif|raw|cr2|nef|arw|dng|psd|avif|jxr|hdr|exr/
       const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
       const mimetype = filetypes.test(file.mimetype)
@@ -38,8 +36,6 @@ const upload = multer({
 
 app.post('/upload', upload.single('photo'), (req, res) => {
   try {
-    console.log('reatch ')
-    console.log(req.file)
     if (!req.body.password || req.body.password !== 'Chackmate@9876') {
       return res.status(401).json({
         error: true,
