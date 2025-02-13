@@ -166,7 +166,7 @@ route.get("/getAllItems", async (req, res) => {
         data = allItems.slice(0, 5);
 
         console.log(req.headers)
-        if(req.headers.visitor){
+        if(req.headers.headers){
             res.json({ error: false, items: data });
             return
         }
@@ -228,7 +228,7 @@ route.post('/getStoreItems', auth, async (req, res) => {
 
 
         console.log(req.headers)
-        if(req.headers.visitor){
+        if(req.headers.headers){
             res.json({ error: false, data: allItems });
             return
         }

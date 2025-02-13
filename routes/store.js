@@ -12,7 +12,7 @@ router.get('/getStores', auth, async (req, res) => {
         const stores = await Store.find({}, { password: 0, items: 0 })
 
         console.log(req.headers)
-        if (req.headers.visitor) {
+        if (req.headers.headers) {
             res.status(200).json({
                 error: false,
                 data: stores
