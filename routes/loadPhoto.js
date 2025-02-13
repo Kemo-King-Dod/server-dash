@@ -15,38 +15,54 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   fileFilter: function (req, file, cb) {
-    console.log(req.file)
-    console.log(file)
-    const filetypes = /jpeg|jpg|png|bmp|webp|tiff|svg|heic|heif|raw|cr2|nef|arw|dng|psd|avif|jxr|hdr|exr/
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
-    const mimetype = filetypes.test(file.mimetype)
+    try {
+      console.log(req.file)
+      console.log(file)
+      const filetypes = /jpeg|jpg|png|bmp|webp|tiff|svg|heic|heif|raw|cr2|nef|arw|dng|psd|avif|jxr|hdr|exr/
+      const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
+      const mimetype = filetypes.test(file.mimetype)
 
-    if (extname && mimetype) {
-      return cb(null, true)
+      if (extname && mimetype) {
+        return cb(null, true)
+      }
+      cb(new Error('Only image files are allowed!'))
+    } catch (err) {
+      console.log(err)
+      res.status(400).json({
+        error: true,
+        path: 'لم يتم تحميل ملفات'
+      })
     }
-    cb(new Error('Only image files are allowed!'))
   }
 })
 
 app.post('/upload', upload.single('photo'), (req, res) => {
-  console.log('reatch ')
-  console.log(req.file)
-  if(!req.body.password || req.body.password !== 'Chackmate@9876') {
-    return res.status(401).json({
-      error: true,
-      message: 'يجب إدخال كلمة المرور'
+  try {
+    console.log('reatch ')
+    console.log(req.file)
+    if (!req.body.password || req.body.password !== 'Chackmate@9876') {
+      return res.status(401).json({
+        error: true,
+        message: 'يجب إدخال كلمة المرور'
+      })
+    }
+    if (!req.file) {
+      res.status(400).json({
+        error: true,
+        path: 'لم يتم تحميل ملفات'
+      })
+    }
+    res.json({
+      error: false,
+      path: req.file.path
     })
-  }
-  if (!req.file) {
-    return res.status(400).json({
+  } catch (err) {
+    console.log(err)
+    res.status(400).json({
       error: true,
       path: 'لم يتم تحميل ملفات'
     })
   }
-  res.json({
-    error: false,
-    path: req.file.path
-  })
 })
 
 module.exports = app
