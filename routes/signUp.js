@@ -19,7 +19,7 @@ router.post('/user', async (req, res) => {
 
         if (!name || !password || !phone) {
             return res.status(400).json({
-                error: false,
+                error: true,
                 data: 'جميع الحقول مطلوبة'
             });
         }
@@ -27,7 +27,7 @@ router.post('/user', async (req, res) => {
         const existingUser = await User.findOne({ phone });
         if (existingUser) {
             return res.status(400).json({
-                error: false,
+                error: true,
                 data: 'رقم الهاتف مسجل مسبقاً'
             });
         }
@@ -84,7 +84,7 @@ router.post('/driver', async (req, res) => {
 
         if (!name || !password || !phone || !licenseNumber || !licensePicture || !viacleType) {
             return res.status(400).json({
-                error: false,
+                error: true,
                 data: 'جميع الحقول مطلوبة'
             });
         }
@@ -92,7 +92,7 @@ router.post('/driver', async (req, res) => {
         const existingDriver = await Driver.findOne({ phone });
         if (existingDriver) {
             return res.status(400).json({
-                error: false,
+                error: true,
                 data: 'رقم الهاتف مسجل مسبقاً'
             });
         }
@@ -158,7 +158,7 @@ router.post('/store', async (req, res) => {
         console.log(1)
         console.log(1)
             return res.status(400).json({
-                error: false,
+                error: true,
                 data: 'جميع الحقول مطلوبة'
             });
         }
@@ -167,7 +167,7 @@ router.post('/store', async (req, res) => {
         if (existingStore) {
         console.log(2)
             return res.status(400).json({
-                error: false,
+                error: true,
                 data: 'رقم الهاتف مسجل مسبقاً'
             });
         }
