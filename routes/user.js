@@ -67,6 +67,12 @@ router.get('/getAddressess', auth, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.userId })
 
+        if (!user.locations)
+            res.status(500).json({
+                error: true,
+                data: 'لم يتم إضافة موقع'
+            })
+
         res.status(200).json({
             error: false,
             data: user.locations
