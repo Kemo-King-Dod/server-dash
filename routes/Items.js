@@ -165,6 +165,12 @@ route.get("/getAllItems", async (req, res) => {
         // }
         data = allItems.slice(0, 5);
 
+        console.log(req.headers)
+        if(req.headers.visitor){
+            res.json({ error: false, items: data });
+            return
+        }
+
         // Add isFavorite property to each item
         for (var i = 0; i < data.length; i++) {
             data[i]._doc.isFavorite = false;
