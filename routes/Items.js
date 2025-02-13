@@ -228,7 +228,7 @@ route.post('/getStoreItems', auth, async (req, res) => {
 
 
         console.log(req.headers)
-        if(req.headers.headers && req.headers.headers == 'true'){
+        if(req.headers.isvisiter && req.headers.isvisiter == 'true'){
             res.json({ error: false, data: allItems });
             return
         }
