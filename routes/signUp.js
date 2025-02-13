@@ -154,7 +154,7 @@ router.post('/store', async (req, res) => {
         console.log(req.body)
         const { name, password, phone, storeType, idNumber, licenseNumber, ownerName, city, location, address, picture, fcmToken } = req.body;
 
-        if (!name || !password || !phone || !storeType || !idNumber || !ownerName || !city || !licenseNumber || !location || !address || !picture) {
+        if (!name || !password || !phone || !storeType || !idNumber || !ownerName || !city || !licenseNumber || !location || !address || !picture || picture == null) {
         console.log(1)
         console.log(1)
             res.status(400).json({
