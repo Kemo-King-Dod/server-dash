@@ -11,7 +11,8 @@ router.get('/getStores', auth, async (req, res) => {
         const id = req.userId
         const stores = await Store.find({}, { password: 0, items: 0 })
 
-        if (req.body.visitor) {
+        console.log(req.headers)
+        if (req.headers.visitor) {
             res.status(200).json({
                 error: false,
                 data: stores
