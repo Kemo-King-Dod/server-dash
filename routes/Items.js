@@ -23,12 +23,12 @@ async function read() {
 
 // Add this helper function after the imports
 const deleteUploadedFile = async (filePath) => {
-  try {
-    if (!filePath) return;
-    await fs.unlink(filePath);
-  } catch (error) {
-    console.error('Error deleting file:', error);
-  }
+    try {
+        if (!filePath) return;
+        await fs.unlink(filePath);
+    } catch (error) {
+        console.error('Error deleting file:', error);
+    }
 };
 
 route.post("/additems", auth, async (req, res) => {
@@ -53,7 +53,7 @@ route.post("/additems", auth, async (req, res) => {
                 operation: "addProduct",
                 message: "غير مصرح"
             });
-            
+
         }
 
         const item = {
@@ -174,6 +174,7 @@ route.get("/getAllItems", async (req, res) => {
             const user = await User.findOne({ _id: id });
             for (var i = 0; i < data.length; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
+                    if (favorateItems[j] == null) continue
                     if (user.favorateItems[j]._id.toString() == data[i]._id.toString()) {
                         data[i]._doc.isFavorite = true;
                     }
@@ -228,6 +229,7 @@ route.post('/getStoreItems', auth, async (req, res) => {
             const user = await User.findOne({ _id: userid });
             for (var i = 0; i < allItems.length; i++) {
                 for (var j = 0; j < user.favorateItems.length; j++) {
+                    if (favorateItems[j] == null) continue
                     if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
                         allItems[i]._doc.isFavorite = true;
                     }
@@ -263,7 +265,7 @@ route.get('/StoreItems', auth, async (req, res) => {
         for (let i = 0; i < theitems.length; i++) {
             if (theitems[i])
                 allItems.push(theitems[i])
-        }       
+        }
 
 
         res.json({ error: false, data: allItems });
