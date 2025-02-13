@@ -165,13 +165,10 @@ route.get("/getAllItems", async (req, res) => {
         // }
         data = allItems.slice(0, 5);
 
-        console.log(req.headers.isvisiter)
         if(req.headers.isvisiter && req.headers.isvisiter == 'true'){
-            console.log(1)
-            res.json({ error: false, data: allItems });
+            res.json({ error: false, items: allItems });
             return
         }
-        console.log(2)
 
         // Add isFavorite property to each item
         for (var i = 0; i < data.length; i++) {
@@ -229,13 +226,10 @@ route.post('/getStoreItems', auth, async (req, res) => {
         }
 
 
-        console.log(req.headers.isvisiter)
         if(req.headers.isvisiter && req.headers.isvisiter == 'true'){
-            console.log(1)
             res.json({ error: false, data: allItems });
             return
         }
-        console.log(2)
 
         // Add isFavorite property to each item
         for (var i = 0; i < allItems.length; i++) {
