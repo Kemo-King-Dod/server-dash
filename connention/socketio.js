@@ -17,7 +17,9 @@ function createserver(server) {
 }
 async function connect(socket) {
 
+  console.log(socket.id)
   if (socket.handshake.headers.authorization) {
+
     await jwt.verify(
       socket.handshake.headers.authorization,
       "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
