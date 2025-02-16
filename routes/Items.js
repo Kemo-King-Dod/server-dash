@@ -341,7 +341,7 @@ route.post("/category", async (req, res) => {
 
     // add store name and image to the items
     for (let i = 0; i < data.length; i++) {
-      if (data[i].storeID == null) {
+      if (data[i] == null) {
         data.splice(i, 1)
         continue
       }
