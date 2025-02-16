@@ -341,11 +341,11 @@ route.post("/category", async (req, res) => {
 
     // add store name and image to the items
     for (let i = 0; i < data.length; i++) {
-      var itemStore = await Store.findById(data[i].storeID.toString());
       if (data[i].storeID == null) {
         data.splice(i, 1)
         continue
       }
+      var itemStore = await Store.findById(data[i].storeID.toString());
       data[i]._doc.storeName = itemStore.name;
       data[i]._doc.storeImage = itemStore.picture;
     }
