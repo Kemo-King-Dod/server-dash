@@ -281,6 +281,7 @@ route.post("/getStoreItems", auth, async (req, res) => {
 
 route.get("/storeItems", auth, async (req, res) => {
   try {
+    console.log('storeItems')
     const userId = req.userId;
     const allItems = [];
 
@@ -335,15 +336,16 @@ route.post("/category", async (req, res) => {
         allItems.push(item)
       }
     }
-    
+
     data = allItems;
 
     // add store name and image to the items
     for (let i = 0; i < data.length; i++) {
       var itemStore = await Store.findById(data[i].storeID.toString());
-      console.log(itemStore)
-      console.log(data[i].storeID)
-      console.log(data[i].storeID.toString())
+      if (data[i].storeID == null) {
+        data.splice(i, 1)
+        continue
+      }
       data[i]._doc.storeName = itemStore.name;
       data[i]._doc.storeImage = itemStore.picture;
     }
