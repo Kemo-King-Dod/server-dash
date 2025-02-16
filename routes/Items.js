@@ -183,7 +183,6 @@ route.get("/getAllItems", async (req, res) => {
       data[i]._doc.storeName = itemStore.name;
       data[i]._doc.storeImage = itemStore.picture;
     }
-    console.log(data);
 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
       res.json({ error: false, items: data });
@@ -319,10 +318,9 @@ route.post("/category", async (req, res) => {
     await read();
 
     // Get all available items
-    if (req.body.category == 'مطاعم')
-      allStores = await Store.find({ category: 'أخرى'})
-    else
-      allStores = await Store.find({ category: req.body.category })
+    const allStores = await Store.find({ category: req.body.category })
+
+
 
     const storedata = []
     var rand = Math.random() * 10;
@@ -345,6 +343,9 @@ route.post("/category", async (req, res) => {
 
     // are you visitor 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
+      console.log(data[0])
+      console.log('---------------------------------')
+      console.log(storedata[0])
       res.json({ error: false, data: data, storedata: storedata });
       return;
     }
