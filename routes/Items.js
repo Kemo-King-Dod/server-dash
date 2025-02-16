@@ -340,10 +340,10 @@ route.post("/category", async (req, res) => {
 
     // add store name and image to the items
     for (let i = 0; i < data.length; i++) {
-      console.log(data[i])
-      console.log('---------------------------')
-      console.log(i)
-      var itemStore = await Store.findById(data[i].storeID);
+      var itemStore = await Store.findById(data[i].storeID.toString());
+      console.log(itemStore)
+      console.log(data[i].storeID)
+      console.log(data[i].storeID.toString())
       data[i]._doc.storeName = itemStore.name;
       data[i]._doc.storeImage = itemStore.picture;
     }
