@@ -323,7 +323,7 @@ route.post("/category", async (req, res) => {
     // Get all available items
     const allStores = await Store.find({ storeType: req.body.category })
 
-    console.log()
+    console.log(req.body.category)
     console.log('allStores')
     console.log(allStores)
 
