@@ -329,8 +329,9 @@ route.post("/category", async (req, res) => {
 
 
     var storedata = []
-    var rand = Math.random() * 10
-    storedata = allStores.slice(rand, rand + 2)
+    storedata = allStores
+    // var rand = Math.random() * 10
+    // storedata = allStores.slice(rand, rand + 2)
 
     const allItems = []
     for (let i = 0; i < storedata.length; i++) {
