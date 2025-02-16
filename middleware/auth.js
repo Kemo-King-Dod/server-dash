@@ -14,6 +14,7 @@ const auth = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, JWT_SECRET);
+        console.log(token)
         req.userId = decoded.id;
         next();
     } catch (error) {
