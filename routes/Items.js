@@ -323,10 +323,6 @@ route.post("/category", async (req, res) => {
     // Get all available items
     const allStores = await Store.find({ category: req.body.category })
 
-
-    console.log('allItems')
-    console.log(allItems)
-
     var storedata = []
     var rand = Math.random() * 10
     storedata = allStores.slice(rand, rand + 2)
@@ -338,6 +334,8 @@ route.post("/category", async (req, res) => {
         allItems[i].push(item)
       }
     }
+    console.log('allItems')
+    console.log(allItems)
     data = allItems;
 
     // add store name and image to the items
