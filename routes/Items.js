@@ -8,8 +8,8 @@ const Store = require("../database/store");
 const User = require("../database/users");
 const { auth } = require("../middleware/auth");
 
-const Random = [];
-const data = [];
+let Random = [];
+let data = [];
 let the_items;
 
 read();
