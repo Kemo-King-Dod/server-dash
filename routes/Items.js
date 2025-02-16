@@ -323,11 +323,6 @@ route.post("/category", async (req, res) => {
     // Get all available items
     const allStores = await Store.find({ storeType: req.body.category })
 
-    console.log(req.body.category)
-    console.log('allStores')
-    console.log(allStores)
-
-
     var storedata = []
     storedata = allStores
     // var rand = Math.random() * 10
@@ -338,15 +333,16 @@ route.post("/category", async (req, res) => {
       for (let j = 0; j < storedata[i].items.length; j++) {
         var item = await items.findById(storedata[i].items[j])
         allItems.push(item)
-        console.log('now')
       }
     }
-    console.log('allItems')
-    console.log(allItems)
+    
     data = allItems;
 
     // add store name and image to the items
     for (let i = 0; i < data.length; i++) {
+      console.log(data[i])
+      console.log('---------------------------')
+      console.log(i)
       var itemStore = await Store.findById(data[i].storeID);
       data[i]._doc.storeName = itemStore.name;
       data[i]._doc.storeImage = itemStore.picture;
@@ -354,11 +350,6 @@ route.post("/category", async (req, res) => {
 
     // are you visitor 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
-      console.log('---------------------------------')
-      console.log(data[0])
-      console.log('---------------------------------')
-      console.log(storedata[0])
-      console.log('---------------------------------')
       res.json({
         error: false, data: {
           products: data,
