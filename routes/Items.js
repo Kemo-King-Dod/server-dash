@@ -8,8 +8,8 @@ const Store = require("../database/store");
 const User = require("../database/users");
 const { auth } = require("../middleware/auth");
 
-let Random = [];
-let data = [];
+const Random = [];
+const data = [];
 let the_items;
 
 read();
@@ -308,9 +308,6 @@ route.get("/StoreItems", auth, async (req, res) => {
 
 route.post("/category", async (req, res) => {
   try {
-    console.log(req.params);
-    console.log(req.body);
-    
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
@@ -322,31 +319,58 @@ route.post("/category", async (req, res) => {
     await read();
 
     // Get all available items
-    const allItems = await items.find({category: 'أخرى'});
+    if (req.body.category == 'مطاعم')
+      req.body.category = 'أخرى'
 
-
-    // If we have less than 4 items total, return all of them
-    // if (allItems.length <= 4) {
-    //     data = allItems;
-    // } else {
-    //     // Randomly select 4 unique items
-    //     const shuffled = allItems.sort(() => 0.5 - Math.random());
-    // }
+    const storedata = []
+    const allStores = await Store.find({ category: req.body.category })
     var rand = Math.random() * 10;
-    data = allItems.slice(rand, rand + 4);
+    storedata = allStores.slice(rand, rand + 2);
 
+    const allItems = []
+    for (let i = 0; i < storedata.length; i++) {
+      for (let j = 0; j < storedata[i].items.length; j++) {
+        allItems[i].push(await items.findById(storedata[i].items[j]))
+      }
+    }
+    data = allItems;
+
+    // add store name and image to the items
     for (let i = 0; i < data.length; i++) {
       var itemStore = await Store.findById(data[i].storeID);
       data[i]._doc.storeName = itemStore.name;
       data[i]._doc.storeImage = itemStore.picture;
     }
-    console.log(data)
 
+    // are you visitor 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
-      res.json({ error: false, data: data });
+      res.json({ error: false, data: data, storedata: storedata });
       return;
     }
 
+
+    // you are not a visitor
+
+    // favorite for stores
+    // Add isFavorite property to each item
+    for (var i = 0; i < storedata.length; i++) {
+      storedata[i]._doc.isFavorite = false;
+    }
+
+    if (id) {
+      const user = await User.findOne({ _id: id });
+      for (var i = 0; i < storedata.length; i++) {
+        for (var j = 0; j < user.favorateStors.length; j++) {
+          if (favorateStors[j] == null) continue;
+          if (user.favorateStors[j]._id.toString() == storedata[i]._id.toString()) {
+            storedata[i]._doc.isFavorite = true;
+          }
+        }
+      }
+    }
+
+
+    // favorite for data
     // Add isFavorite property to each item
     for (var i = 0; i < data.length; i++) {
       data[i]._doc.isFavorite = false;
@@ -364,7 +388,7 @@ route.post("/category", async (req, res) => {
       }
     }
 
-    res.json({ error: false, items: data });
+    res.json({ error: false, data: data, storedata: storedata  });
   } catch (error) {
     console.log(error);
     res.status(401).json({
