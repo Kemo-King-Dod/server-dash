@@ -321,7 +321,12 @@ route.post("/category", async (req, res) => {
     await read();
 
     // Get all available items
-    const allStores = await Store.find({ category: req.body.category })
+    const allStores = await Store.find({ storeType: req.body.category })
+
+    console.log()
+    console.log('allStores')
+    console.log(allStores)
+
 
     var storedata = []
     var rand = Math.random() * 10
