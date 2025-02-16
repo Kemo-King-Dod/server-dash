@@ -320,10 +320,11 @@ route.post("/category", async (req, res) => {
 
     // Get all available items
     if (req.body.category == 'مطاعم')
-      req.body.category = 'أخرى'
+      allStores = await Store.find({ category: 'أخرى'})
+    else
+      allStores = await Store.find({ category: req.body.category })
 
     const storedata = []
-    const allStores = await Store.find({ category: req.body.category })
     var rand = Math.random() * 10;
     storedata = allStores.slice(rand, rand + 2);
 
@@ -388,7 +389,7 @@ route.post("/category", async (req, res) => {
       }
     }
 
-    res.json({ error: false, data: data, storedata: storedata  });
+    res.json({ error: false, data: data, storedata: storedata });
   } catch (error) {
     console.log(error);
     res.status(401).json({
