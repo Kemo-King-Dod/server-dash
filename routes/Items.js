@@ -332,6 +332,7 @@ route.post("/category", async (req, res) => {
       for (let j = 0; j < storedata[i].items.length; j++) {
         var item = await items.findById(storedata[i].items[j])
         allItems[i].push(item)
+        console.log('now')
       }
     }
     console.log('allItems')
