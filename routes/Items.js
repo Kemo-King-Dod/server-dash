@@ -324,6 +324,8 @@ route.post("/category", async (req, res) => {
     const allStores = await Store.find({ category: req.body.category })
 
 
+    console.log('allItems')
+    console.log(allItems)
 
     var storedata = []
     var rand = Math.random() * 10
@@ -346,10 +348,17 @@ route.post("/category", async (req, res) => {
 
     // are you visitor 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
+      console.log('---------------------------------')
       console.log(data[0])
       console.log('---------------------------------')
       console.log(storedata[0])
-      res.json({ error: false, data: data, storedata: storedata });
+      console.log('---------------------------------')
+      res.json({
+        error: false, data: {
+          products: data,
+          stores: storedata
+        }
+      });
       return;
     }
 
@@ -393,7 +402,12 @@ route.post("/category", async (req, res) => {
       }
     }
 
-    res.json({ error: false, data: data, storedata: storedata });
+    res.json({
+      error: false, data: {
+        products: data,
+        stores: storedata
+      }
+    });
   } catch (error) {
     console.log(error);
     res.status(401).json({
