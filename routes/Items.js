@@ -323,11 +323,6 @@ route.post("/category", async (req, res) => {
     // Get all available items
     const allStores = await Store.find({ storeType: req.body.category })
 
-    console.log(req.body.category)
-    console.log('allStores')
-    console.log(allStores)
-
-
     var storedata = []
     var rand = Math.random() * 10
     storedata = allStores.slice(rand, rand + 2)
@@ -340,8 +335,7 @@ route.post("/category", async (req, res) => {
         console.log('now')
       }
     }
-    console.log('allItems')
-    console.log(allItems)
+
     data = allItems;
 
     // add store name and image to the items
@@ -353,11 +347,6 @@ route.post("/category", async (req, res) => {
 
     // are you visitor 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
-      console.log('---------------------------------')
-      console.log(data[0])
-      console.log('---------------------------------')
-      console.log(storedata[0])
-      console.log('---------------------------------')
       res.json({
         error: false, data: {
           products: data,
