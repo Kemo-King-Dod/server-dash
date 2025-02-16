@@ -279,7 +279,7 @@ route.post("/getStoreItems", auth, async (req, res) => {
   }
 });
 
-route.get("/StoreItems", auth, async (req, res) => {
+route.get("/storeItems", auth, async (req, res) => {
   try {
     const userId = req.userId;
     const allItems = [];
