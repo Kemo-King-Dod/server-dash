@@ -59,7 +59,7 @@ router.post('/addOrder', auth, async (req, res) => {
             totalPrice: totalprice,
             status: 'waiting',
             type: 'waiting',
-            location: AddressId,
+            address: AddressId,
             distenationPrice: Store.deliveryCostByKilo,
             reseveCode: Math.random(100000) * 100000,
             chat: {}
