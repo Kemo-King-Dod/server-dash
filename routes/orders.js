@@ -190,3 +190,8 @@ router.get('/getOrdersForStore', async (req, res) => {
 })
 
 module.exports = router;
+
+
+let statuse = ["waiting", "accepted", 
+    "onway", "arrived", "delivered"
+]
