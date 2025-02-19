@@ -21,8 +21,8 @@ async function read() {
 router.post('/addOrder', auth, async (req, res) => {
     try {
         console.log(req.body)
-        console.log(StoreId)
-        
+        // console.log(StoreId)
+
         const itemsdata = []
         const userId = req.userId;
         const StoreId = req.body.storeId;
