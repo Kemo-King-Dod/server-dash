@@ -59,7 +59,7 @@ router.post('/addOrder', auth, async (req, res) => {
             totalPrice: totalprice,
             status: 'waiting',
             type: 'waiting',
-            address: AddressId,
+            address: { id: AddressId },
             distenationPrice: Store.deliveryCostByKilo,
             reseveCode: Math.random(100000) * 100000,
             chat: {}
@@ -153,6 +153,10 @@ router.get('/getOrdersForUser', auth, async (req, res) => {
     try {
         const userId = req.userId
         const orders = await Order.find({ customer_id: userId })
+
+        for (let i = 0; i < orders.length; i++) {
+            orders.reseveCode = ''
+        }
 
         res.status(200).json({
             error: false,
