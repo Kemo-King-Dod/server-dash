@@ -152,7 +152,7 @@ router.patch('/deleteOrder', async (req, res) => {
 router.get('/getOrdersForUser', auth, async (req, res) => {
     try {
         const userId = req.userId
-        const orders = await Order.find({ customer_id: userId })
+        const orders = await Order.find({ customerId: userId })
 
         for (let i = 0; i < orders.length; i++) {
             orders.reseveCode = ''
@@ -176,7 +176,7 @@ router.get('/getOrdersForUser', auth, async (req, res) => {
 router.get('/getOrdersForStore', auth, async (req, res) => {
     try {
         const userId = req.userId
-        const orders = await Order.find({ store_id: userId })
+        const orders = await Order.find({ storeId: userId })
 
         res.status(200).json({
             error: false,
