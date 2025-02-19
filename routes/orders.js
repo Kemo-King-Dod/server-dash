@@ -149,7 +149,7 @@ router.patch('/deleteOrder', async (req, res) => {
 });
 
 
-router.get('/getOrdersForUser', async (req, res) => {
+router.get('/getOrdersForUser', auth, async (req, res) => {
     try {
         const userId = req.userId
         const orders = await Order.find({ customer_id: userId })
@@ -169,7 +169,7 @@ router.get('/getOrdersForUser', async (req, res) => {
     }
 })
 
-router.get('/getOrdersForStore', async (req, res) => {
+router.get('/getOrdersForStore', auth, async (req, res) => {
     try {
         const userId = req.userId
         const orders = await Order.find({ store_id: userId })
@@ -192,6 +192,6 @@ router.get('/getOrdersForStore', async (req, res) => {
 module.exports = router;
 
 
-let statuse = ["waiting", "accepted", 
+let statuse = ["waiting", "accepted",
     "onway", "arrived", "delivered"
 ]
