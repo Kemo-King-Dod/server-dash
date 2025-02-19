@@ -69,7 +69,7 @@ router.post('/addOrder', auth, async (req, res) => {
         await order.save();
         console.log(order)
 
-        const theorderId = await Order.findOne({ order_id: ordersNum })
+        const theorderId = await Order.findOne({ orderId: ordersNum })
 
         // Update store's orders array
         await Store.findByIdAndUpdate(
