@@ -2,16 +2,16 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const orders = new Schema({
-  order_id: {
+  orderId: {
     type: String
   },
-  customer_id: {
+  customerId: {
     type: String
   },
-  store_id: {
+  storeId: {
     type: String
   },
-  driver_id: {
+  driverId: {
     type: String
   },
   date: {
@@ -20,7 +20,7 @@ const orders = new Schema({
   items: {
     type: Array
   },
-  total_price: {
+  totalPrice: {
     type: Number
   },
   status: {
@@ -35,7 +35,7 @@ const orders = new Schema({
   distenationPrice: {
     type: Number
   },
-  reseve_code: {
+  reseveCode: {
     type: String
   },
   chat: {

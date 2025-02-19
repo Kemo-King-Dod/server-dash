@@ -50,18 +50,18 @@ router.post('/addOrder', auth, async (req, res) => {
 
         // Create new order
         const order = new Order({
-            order_id: await read(),
-            customer_id: userId,
-            store_id: StoreId,
-            driver_id: null,
+            orderId: await read(),
+            customerId: userId,
+            storeId: StoreId,
+            driverId: null,
             date: new Date(),
             items: itemsdata,
-            total_price: totalprice,
+            totalPrice: totalprice,
             status: 'waiting',
             type: 'waiting',
             location: AddressId,
             distenationPrice: Store.deliveryCostByKilo,
-            reseve_code: Math.random(100000) * 100000,
+            reseveCode: Math.random(100000) * 100000,
             chat: {}
         });
 
