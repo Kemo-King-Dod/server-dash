@@ -8,18 +8,6 @@ const Store = require("../database/store");
 const User = require("../database/users");
 const { auth } = require("../middleware/auth");
 
-let Random = [];
-let data = [];
-let the_items;
-
-read();
-async function read() {
-  const data = await fs.readFile(
-    path.join(__dirname, "..", "data", "data.txt")
-  );
-  the_items = parseInt(data.toString());
-}
-
 // Add this helper function after the imports
 const deleteUploadedFile = async (filePath) => {
   try {
@@ -164,7 +152,7 @@ route.get("/getAllItems", async (req, res) => {
       id = decoded.id;
     }
 
-    // await read();
+    
 
     // Get all available items
     const data = await items.aggregate([
@@ -212,7 +200,7 @@ route.get("/getAllItems", async (req, res) => {
   }
 });
 
-route.post("/getStoreItems", auth, async (req, res) => {
+route.post("/getStoreItems", async (req, res) => {
   try {
     var id = req.body.id;
     var userid = null;
@@ -273,7 +261,7 @@ route.post("/getStoreItems", auth, async (req, res) => {
   }
 });
 
-route.get("/storeItems", auth, async (req, res) => {
+route.get("/storeItems",auth , async (req, res) => {
   try {
     const userId = req.userId;
     const allItems = [];
@@ -311,7 +299,7 @@ route.post("/category", async (req, res) => {
       id = decoded.id;
     }
 
-    // await read();
+    
 
     // Get all available items
     const allStores = await Store.aggregate([
