@@ -38,7 +38,6 @@ route.post("/additems", auth, async (req, res) => {
       price,
       description,
       stock,
-      category,
       options,
       addOns,
       imageUrl,
@@ -75,7 +74,7 @@ route.post("/additems", auth, async (req, res) => {
       options,
       addOns,
       stock,
-      category,
+      category: the_store.storeType,
       imageUrl: imageUrl,
       storeID: the_store.id,
       store_register_condition: the_store.registerCondition,
@@ -92,7 +91,7 @@ route.post("/additems", auth, async (req, res) => {
     the_items++;
     await fs.writeFile(
       path.join(__dirname, "..", "data", "data.txt"),
-      `${the_items}`
+      '' + the_items
     );
 
     res.status(200).json({
@@ -165,20 +164,15 @@ route.get("/getAllItems", async (req, res) => {
       id = decoded.id;
     }
 
-    await read();
+    // await read();
 
     // Get all available items
-    const allItems = await items.find({});
+    const data = await items.aggregate([
+      {
+        $sample: { size: 4 }
+      }
+    ])
 
-    // If we have less than 4 items total, return all of them
-    // if (allItems.length <= 4) {
-    //     data = allItems;
-    // } else {
-    //     // Randomly select 4 unique items
-    //     const shuffled = allItems.sort(() => 0.5 - Math.random());
-    // }
-    var rand = Math.random() * 10;
-    data = allItems.slice(rand, rand + 4);
 
     for (let i = 0; i < data.length; i++) {
       var itemStore = await Store.findById(data[i].storeID);
@@ -281,7 +275,6 @@ route.post("/getStoreItems", auth, async (req, res) => {
 
 route.get("/storeItems", auth, async (req, res) => {
   try {
-    console.log('storeItems')
     const userId = req.userId;
     const allItems = [];
 
@@ -310,7 +303,6 @@ route.get("/storeItems", auth, async (req, res) => {
 
 route.post("/category", async (req, res) => {
   try {
-    console.log(1111)
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
@@ -319,43 +311,39 @@ route.post("/category", async (req, res) => {
       id = decoded.id;
     }
 
-    await read();
+    // await read();
 
     // Get all available items
-    const allStores = await Store.find({ storeType: req.body.category })
-
-    var storedata = []
-    storedata = allStores
-    // var rand = Math.random() * 10
-    // storedata = allStores.slice(rand, rand + 2)
-
-    const allItems = []
-    for (let i = 0; i < storedata.length; i++) {
-      for (let j = 0; j < storedata[i].items.length; j++) {
-        var item = await items.findById(storedata[i].items[j])
-        allItems.push(item)
+    const allStores = await Store.aggregate([
+      {
+        $sample: { size: 2 }
+      },
+      {
+        $match: { storeType: req.body.category }
       }
-    }
-
-    data = allItems;
+    ])
+    const allItems = await items.aggregate([
+      {
+        $sample: { size: 2 }
+      },
+      {
+        $match: { category: req.body.category }
+      }
+    ])
 
     // add store name and image to the items
-    for (let i = 0; i < data.length; i++) {
-      if (data[i] == null) {
-        data.splice(i, 1)
-        continue
-      }
-      var itemStore = await Store.findById(data[i].storeID.toString());
-      data[i]._doc.storeName = itemStore.name;
-      data[i]._doc.storeImage = itemStore.picture;
+    for (let i = 0; i < allItems.length; i++) {
+      var itemStore = await Store.findById(allItems[i].storeID);
+      allItems[i]._doc.storeName = itemStore.name;
+      allItems[i]._doc.storeImage = itemStore.picture;
     }
 
     // are you visitor 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
       res.json({
         error: false, data: {
-          products: data,
-          stores: storedata
+          products: allItems,
+          stores: allStores
         }
       });
       return;
@@ -366,17 +354,17 @@ route.post("/category", async (req, res) => {
 
     // favorite for stores
     // Add isFavorite property to each item
-    for (var i = 0; i < storedata.length; i++) {
-      storedata[i]._doc.isFavorite = false;
+    for (var i = 0; i < allStores.length; i++) {
+      allStores[i]._doc.isFavorite = false;
     }
 
     if (id) {
       const user = await User.findOne({ _id: id });
-      for (var i = 0; i < storedata.length; i++) {
+      for (var i = 0; i < allStores.length; i++) {
         for (var j = 0; j < user.favorateStors.length; j++) {
           if (favorateStors[j] == null) continue;
-          if (user.favorateStors[j]._id.toString() == storedata[i]._id.toString()) {
-            storedata[i]._doc.isFavorite = true;
+          if (user.favorateStors[j]._id.toString() == allStores[i]._id.toString()) {
+            allStores[i]._doc.isFavorite = true;
           }
         }
       }
@@ -385,17 +373,17 @@ route.post("/category", async (req, res) => {
 
     // favorite for data
     // Add isFavorite property to each item
-    for (var i = 0; i < data.length; i++) {
-      data[i]._doc.isFavorite = false;
+    for (var i = 0; i < allItems.length; i++) {
+      allItems[i]._doc.isFavorite = false;
     }
 
     if (id) {
       const user = await User.findOne({ _id: id });
-      for (var i = 0; i < data.length; i++) {
+      for (var i = 0; i < allItems.length; i++) {
         for (var j = 0; j < user.favorateItems.length; j++) {
           if (favorateItems[j] == null) continue;
-          if (user.favorateItems[j]._id.toString() == data[i]._id.toString()) {
-            data[i]._doc.isFavorite = true;
+          if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
+            allItems[i]._doc.isFavorite = true;
           }
         }
       }
@@ -403,8 +391,8 @@ route.post("/category", async (req, res) => {
 
     res.json({
       error: false, data: {
-        products: data,
-        stores: storedata
+        products: allItems,
+        stores: allStores
       }
     });
   } catch (error) {
@@ -416,4 +404,4 @@ route.post("/category", async (req, res) => {
   }
 });
 
-module.exports = route;
+module.exports = route
