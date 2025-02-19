@@ -145,8 +145,6 @@ route.patch("/deleteitem", auth, async (req, res) => {
 
 route.get("/getAllItems", async (req, res) => {
   try {
-    console.log(2222)
-
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
@@ -169,8 +167,8 @@ route.get("/getAllItems", async (req, res) => {
 
     for (let i = 0; i < data.length; i++) {
       var itemStore = await Store.findById(data[i].storeID);
-      data[i]._doc.storeName = itemStore.name;
-      data[i]._doc.storeImage = itemStore.picture;
+      data[i].storeName = itemStore.name;
+      data[i].storeImage = itemStore.picture;
     }
 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
@@ -180,7 +178,7 @@ route.get("/getAllItems", async (req, res) => {
 
     // Add isFavorite property to each item
     for (var i = 0; i < data.length; i++) {
-      data[i]._doc.isFavorite = false;
+      data[i].isFavorite = false;
     }
 
     if (id) {
@@ -189,7 +187,7 @@ route.get("/getAllItems", async (req, res) => {
         for (var j = 0; j < user.favorateItems.length; j++) {
           if (favorateItems[j] == null) continue;
           if (user.favorateItems[j]._id.toString() == data[i]._id.toString()) {
-            data[i]._doc.isFavorite = true;
+            data[i].isFavorite = true;
           }
         }
       }
