@@ -26,6 +26,9 @@ const orders = new Schema({
   status: {
     type: String
   },
+  type: {
+    type: String
+  },
   location: {
     type: Object
   },

@@ -36,10 +36,11 @@ router.post('/addOrder', auth, async (req, res) => {
             if (user.cart[i].cartItem.storeID == StoreId) {
                 const item = await Item.findById(user.cart[i].cartItem.id)
                 itemsdata.push({
-                    id: item._id,
+                    name: item.name,
                     options: user.cart[i].cartItem.options,
                     addOns: user.cart[i].cartItem.addOns,
-                    quantity: 1 // update later
+                    quantity: 1, // update later
+                    price: item.price,
                 })
                 totalprice += item.price
             }
@@ -56,10 +57,11 @@ router.post('/addOrder', auth, async (req, res) => {
             date: new Date(),
             items: itemsdata,
             total_price: totalprice,
-            status: 'pending',
+            status: 'waiting',
+            type: 'waiting',
             location: AddressId,
             distenationPrice: Store.deliveryCostByKilo,
-            reseve_code: Math.random(10000000000),
+            reseve_code: Math.random(100000) * 100000,
             chat: {}
         });
 

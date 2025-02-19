@@ -60,14 +60,9 @@ async function connect(socket) {
   })
 
   socket.on("updateStore", async (data) => {
-
-    // عمليات
-    console.log(data)
-    console.log("updateStore")
     const store = await Store.findById(data.storeID)
     if (store.connection)
       socket.to(store.connectionId).emit("updateStore", data)
-
   })
 
   socket.on("updateDriver", async (data) => {
