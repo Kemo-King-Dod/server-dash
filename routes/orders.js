@@ -156,7 +156,7 @@ router.get('/getOrdersForUser', auth, async (req, res) => {
 
         res.status(200).json({
             error: false,
-            orders: orders
+            data: orders
         });
 
     } catch (err) {
@@ -176,7 +176,7 @@ router.get('/getOrdersForStore', auth, async (req, res) => {
 
         res.status(200).json({
             error: false,
-            orders: orders
+            data: orders
         });
 
     } catch (err) {
@@ -190,8 +190,3 @@ router.get('/getOrdersForStore', auth, async (req, res) => {
 })
 
 module.exports = router;
-
-
-let statuse = ["waiting", "accepted",
-    "onway", "arrived", "delivered"
-]
