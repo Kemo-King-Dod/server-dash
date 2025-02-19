@@ -95,7 +95,7 @@ router.post('/addOrder', auth, async (req, res) => {
         res.status(200).json({
             error: false,
             message: 'Order added successfully',
-            order: theorderId
+            data: theorderId
         });
 
     } catch (error) {
