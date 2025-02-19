@@ -8,6 +8,9 @@ const Store = require("../database/store");
 const User = require("../database/users");
 const { auth } = require("../middleware/auth");
 
+let random = []
+let data = []
+
 // Add this helper function after the imports
 const deleteUploadedFile = async (filePath) => {
   try {
@@ -152,7 +155,7 @@ route.get("/getAllItems", async (req, res) => {
       id = decoded.id;
     }
 
-
+    
 
     // Get all available items
     const data = await items.aggregate([
@@ -164,13 +167,8 @@ route.get("/getAllItems", async (req, res) => {
 
     for (let i = 0; i < data.length; i++) {
       var itemStore = await Store.findById(data[i].storeID);
-      if (allItems[i]._doc == null) {
-        allItems[i].storeName = itemStore.name;
-        allItems[i].storeImage = itemStore.picture;
-      } else {
-        allItems[i]._doc.storeName = itemStore.name;
-        allItems[i]._doc.storeImage = itemStore.picture;
-      }
+      data[i]._doc.storeName = itemStore.name;
+      data[i]._doc.storeImage = itemStore.picture;
     }
 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
@@ -266,7 +264,7 @@ route.post("/getStoreItems", async (req, res) => {
   }
 });
 
-route.get("/storeItems", auth, async (req, res) => {
+route.get("/storeItems",auth , async (req, res) => {
   try {
     const userId = req.userId;
     const allItems = [];
@@ -304,7 +302,7 @@ route.post("/category", async (req, res) => {
       id = decoded.id;
     }
 
-
+    
 
     // Get all available items
     const allStores = await Store.aggregate([
@@ -327,13 +325,8 @@ route.post("/category", async (req, res) => {
     // add store name and image to the items
     for (let i = 0; i < allItems.length; i++) {
       var itemStore = await Store.findById(allItems[i].storeID);
-      if (allItems[i]._doc == null) {
-        allItems[i].storeName = itemStore.name;
-        allItems[i].storeImage = itemStore.picture;
-      } else {
-        allItems[i]._doc.storeName = itemStore.name;
-        allItems[i]._doc.storeImage = itemStore.picture;
-      }
+      allItems[i]._doc.storeName = itemStore.name;
+      allItems[i]._doc.storeImage = itemStore.picture;
     }
 
     // are you visitor 
