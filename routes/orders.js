@@ -61,6 +61,8 @@ router.post('/addOrder', auth, async (req, res) => {
             reseveCode: Math.random(100000) * 100000,
             chat: {}
         });
+        
+        console.log(order)
 
         // Save order
         await order.save()
