@@ -118,7 +118,8 @@ router.post('/acceptOrder', auth, async (req, res) => {
         const id = req.body.orderId
         const order = await Order.findById(id)
         if(order){
-            order.status = "Accepted"
+            order.status = "accepted"
+            order.type = "accepted"
             await order.save()
         }
         else{
@@ -130,7 +131,7 @@ router.post('/acceptOrder', auth, async (req, res) => {
 
         res.status(200).json({
             error: false,
-            data: orders
+            data: order
         });
 
     } catch (err) {
