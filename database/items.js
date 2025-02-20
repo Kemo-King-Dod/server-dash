@@ -37,9 +37,6 @@ const items = new Schema({
     },
     retrenchment_percent: {
         type: Number
-    },
-    num: {
-        type: Number
     }
 })
 

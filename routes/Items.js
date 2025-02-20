@@ -70,19 +70,13 @@ route.post("/additems", auth, async (req, res) => {
       storeID: the_store.id,
       store_register_condition: the_store.registerCondition,
       is_retrenchment: req.body.is_retrenchment || false,
-      retrenchment_percent: req.body.retrenchment_percent || 0,
-      num: the_items,
+      retrenchment_percent: req.body.retrenchment_percent || 0
     };
 
     const newItem = await items.create(item);
     await Store.updateOne(
       { _id: the_store.id },
       { $push: { items: newItem._id } }
-    );
-    the_items++;
-    await fs.writeFile(
-      path.join(__dirname, "..", "data", "data.txt"),
-      '' + the_items
     );
 
     res.status(200).json({
