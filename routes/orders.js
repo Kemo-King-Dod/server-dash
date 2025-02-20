@@ -33,25 +33,14 @@ router.post('/addOrder', auth, async (req, res) => {
         for (var i = 0; i < user.cart.length; i++) {
             if (user.cart[i].cartItem.storeID == StoreId) {
                 const item = await Item.findById(user.cart[i].cartItem.id)
-                let temp = 0
-                for (var j = 0; j < user.cart[j].cartItem.options.length; i++) {
-                    if (user.cart[j].cartItem.options[j].isSelected) {
-                        temp += user.cart[j].cartItem.options[j].price;
-                    }
-                }
-                for (var j = 0; j < user.cart[j].cartItem.addOns.length; i++) {
-                    if (user.cart[j].cartItem.addOns[j].isSelected) {
-                        temp += user.cart[j].cartItem.addOns[j].price;
-                    }
-                }
                 itemsdata.push({
                     name: item.name,
                     options: user.cart[i].cartItem.options,
                     addOns: user.cart[i].cartItem.addOns,
                     quantity: 1, // update later
-                    price: item.price + temp,
+                    price: user.cart[i].cartItem.price
                 })
-                totalprice += item.price + temp
+                totalprice += user.cart[i].cartItem.price
             }
         }
 
