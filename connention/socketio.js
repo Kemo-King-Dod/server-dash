@@ -67,8 +67,10 @@ async function connect(socket) {
       let timesToSendRequist = 0 // to 180
       if (!store.connection) {
         const times = setInterval(() => {
+          consolele.log('order : '+timesToSendRequist)
           timesToSendRequist++
           if (store.connection || timesToSendRequist > 180) {
+            console.log(true)
             socket.to(store.connectionId).emit("updateStore", data)
             clearInterval(times)
           }
