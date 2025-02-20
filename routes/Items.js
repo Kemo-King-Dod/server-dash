@@ -256,7 +256,7 @@ route.post("/getStoreItems", async (req, res) => {
 
     res.json({ error: false, data: allItems });
   } catch (error) {
-    console.log(error);
+    console.log(error.stack);
     res.status(401).json({
       error: true,
       message: error.message,
@@ -284,7 +284,7 @@ route.get("/storeItems",auth , async (req, res) => {
 
     res.json({ error: false, data: allItems });
   } catch (error) {
-    console.log(error);
+    console.log(error.stack);
     res.status(401).json({
       error: true,
       message: error.message,
