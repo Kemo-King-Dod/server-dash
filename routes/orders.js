@@ -24,7 +24,7 @@ router.post('/addOrder', auth, async (req, res) => {
         const itemsdata = []
         const userId = req.userId;
         const StoreId = req.body.storeId;
-        const AddressId = await Address.findById((req.body.addressId));
+        const theAddress = await Address.findById((req.body.addressId));
 
         const user = await User.findById(userId);
         let totalprice = 0
@@ -57,7 +57,7 @@ router.post('/addOrder', auth, async (req, res) => {
             totalPrice: totalprice,
             status: 'waiting',
             type: 'waiting',
-            address: { id: AddressId },
+            address: theAddress,
             distenationPrice: Store.deliveryCostByKilo,
             reseveCode: Math.random(100000) * 100000,
             chat: {}
