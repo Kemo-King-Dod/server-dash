@@ -20,9 +20,6 @@ async function read() {
 // Add new order
 router.post('/addOrder', auth, async (req, res) => {
     try {
-        console.log(req.body)
-        // console.log(StoreId)
-
         const itemsdata = []
         const userId = req.userId;
         const StoreId = req.body.storeId;
@@ -66,8 +63,7 @@ router.post('/addOrder', auth, async (req, res) => {
         });
 
         // Save order
-        await order.save();
-        console.log(order)
+        await order.save()
 
         const theorderId = await Order.findOne({ orderId: ordersNum })
 

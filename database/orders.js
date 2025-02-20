@@ -30,7 +30,8 @@ const orders = new Schema({
     type: String
   },
   address: {
-    type: Object
+    type: Object,
+    required: true
   },
   distenationPrice: {
     type: Number
