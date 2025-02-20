@@ -116,18 +116,15 @@ router.post("/addtocart", auth, async (req, res) => {
         data: "المستخدم غير موجود",
       });
     }
-
-    console.log(cartItem)
-    console.log(cartItem.options)
-    console.log(cartItem.options.items)
-    for (var i = 0; i < cartItem.options.items.length; i++) {
-      if (cartItem.options.items[i].isSelected) {
-        cartItem.price += cartItem.options.items[i].price;
+    
+    for (var i = 0; i < cartItem.options.length; i++) {
+      if (cartItem.options[i].isSelected) {
+        cartItem.price += cartItem.options[i].price;
       }
     }
-    for (var i = 0; i < cartItem.addOns.items.length; i++) {
-      if (cartItem.addOns.items[i].isSelected) {
-        cartItem.price += cartItem.addOns.items[i].price;
+    for (var i = 0; i < cartItem.addOns.length; i++) {
+      if (cartItem.addOns[i].isSelected) {
+        cartItem.price += cartItem.addOns[i].price;
       }
     }
 
