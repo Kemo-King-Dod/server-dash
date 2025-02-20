@@ -66,9 +66,9 @@ async function connect(socket) {
       const store = await Store.findById(data.storeID)
       let timesToSendRequist = 0 // to 180
       if (store.connection == false) {
-        console.log('order222 : '+timesToSendRequist)
+        console.log('order222 : ' + timesToSendRequist)
         const times = setInterval(() => {
-          console.log('order : '+timesToSendRequist)
+          console.log('order : ' + timesToSendRequist)
           timesToSendRequist++
           if (store.connection || timesToSendRequist > 180) {
             console.log(true)
@@ -76,10 +76,11 @@ async function connect(socket) {
             clearInterval(times)
           }
         }, 20000);
-        if (store.connection) {
-          console.log(true)
-          socket.to(store.connectionId).emit("updateStore", data)
-        }
+        times()
+      }
+      if (store.connection) {
+        console.log(true)
+        socket.to(store.connectionId).emit("updateStore", data)
       }
     } catch (error) {
       console.log(error)
