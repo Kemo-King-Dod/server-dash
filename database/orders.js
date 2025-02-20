@@ -31,7 +31,7 @@ const orders = new Schema({
   },
   address: {
     type: Object,
-    required: true
+    require: [true, 'العنوان مطلوب']
   },
   distenationPrice: {
     type: Number
