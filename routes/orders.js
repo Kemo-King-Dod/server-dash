@@ -39,7 +39,6 @@ router.post('/addOrder', auth, async (req, res) => {
                         temp += user.cart[j].cartItem.options[j].price;
                     }
                 }
-                console.log(temp)
                 for (var j = 0; j < user.cart[j].cartItem.addOns.length; i++) {
                     if (user.cart[j].cartItem.addOns[j].isSelected) {
                         temp += user.cart[j].cartItem.addOns[j].price;
