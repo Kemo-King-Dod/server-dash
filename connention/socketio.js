@@ -60,6 +60,8 @@ async function connect(socket) {
   })
 
   socket.on("updateStore", async (data) => {
+    console.log('socket')
+    console.log(data)
     const store = await Store.findById(data.storeID)
     if (store.connection)
       socket.to(store.connectionId).emit("updateStore", data)
