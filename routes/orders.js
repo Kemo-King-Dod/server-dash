@@ -144,6 +144,37 @@ router.post('/acceptOrder', auth, async (req, res) => {
     }
 })
 
+router.post('/readyOrder', auth, async (req, res) => {
+    try {
+        const id = req.body.orderId
+        const order = await Order.findById(id)
+        if(order){
+            order.status = "ready"
+            order.type = "ready"
+            await order.save()
+        }
+        else{
+            res.status(500).json({
+                error: true,
+                message: 'الطلب غير موجود'
+            })
+        }
+
+        res.status(200).json({
+            error: false,
+            data: order
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: 'Error adding order',
+            error: err.message
+        });
+    }
+})
+
 // Delete order
 router.patch('/deleteOrder', async (req, res) => {
     try {
