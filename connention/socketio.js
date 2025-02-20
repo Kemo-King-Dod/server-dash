@@ -60,12 +60,22 @@ async function connect(socket) {
   })
 
   socket.on("updateStore", async (data) => {
-    console.log('socket')
-    console.log(data)
-    const store = await Store.findById(data.storeID)
-    console.log(store)
-    if (store.connection)
-      socket.to(store.connectionId).emit("updateStore", data)
+    try {
+      console.log('socket')
+      console.log(data)
+      const store = await Store.findById(data.storeID)
+      if (store.connection) {
+        console.log(true)
+        socket.to(store.connectionId).emit("updateStore", data)
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({
+        error: true,
+        message: 'Error adding order',
+        error: error.message
+      });
+    }
   })
 
   socket.on("updateDriver", async (data) => {
