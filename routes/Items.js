@@ -185,7 +185,7 @@ route.get("/getAllItems", async (req, res) => {
       const user = await User.findOne({ _id: id });
       for (var i = 0; i < data.length; i++) {
         for (var j = 0; j < user.favorateItems.length; j++) {
-          if (favorateItems[j] == null) continue;
+          if (user.favorateItems[j] == null) continue;
           if (user.favorateItems[j]._id.toString() == data[i]._id.toString()) {
             data[i].isFavorite = true;
           }
@@ -244,7 +244,7 @@ route.post("/getStoreItems", async (req, res) => {
       const user = await User.findOne({ _id: userid });
       for (var i = 0; i < allItems.length; i++) {
         for (var j = 0; j < user.favorateItems.length; j++) {
-          if (favorateItems[j] == null) continue;
+          if (user.favorateItems[j] == null) continue;
           if (
             user.favorateItems[j]._id.toString() == allItems[i]._id.toString()
           ) {
@@ -346,7 +346,7 @@ route.post("/category", async (req, res) => {
     // favorite for stores
     // Add isFavorite property to each item
     for (var i = 0; i < allStores.length; i++) {
-      allStores[i]._doc.isFavorite = false;
+      allStores[i].isFavorite = false;
     }
 
     if (id) {
@@ -355,7 +355,7 @@ route.post("/category", async (req, res) => {
         for (var j = 0; j < user.favorateStors.length; j++) {
           if (favorateStors[j] == null) continue;
           if (user.favorateStors[j]._id.toString() == allStores[i]._id.toString()) {
-            allStores[i]._doc.isFavorite = true;
+            allStores[i].isFavorite = true;
           }
         }
       }
@@ -365,16 +365,16 @@ route.post("/category", async (req, res) => {
     // favorite for data
     // Add isFavorite property to each item
     for (var i = 0; i < allItems.length; i++) {
-      allItems[i]._doc.isFavorite = false;
+      allItems[i].isFavorite = false;
     }
 
     if (id) {
       const user = await User.findOne({ _id: id });
       for (var i = 0; i < allItems.length; i++) {
         for (var j = 0; j < user.favorateItems.length; j++) {
-          if (favorateItems[j] == null) continue;
+          if (user.favorateItems[j] == null) continue;
           if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
-            allItems[i]._doc.isFavorite = true;
+            allItems[i].isFavorite = true;
           }
         }
       }
