@@ -33,14 +33,25 @@ router.post('/addOrder', auth, async (req, res) => {
         for (var i = 0; i < user.cart.length; i++) {
             if (user.cart[i].cartItem.storeID == StoreId) {
                 const item = await Item.findById(user.cart[i].cartItem.id)
+                let temp = 0
+                for (var i = 0; i < user.cart[i].cartItem.options.length; i++) {
+                    if (user.cart[i].cartItem.options[i].isSelected) {
+                        temp += user.cart[i].cartItem.options[i].price;
+                    }
+                }
+                for (var i = 0; i < user.cart[i].cartItem.addOns.length; i++) {
+                    if (user.cart[i].cartItem.addOns[i].isSelected) {
+                        temp += user.cart[i].cartItem.addOns[i].price;
+                    }
+                }
                 itemsdata.push({
                     name: item.name,
                     options: user.cart[i].cartItem.options,
                     addOns: user.cart[i].cartItem.addOns,
                     quantity: 1, // update later
-                    price: item.price,
+                    price: item.price + temp,
                 })
-                totalprice += item.price
+                totalprice += item.price + temp
             }
         }
 
@@ -62,7 +73,7 @@ router.post('/addOrder', auth, async (req, res) => {
             reseveCode: Math.random(100000) * 100000,
             chat: {}
         });
-        
+
         console.log(order)
 
         // Save order

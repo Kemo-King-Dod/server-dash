@@ -22,12 +22,6 @@ router.get("/getfromcart", auth, async (req, res) => {
     for (var i = 0; i < user.cart.length; i++) {
       const item = await Item.findById(user.cart[i].cartItem.id);
 
-      // adjust price in the cart from items
-      if (user.cart[i].cartItem.price != item.price) {
-        user.cart[i].cartItem.price = item.price;
-        await user.save();
-      }
-
       // find shop
       const store = await Store.findById(item.storeID);
       if (thedata.length == 0) {
@@ -116,7 +110,7 @@ router.post("/addtocart", auth, async (req, res) => {
         data: "المستخدم غير موجود",
       });
     }
-    
+
     for (var i = 0; i < cartItem.options.length; i++) {
       if (cartItem.options[i].isSelected) {
         cartItem.price += cartItem.options[i].price;
