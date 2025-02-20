@@ -325,8 +325,8 @@ route.post("/category", async (req, res) => {
     // add store name and image to the items
     for (let i = 0; i < allItems.length; i++) {
       var itemStore = await Store.findById(allItems[i].storeID);
-      allItems[i]._doc.storeName = itemStore.name;
-      allItems[i]._doc.storeImage = itemStore.picture;
+      allItems[i].storeName = itemStore.name;
+      allItems[i].storeImage = itemStore.picture;
     }
 
     // are you visitor 
@@ -346,7 +346,7 @@ route.post("/category", async (req, res) => {
     // favorite for stores
     // Add isFavorite property to each item
     for (var i = 0; i < allStores.length; i++) {
-      allStores[i]._doc.isFavorite = false;
+      allStores[i].isFavorite = false;
     }
 
     if (id) {
@@ -355,7 +355,7 @@ route.post("/category", async (req, res) => {
         for (var j = 0; j < user.favorateStors.length; j++) {
           if (favorateStors[j] == null) continue;
           if (user.favorateStors[j]._id.toString() == allStores[i]._id.toString()) {
-            allStores[i]._doc.isFavorite = true;
+            allStores[i].isFavorite = true;
           }
         }
       }
@@ -365,7 +365,7 @@ route.post("/category", async (req, res) => {
     // favorite for data
     // Add isFavorite property to each item
     for (var i = 0; i < allItems.length; i++) {
-      allItems[i]._doc.isFavorite = false;
+      allItems[i].isFavorite = false;
     }
 
     if (id) {
@@ -374,7 +374,7 @@ route.post("/category", async (req, res) => {
         for (var j = 0; j < user.favorateItems.length; j++) {
           if (favorateItems[j] == null) continue;
           if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
-            allItems[i]._doc.isFavorite = true;
+            allItems[i].isFavorite = true;
           }
         }
       }
