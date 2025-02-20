@@ -28,6 +28,12 @@ router.post('/addOrder', auth, async (req, res) => {
         const user = await User.findById(userId);
         let totalprice = 0
 
+        console.log(req.body)
+        res.status(200).json({
+            error: true,
+            message: 'error',
+        });
+        return
 
         for (var i = 0; i < user.cart.length; i++) {
             if (user.cart[i].cartItem.storeID == StoreId) {
