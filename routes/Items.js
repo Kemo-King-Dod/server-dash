@@ -256,7 +256,7 @@ route.post("/getStoreItems", async (req, res) => {
 
     res.json({ error: false, data: allItems });
   } catch (error) {
-    console.log(error.stack);
+    console.log(error);
     res.status(401).json({
       error: true,
       message: error.message,
@@ -284,7 +284,7 @@ route.get("/storeItems",auth , async (req, res) => {
 
     res.json({ error: false, data: allItems });
   } catch (error) {
-    console.log(error.stack);
+    console.log(error);
     res.status(401).json({
       error: true,
       message: error.message,
@@ -346,7 +346,7 @@ route.post("/category", async (req, res) => {
     // favorite for stores
     // Add isFavorite property to each item
     for (var i = 0; i < allStores.length; i++) {
-      allStores[i].isFavorite = false;
+      allStores[i]._doc.isFavorite = false;
     }
 
     if (id) {
@@ -355,7 +355,7 @@ route.post("/category", async (req, res) => {
         for (var j = 0; j < user.favorateStors.length; j++) {
           if (favorateStors[j] == null) continue;
           if (user.favorateStors[j]._id.toString() == allStores[i]._id.toString()) {
-            allStores[i].isFavorite = true;
+            allStores[i]._doc.isFavorite = true;
           }
         }
       }
@@ -365,7 +365,7 @@ route.post("/category", async (req, res) => {
     // favorite for data
     // Add isFavorite property to each item
     for (var i = 0; i < allItems.length; i++) {
-      allItems[i].isFavorite = false;
+      allItems[i]._doc.isFavorite = false;
     }
 
     if (id) {
@@ -374,7 +374,7 @@ route.post("/category", async (req, res) => {
         for (var j = 0; j < user.favorateItems.length; j++) {
           if (favorateItems[j] == null) continue;
           if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
-            allItems[i].isFavorite = true;
+            allItems[i]._doc.isFavorite = true;
           }
         }
       }
@@ -387,7 +387,7 @@ route.post("/category", async (req, res) => {
       }
     });
   } catch (error) {
-    console.log(error.stack);
+    console.log(error);
     res.status(401).json({
       error: true,
       message: error.message,
