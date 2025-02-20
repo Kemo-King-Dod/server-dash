@@ -75,8 +75,7 @@ async function connect(socket) {
             socket.to(store.connectionId).emit("updateStore", data)
             clearInterval(times)
           }
-        }, 20000);
-        times()
+        }, 20000)
       }
       if (store.connection) {
         console.log(true)
