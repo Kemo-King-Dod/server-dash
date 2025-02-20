@@ -387,7 +387,7 @@ route.post("/category", async (req, res) => {
       }
     });
   } catch (error) {
-    console.log(error);
+    console.log(error.stack);
     res.status(401).json({
       error: true,
       message: error.message,
