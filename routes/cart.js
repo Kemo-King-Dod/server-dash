@@ -117,6 +117,9 @@ router.post("/addtocart", auth, async (req, res) => {
       });
     }
 
+    console.log(cartItem)
+    console.log(cartItem.options)
+    console.log(cartItem.options.items)
     for (var i = 0; i < cartItem.options.items.length; i++) {
       if (cartItem.options.items[i].isSelected) {
         cartItem.price += cartItem.options.items[i].price;
