@@ -63,8 +63,6 @@ router.post('/addOrder', auth, async (req, res) => {
             chat: {}
         });
 
-        console.log(order)
-
         // Save order
         await order.save()
 
