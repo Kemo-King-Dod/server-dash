@@ -44,6 +44,14 @@ router.post('/addOrder', auth, async (req, res) => {
             }
         }
 
+        if (itemsdata.length == 0) {
+            res.status(500).json({
+                error: true,
+                message: 'ليس هناك عناصر'
+            });
+            return
+        }
+
 
 
         // Create new order
@@ -104,6 +112,36 @@ router.post('/addOrder', auth, async (req, res) => {
         });
     }
 });
+
+router.post('/acceptOrder', auth, async (req, res) => {
+    try {
+        const id = req.body.orderId
+        const order = await Order.findById(id)
+        if(order){
+            order.status = "Accepted"
+            await order.save()
+        }
+        else{
+            res.status(500).json({
+                error: true,
+                message: 'الطلب غير موجود'
+            })
+        }
+
+        res.status(200).json({
+            error: false,
+            data: orders
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: 'Error adding order',
+            error: err.message
+        });
+    }
+})
 
 // Delete order
 router.patch('/deleteOrder', async (req, res) => {
@@ -189,5 +227,46 @@ router.get('/getOrdersForStore', auth, async (req, res) => {
         });
     }
 })
+
+router.get('/getAcceptedOrdersForStore', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const orders = await Order.find({ storeId: userId, status: "Accepted" })
+
+        res.status(200).json({
+            error: false,
+            data: orders
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: 'Error adding order',
+            error: err.message
+        });
+    }
+})
+
+router.get('/getReadyOrdersForStore', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const orders = await Order.find({ storeId: userId, status: "Ready" })
+
+        res.status(200).json({
+            error: false,
+            data: orders
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: 'Error adding order',
+            error: err.message
+        });
+    }
+})
+
 
 module.exports = router;
