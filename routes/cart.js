@@ -117,6 +117,17 @@ router.post("/addtocart", auth, async (req, res) => {
       });
     }
 
+    for (var i = 0; i < cartItem.options.items.length; i++) {
+      if (cartItem.options.items[i].isSelected) {
+        cartItem.price += cartItem.options.items[i].price;
+      }
+    }
+    for (var i = 0; i < cartItem.addOns.items.length; i++) {
+      if (cartItem.addOns.items[i].isSelected) {
+        cartItem.price += cartItem.addOns.items[i].price;
+      }
+    }
+
     user.cart.push({ cartItem });
     await user.save();
 
