@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../database/orders');
 const Store = require('../database/store');
+const Address = require('../database/Address');
 const User = require('../database/users');
 const Item = require('../database/items');
 const fs = require("fs").promises;
@@ -23,17 +24,11 @@ router.post('/addOrder', auth, async (req, res) => {
         const itemsdata = []
         const userId = req.userId;
         const StoreId = req.body.storeId;
-        const AddressId = req.body.AddressId;
+        const AddressId = await Address.findById((req.body.addressId));
 
         const user = await User.findById(userId);
         let totalprice = 0
 
-        console.log(req.body)
-        res.status(200).json({
-            error: true,
-            message: 'error',
-        });
-        return
 
         for (var i = 0; i < user.cart.length; i++) {
             if (user.cart[i].cartItem.storeID == StoreId) {
