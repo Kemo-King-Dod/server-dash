@@ -1,7 +1,7 @@
 const { Server } = require("socket.io");
 const Store = require("../database/store");
 const User = require("../database/users");
-const Driver = require("../database/driver")
+const Driver = require("../database/driver");
 const jwt = require("jsonwebtoken");
 const { auth } = require("../middleware/auth");
 
@@ -16,23 +16,28 @@ function createserver(server) {
   });
 }
 async function connect(socket) {
-
-  console.log(socket.id)
   if (socket.handshake.headers.authorization) {
-
     await jwt.verify(
       socket.handshake.headers.authorization,
       "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
       async (err, data) => {
         if (err) {
-          console.log(err)
-          console.log('يرجى تسجيل الدخول')
+          console.log(err);
+          console.log("يرجى تسجيل الدخول");
         } else {
           let exist = await User.findOne({ _id: data.id });
           if (!exist) {
             exist = await Store.findOne({ _id: data.id });
             if (!exist) {
-              console.log('access denied')
+              exist = await Driver.findOne({ _id: data.id });
+              await Driver.updateOne(
+                { _id: data.id },
+                { $set: { connection: true, connectionId: socket.id } }
+              );
+              socket.join("drivers");
+              if (!exist) {
+                console.log("access denied");
+              }
             }
             await Store.updateOne(
               { _id: data.id },
@@ -49,54 +54,46 @@ async function connect(socket) {
     );
   }
 
-
   socket.on("updateUser", async (data) => {
-
     // عمليات
-    console.log(data)
-    console.log("updateUser")
-
-
-  })
+    console.log(data);
+    console.log("updateUser");
+  });
 
   socket.on("updateStore", async (data) => {
-    console.log('socket')
+    console.log("socket");
     try {
-      console.log(data)
-      let store = await Store.findById(data.storeID)
-      let timesToSendRequist = 0 // to 180
+      console.log(data);
+      let store = await Store.findById(data.storeID);
+      let timesToSendRequist = 0; // to 180
       if (store.connection == false) {
         const times = setInterval(async () => {
-          timesToSendRequist++
-          store = await Store.findById(data.storeID)
+          timesToSendRequist++;
+          store = await Store.findById(data.storeID);
           if (store.connection || timesToSendRequist > 180) {
-            socket.to(store.connectionId).emit("updateStore", data)
-            clearInterval(times)
+            socket.to(store.connectionId).emit("updateStore", data);
+            clearInterval(times);
           }
-        }, 5000)
+        }, 5000);
       }
       if (store.connection) {
-        socket.to(store.connectionId).emit("updateStore", data)
+        socket.to(store.connectionId).emit("updateStore", data);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       res.status(500).json({
         error: true,
-        message: 'Error adding order',
-        error: error.message
+        message: "Error adding order",
+        error: error.message,
       });
     }
-  })
+  });
 
   socket.on("updateDriver", async (data) => {
-
-    // عمليات
-    console.log(data)
-    console.log("updateDriver")
-
-  })
-
-
+    if (daat.type == "orderIsReady") {
+      socket.to("drivers").emit("updateDriver", data);
+    }
+  });
 
   socket.on("reconnect", async (token) => {
     if (token) {
@@ -105,13 +102,13 @@ async function connect(socket) {
         "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
         async (err, data) => {
           if (err) {
-            console.log('يرجى تسجيل الدخول')
+            console.log("يرجى تسجيل الدخول");
           } else {
             let exist = await Store.findOne({ _id: data.id });
             if (!exist) {
               exist = await User.findOne({ _id: data.id });
               if (!exist) {
-                console.log('access denied')
+                console.log("access denied");
               }
               await User.updateOne(
                 { _id: data.id },
@@ -183,17 +180,17 @@ async function connect(socket) {
   // انضمام المستخدم إلى غرفة خاصة
   socket.on("joinRoom", (roomName) => {
     socket.join(roomName);
-    console.log('User' + socket.id + ' joined room:' + roomName);
+    console.log("User" + socket.id + " joined room:" + roomName);
   });
 
   // مغادرة المستخدم للغرفة
   socket.on("leaveRoom", (roomName) => {
     socket.leave(roomName);
-    console.log('User' + socket.id + ' left room:' + roomName);
+    console.log("User" + socket.id + " left room:" + roomName);
   });
 
   socket.on("disconnect", () => {
-    console.log('User disconnected:' + socket.id);
+    console.log("User disconnected:" + socket.id);
   });
 }
 
