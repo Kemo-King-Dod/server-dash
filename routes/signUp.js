@@ -108,9 +108,9 @@ router.post('/driver', async (req, res) => {
 
         const existingDriver = await Driver.findOne({ phone });
         if (existingDriver) {
-            await deleteUploadedFile(licenseNumber);
             await deleteUploadedFile(licenseImage);
             await deleteUploadedFile(passportImage);
+            await deleteUploadedFile(CarBookImage);
             await deleteUploadedFile(CarImage);
             res.status(400).json({
                 error: true,
@@ -161,9 +161,9 @@ router.post('/driver', async (req, res) => {
             }
         });
     } catch (error) {
-        await deleteUploadedFile(req.body.licenseNumber);
         await deleteUploadedFile(req.body.licenseImage);
         await deleteUploadedFile(req.body.passportImage);
+            await deleteUploadedFile(req.body.CarBookImage);
         await deleteUploadedFile(req.body.CarImage);
         console.log(error)
         res.status(500).json({
