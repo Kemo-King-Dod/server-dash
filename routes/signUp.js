@@ -20,7 +20,7 @@ const deleteUploadedFile = async (filePath) => {
         if (fs.existsSync(path.join(__dirname, '..', filePath)))
             await fs.unlink(path.join(__dirname, '..', filePath));
     } catch (error) {
-        console.error('Error deleting file:', error);
+        // console.error('Error deleting file:', error);
     }
 };
 
