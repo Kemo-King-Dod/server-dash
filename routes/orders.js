@@ -23,7 +23,7 @@ async function read() {
   return ordersNum;
 }
 
-// Add new order
+// orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
   try {
     const itemsdata = [];
@@ -205,6 +205,9 @@ router.patch("/deleteOrder", async (req, res) => {
   }
 });
 
+
+
+// user
 router.get("/getOrdersForUser", auth, async (req, res) => {
   try {
     const userId = req.userId;
@@ -228,6 +231,9 @@ router.get("/getOrdersForUser", auth, async (req, res) => {
   }
 });
 
+
+
+// store
 router.get("/getOrdersForStore", auth, async (req, res) => {
   try {
     const userId = req.userId;
@@ -285,6 +291,9 @@ router.get("/getReadyOrdersForStore", auth, async (req, res) => {
   }
 });
 
+
+
+// driver
 router.get("/getReadyOrderForDriver", async (req, res) => {
   try {
     const order = await Order.
