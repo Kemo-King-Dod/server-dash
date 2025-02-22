@@ -360,6 +360,10 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
             order._doc.shopName = store.name
             order._doc.shopImage = store.picture
             order._doc.deliveryFee = store.deliveryCostByKilo
+            const customer = await User.findById(order.customerId)
+            order._doc.name = customer.name
+            order._doc.phone = customer.phone
+            order._doc.gender = customer.gender
 
             res.status(200).json({
                 error: false,
