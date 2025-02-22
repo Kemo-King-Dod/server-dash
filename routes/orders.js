@@ -336,8 +336,51 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
         const id = req.body.orderId;
         const order = await Order.findById(id);
         if (order) {
-            order.status = "onway";
-            order.type = "onway";
+            order.status = "driverAccepted";
+            order.type = "driverAccepted";
+            await order.save();
+            const store = await Store.findById(order.storeId)
+            order._doc.shopName = store.name
+            order._doc.shopImage = store.picture
+            order._doc.deliveryFee = store.deliveryCostByKilo
+
+            res.status(200).json({
+                error: false,
+                data: order,
+            });
+
+        } else {
+            res.status(500).json({
+                error: true,
+                message: "الطلب غير موجود",
+            });
+        }
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: true,
+            message: "Error adding order",
+            error: err.message,
+        });
+    }
+});
+
+
+// examine code
+router.post("/driverAcceptOrder", auth, async (req, res) => {
+    try {
+        const { orderId, code } = req.body;
+        const order = await Order.findById(orderId);
+        if (order) {
+            if (order.reseveCode != code) {
+                return res.status(500).json({
+                    error: true,
+                    message: "الكود غير صحيح",
+                });
+            }
+            order.status = "onWay";
+            order.type = "onWay";
             await order.save();
             const store = await Store.findById(order.storeId)
             order._doc.shopName = store.name
