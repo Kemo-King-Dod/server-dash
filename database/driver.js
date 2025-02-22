@@ -6,6 +6,10 @@ const drivers = new Schema({
         type: String,
         require: [true, 'الإسم مطلوب']
     },
+    age: {
+        type: String,
+        require: [true, 'العمر مطلوب']
+    },
     password: {
         type: String,
         require: [true, 'كلمة السر مطلوبة']
@@ -15,18 +19,39 @@ const drivers = new Schema({
         length: 10,
         require: [true, 'رقم الهاتف مطلوب']
     },
-    licenseNumber:{
+    gender: {
         type: String,
-        require: [true, 'رقم الرخصة مطلوب']
+        require: [true, 'الجنس مطلوب']
     },
-    licensePicture:{
+    licenseNumber:{
+        type: String
+    },
+    carCardNumber:{
+        type: String
+    },
+    licenseImage:{
         type: String,
         require: [true, 'صورة الرخصة مطلوبة']
     },
-    registerCondition: {
+    CarBookImage:{
         type: String,
-        require: [true, 'الموقع مطلوب'],
+        require: [true, 'صورة كتيب مطلوبة']
+    },
+    CarImage:{
+        type: String,
+        require: [true, 'صورة السيارة مطلوبة']
+    },
+    passportImage:{
+        type: String,
+        require: [true, 'صورة الجواز مطلوبة']
+    },
+    status:{
+        type: String,
         default: "waiting"
+    },
+    balance:{
+        type: Number,
+        default: 0
     },
     connection:{
         type: Boolean,
@@ -36,9 +61,6 @@ const drivers = new Schema({
     connectionId: {
         type: String
     },
-    totalCommission: {
-        type: Number
-    },
     moneyRecord: {
         type: Array
     },
@@ -46,17 +68,11 @@ const drivers = new Schema({
         type: Array
     },
     viacleType:{
-        type: String
+        type: String,
+        default: null
     },
     joinDate:{
         type: Date
-    },
-    activityCondition:{
-        type:Boolean,
-        default: true
-    },
-    isThereOrder:{
-        type: Boolean
     },
     currentOrder: {
         type: Object
