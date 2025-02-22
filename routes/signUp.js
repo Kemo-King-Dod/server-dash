@@ -90,7 +90,8 @@ router.post('/user', async (req, res) => {
 // Driver Signup
 router.post('/driver', async (req, res) => {
     try {
-        const { name, phone, password, age, gender, viacleType, licenseNumber, licenseImage, passportImage, CarBookImage, CarImage } = req.body;
+        const { name, phone, age, gender, viacleType, licenseNumber, licenseImage, passportImage, CarBookImage, CarImage } = req.body.driver;
+        const password = req.body.password
 
         if (!name || !phone || !password || !age || !gender || !viacleType || !licenseNumber || !licenseImage || !passportImage || !CarBookImage || !CarImage) {
             await deleteUploadedFile(licenseNumber);
@@ -99,7 +100,7 @@ router.post('/driver', async (req, res) => {
             await deleteUploadedFile(CarImage);
             res.status(400).json({
                 error: true,
-                data: 'جميع الحقول مطلوبة'
+                message: 'جميع الحقول مطلوبة'
             });
             return
         }
@@ -112,7 +113,7 @@ router.post('/driver', async (req, res) => {
             await deleteUploadedFile(CarImage);
             res.status(400).json({
                 error: true,
-                data: 'رقم الهاتف مسجل مسبقاً'
+                message: 'رقم الهاتف مسجل مسبقاً'
             });
         }
 
