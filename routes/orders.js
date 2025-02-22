@@ -306,17 +306,16 @@ router.get("/getReadyOrderForDriver", async (req, res) => {
                 }
             ])
 
-        console.log(order)
+        console.log(order[0])
         res.status(200).json({
             error: false,
-            data: { order },
+            data: order[0],
         });
     } catch (err) {
         console.log(err);
         res.status(500).json({
             error: true,
-            message: "Error adding order",
-            error: err.message,
+            message: err
         });
     }
 });
