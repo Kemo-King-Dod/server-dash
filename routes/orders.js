@@ -296,21 +296,19 @@ router.get("/getReadyOrdersForStore", auth, async (req, res) => {
 // driver
 router.get("/getReadyOrderForDriver", async (req, res) => {
     try {
-        // const order = await Order.
-        //     aggregate([
-        //         {
-        //             $sample: { size: 1 }
-        //         },
-        //         {
-        //             $match: { status: "ready" }
-        //         }
-        //     ])
-        const order = await Order.findOne({ status: "ready" })
+        const order = await Order.
+            aggregate([
+                {
+                    $match: { status: "ready" }
+                },
+                {
+                    $sample: { size: 1 }
+                }
+            ])
 
-        console.log(order)
         res.status(200).json({
             error: false,
-            data: order,
+            data: order[0],
         });
     } catch (err) {
         console.log(err);

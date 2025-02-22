@@ -299,18 +299,18 @@ route.post("/category", async (req, res) => {
     // Get all available items
     const allStores = await Store.aggregate([
       {
-        $sample: { size: 2 }
+        $match: { storeType: req.body.category }
       },
       {
-        $match: { storeType: req.body.category }
+        $sample: { size: 2 }
       }
     ])
     const allItems = await items.aggregate([
       {
-        $sample: { size: 2 }
+        $match: { category: req.body.category }
       },
       {
-        $match: { category: req.body.category }
+        $sample: { size: 2 }
       }
     ])
 
