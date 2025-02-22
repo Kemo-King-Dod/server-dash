@@ -88,9 +88,7 @@ async function connect(socket) {
   });
 
   socket.on("updateDriver", async (data) => {
-    if (daat.type == "orderIsReady") {
-      socket.to("drivers").emit("updateDriver", data);
-    }
+    socket.to("drivers").emit("updateDriver", data)
   });
 
   socket.on("reconnect", async (token) => {
