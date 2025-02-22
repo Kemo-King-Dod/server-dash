@@ -97,6 +97,7 @@ router.post('/driver', async (req, res) => {
                 error: true,
                 data: 'جميع الحقول مطلوبة'
             });
+            return
         }
 
         const existingDriver = await Driver.findOne({ phone });
@@ -150,9 +151,10 @@ router.post('/driver', async (req, res) => {
                 }
             });
         } catch (error) {
+            console.log(error)
             res.status(500).json({
                 error: true,
-                data: 'حدث خطأ أثناء التسجيل'
+                message: error
             });
         }
     });
