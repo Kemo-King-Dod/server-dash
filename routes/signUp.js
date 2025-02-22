@@ -95,9 +95,9 @@ router.post('/driver', async (req, res) => {
         const password = req.body.password
 
         if (!name || !phone || !password || !age || !gender || !viacleType || !licenseNumber || !licenseImage || !passportImage || !CarBookImage || !CarImage) {
-            await deleteUploadedFile(licenseNumber);
             await deleteUploadedFile(licenseImage);
             await deleteUploadedFile(passportImage);
+            await deleteUploadedFile(CarBookImage);
             await deleteUploadedFile(CarImage);
             res.status(400).json({
                 error: true,
