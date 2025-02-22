@@ -309,6 +309,7 @@ router.get("/getReadyOrderForDriver", async (req, res) => {
         const store = await Store.findById(order[0].storeId)
         order[0].shopName = store.name
         order[0].shopImage = store.picture
+        order[0].deliveryFee = store.deliveryCostByKilo
 
         res.status(200).json({
             error: false,
