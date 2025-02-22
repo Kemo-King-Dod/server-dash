@@ -23,37 +23,37 @@ const drivers = new Schema({
         type: String,
         require: [true, 'الجنس مطلوب']
     },
-    licenseNumber:{
+    licenseNumber: {
         type: String
     },
-    carCardNumber:{
+    carCardNumber: {
         type: String
     },
-    licenseImage:{
+    licenseImage: {
         type: String,
         require: [true, 'صورة الرخصة مطلوبة']
     },
-    CarBookImage:{
+    CarBookImage: {
         type: String,
         require: [true, 'صورة كتيب مطلوبة']
     },
-    CarImage:{
+    CarImage: {
         type: String,
         require: [true, 'صورة السيارة مطلوبة']
     },
-    passportImage:{
+    passportImage: {
         type: String,
         require: [true, 'صورة الجواز مطلوبة']
     },
-    status:{
+    status: {
         type: String,
         default: "waiting"
     },
-    balance:{
+    balance: {
         type: Number,
         default: 0
     },
-    connection:{
+    connection: {
         type: Boolean,
         require: [true, 'الإتصال مطلوب'],
         default: false
@@ -64,26 +64,26 @@ const drivers = new Schema({
     moneyRecord: {
         type: Array
     },
-    orders:{
+    orders: {
         type: Array
     },
-    viacleType:{
+    vehicleType: {
         type: String,
         default: null
     },
-    joinDate:{
+    joinDate: {
         type: Date
     },
     currentOrder: {
         type: Object
     },
-    funds:{
+    funds: {
         type: Number
     },
     userType: {
         type: String
     },
-    fcmToken:{
+    fcmToken: {
         type: String
     }
 })

@@ -93,14 +93,14 @@ router.post('/user', async (req, res) => {
 router.post('/driver', async (req, res) => {
     try {
         console.log(req.body)
-        const { name, phone, age, gender, viacleType, licenseNumber, licenseImage, passportImage, CarBookImage, CarImage } = req.body.driver;
+        const { name, phone, age, gender, vehicleType, licenseNumber, licenseImage, passportImage, carBookImage, carImage } = req.body.driver;
         const password = req.body.password
 
-        if (!name || !phone || !password || !age || !gender || !viacleType || !licenseNumber || !licenseImage || !passportImage || !CarBookImage || !CarImage) {
+        if (!name || !phone || !password || !age || !gender || !vehicleType || !licenseNumber || !licenseImage || !passportImage || !carBookImage || !carImage) {
             await deleteUploadedFile(licenseImage);
             await deleteUploadedFile(passportImage);
-            await deleteUploadedFile(CarBookImage);
-            await deleteUploadedFile(CarImage);
+            await deleteUploadedFile(carBookImage);
+            await deleteUploadedFile(carImage);
             res.status(400).json({
                 error: true,
                 message: 'جميع الحقول مطلوبة'
@@ -112,8 +112,8 @@ router.post('/driver', async (req, res) => {
         if (existingDriver) {
             await deleteUploadedFile(licenseImage);
             await deleteUploadedFile(passportImage);
-            await deleteUploadedFile(CarBookImage);
-            await deleteUploadedFile(CarImage);
+            await deleteUploadedFile(carBookImage);
+            await deleteUploadedFile(carImage);
             res.status(400).json({
                 error: true,
                 message: 'رقم الهاتف مسجل مسبقاً'
@@ -129,12 +129,12 @@ router.post('/driver', async (req, res) => {
             password: hashedPassword,
             age,
             gender,
-            viacleType,
+            vehicleType,
             licenseNumber,
             licenseImage,
             passportImage,
-            CarBookImage,
-            CarImage,
+            carBookImage,
+            carImage,
             connection: false,
             connectionId: null,
             moneyRecord: [],
@@ -165,8 +165,8 @@ router.post('/driver', async (req, res) => {
     } catch (error) {
         await deleteUploadedFile(req.body.licenseImage);
         await deleteUploadedFile(req.body.passportImage);
-        await deleteUploadedFile(req.body.CarBookImage);
-        await deleteUploadedFile(req.body.CarImage);
+        await deleteUploadedFile(req.body.carBookImage);
+        await deleteUploadedFile(req.body.carImage);
         console.log(error)
         res.status(500).json({
             error: true,
