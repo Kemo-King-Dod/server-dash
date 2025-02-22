@@ -306,7 +306,7 @@ router.get("/getReadyOrderForDriver", async (req, res) => {
                 }
             ])
 
-        const store = Store.findById(order[0].storeId)
+        const store = await Store.findById(order[0].storeId)
         order[0].shopName = store.name
         order[0].shopImage = store.picture
 
