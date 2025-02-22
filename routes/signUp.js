@@ -163,9 +163,9 @@ router.post('/driver', async (req, res) => {
     } catch (error) {
         await deleteUploadedFile(req.body.licenseImage);
         await deleteUploadedFile(req.body.passportImage);
-            await deleteUploadedFile(req.body.CarBookImage);
+        await deleteUploadedFile(req.body.CarBookImage);
         await deleteUploadedFile(req.body.CarImage);
-        console.log(error)
+        // console.log(error)
         res.status(500).json({
             error: true,
             message: error
