@@ -306,6 +306,7 @@ router.get("/getReadyOrderForDriver", async (req, res) => {
       },
     ]);
 
+    console.log(order)
     res.status(200).json({
       error: false,
       data: order,
