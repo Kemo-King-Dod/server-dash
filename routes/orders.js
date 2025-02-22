@@ -279,8 +279,7 @@ router.get("/getReadyOrdersForStore", auth, async (req, res) => {
             storeId: userId,
             status: { $in: ["driverAccepted", "ready"] }
         });
-
-
+        console.log(orders)
         res.status(200).json({
             error: false,
             data: orders,
