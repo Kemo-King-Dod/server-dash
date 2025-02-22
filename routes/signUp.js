@@ -93,6 +93,10 @@ router.post('/driver', async (req, res) => {
         const { name, phone, password, age, gender, viacleType, licenseNumber, licenseImage, passportImage, CarBookImage, CarImage } = req.body;
 
         if (!name || !phone || !password || !age || !gender || !viacleType || !licenseNumber || !licenseImage || !passportImage || !CarBookImage || !CarImage) {
+            await deleteUploadedFile(licenseNumber);
+            await deleteUploadedFile(licenseImage);
+            await deleteUploadedFile(passportImage);
+            await deleteUploadedFile(CarImage);
             res.status(400).json({
                 error: true,
                 data: 'جميع الحقول مطلوبة'
@@ -102,6 +106,10 @@ router.post('/driver', async (req, res) => {
 
         const existingDriver = await Driver.findOne({ phone });
         if (existingDriver) {
+            await deleteUploadedFile(licenseNumber);
+            await deleteUploadedFile(licenseImage);
+            await deleteUploadedFile(passportImage);
+            await deleteUploadedFile(CarImage);
             res.status(400).json({
                 error: true,
                 data: 'رقم الهاتف مسجل مسبقاً'
@@ -111,53 +119,57 @@ router.post('/driver', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-            const newDriver = new Driver({
-                name,
-                phone,
-                password: hashedPassword,
-                age,
-                gender,
-                viacleType,
-                licenseNumber,
-                licenseImage,
-                passportImage,
-                CarBookImage,
-                CarImage,
-                connection: false,
-                connectionId: null,
-                moneyRecord: [],
-                orders: [],
-                joinDate: new Date(),
-                currentOrder: {},
-                funds: 0,
-                userType: "Driver",
-                fcmToken: "kamal"
-            });
+        const newDriver = new Driver({
+            name,
+            phone,
+            password: hashedPassword,
+            age,
+            gender,
+            viacleType,
+            licenseNumber,
+            licenseImage,
+            passportImage,
+            CarBookImage,
+            CarImage,
+            connection: false,
+            connectionId: null,
+            moneyRecord: [],
+            orders: [],
+            joinDate: new Date(),
+            currentOrder: {},
+            funds: 0,
+            userType: "Driver",
+            fcmToken: "kamal"
+        });
 
-            await newDriver.save();
-            const token = sign(newDriver._id, "Driver");
+        await newDriver.save();
+        const token = sign(newDriver._id, "Driver");
 
-            res.status(201).json({
-                error: false,
-                data: {
-                    token,
-                    user: {
-                        id: newDriver._id,
-                        name: newDriver.name,
-                        phone: newDriver.phone,
-                        userType: "Driver",
-                        registerCondition: newDriver.registerCondition
-                    }
+        res.status(201).json({
+            error: false,
+            data: {
+                token,
+                user: {
+                    id: newDriver._id,
+                    name: newDriver.name,
+                    phone: newDriver.phone,
+                    userType: "Driver",
+                    registerCondition: newDriver.registerCondition
                 }
-            });
-        } catch (error) {
-            console.log(error)
-            res.status(500).json({
-                error: true,
-                message: error
-            });
-        }
-    });
+            }
+        });
+    } catch (error) {
+        await deleteUploadedFile(req.body.licenseNumber);
+        await deleteUploadedFile(req.body.licenseImage);
+        await deleteUploadedFile(req.body.passportImage);
+        await deleteUploadedFile(req.body.CarImage);
+        console.log(error)
+        res.status(500).json({
+            error: true,
+            message: error
+        });
+    }
+});
 
 // Store Signup
 router.post('/store', async (req, res) => {
