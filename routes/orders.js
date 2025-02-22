@@ -340,9 +340,9 @@ router.post("/driverAcceptOrder", async (req, res) => {
             order.type = "onway";
             await order.save();
             const store = await Store.findById(order.storeId)
-            order.shopName = store.name
-            order.shopImage = store.picture
-            order.deliveryFee = store.deliveryCostByKilo
+            order._doc.shopName = store.name
+            order._doc.shopImage = store.picture
+            order._doc.deliveryFee = store.deliveryCostByKilo
 
             res.status(200).json({
                 error: false,
