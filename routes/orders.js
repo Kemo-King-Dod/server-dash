@@ -239,6 +239,7 @@ router.get("/getOrdersForStore", auth, async (req, res) => {
         const userId = req.userId;
         const orders = await Order.find({ storeId: userId });
 
+        console.log(orders)
         res.status(200).json({
             error: false,
             data: orders,
