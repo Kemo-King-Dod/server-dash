@@ -274,6 +274,7 @@ router.get("/getAcceptedOrdersForStore", auth, async (req, res) => {
 
 router.get("/getReadyOrdersForStore", auth, async (req, res) => {
     try {
+        console.log(9999)
         const userId = req.userId;
         const orders = await Order.find({
             storeId: userId,
