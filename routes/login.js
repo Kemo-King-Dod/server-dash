@@ -58,6 +58,7 @@ route.post("/login", async (req, res) => {
             }
         }
 
+        console.log(response)
         res.status(200).json(response)
 
     } catch (error) {
