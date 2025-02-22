@@ -245,7 +245,7 @@ router.get("/getOrdersForStore", auth, async (req, res) => {
         });
     } catch (err) {
         console.log(err);
-        res.status(500).json({
+        res.status(400).json({
             error: true,
             message: "Error adding order",
             error: err.message,
