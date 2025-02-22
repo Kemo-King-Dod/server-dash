@@ -306,6 +306,13 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
                 }
             ])
 
+        if (order.length == 0) {
+            return res.status(300).json({
+                error: true,
+                message: 'ليس هناك طلبات جاهزة حتى الآن'
+            });
+        }
+
         const store = await Store.findById(order[0].storeId)
         order[0].shopName = store.name
         order[0].shopImage = store.picture
@@ -332,6 +339,16 @@ router.post("/driverAcceptOrder", async (req, res) => {
             order.status = "onway";
             order.type = "onway";
             await order.save();
+            const store = await Store.findById(order.storeId)
+            order.shopName = store.name
+            order.shopImage = store.picture
+            order.deliveryFee = store.deliveryCostByKilo
+
+            res.status(200).json({
+                error: false,
+                data: order,
+            });
+
         } else {
             res.status(500).json({
                 error: true,
@@ -339,15 +356,6 @@ router.post("/driverAcceptOrder", async (req, res) => {
             });
         }
 
-        const store = await Store.findById(order.storeId)
-        order.shopName = store.name
-        order.shopImage = store.picture
-        order.deliveryFee = store.deliveryCostByKilo
-
-        res.status(200).json({
-            error: false,
-            data: order,
-        });
     } catch (err) {
         console.log(err);
         res.status(500).json({
