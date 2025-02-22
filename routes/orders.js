@@ -275,7 +275,11 @@ router.get("/getAcceptedOrdersForStore", auth, async (req, res) => {
 router.get("/getReadyOrdersForStore", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ storeId: userId, status: "driverAccepted" });
+        const orders = await Order.find({
+            storeId: userId,
+            status: { $in: ["driverAccepted", "ready"] }
+        });
+
 
         res.status(200).json({
             error: false,
@@ -296,6 +300,19 @@ router.get("/getReadyOrdersForStore", auth, async (req, res) => {
 // driver
 router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     try {
+        const id = req.userId
+        const acceptedorder = await Order.findOne({ driverId: id, status: "driverAccepted" })
+        if (acceptedorder) {
+            const store = await Store.findById(acceptedorder.storeId)
+            acceptedorder.shopName = store.name
+            acceptedorder.shopImage = store.picture
+            acceptedorder.deliveryFee = store.deliveryCostByKilo
+
+            return res.status(200).json({
+                error: false,
+                data: acceptedorder,
+            });
+        }
         const order = await Order.
             aggregate([
                 {
