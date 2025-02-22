@@ -385,28 +385,16 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
 
 
 // examine code
-router.post("/driverAcceptOrder", auth, async (req, res) => {
+router.post("/examineCode", auth, async (req, res) => {
     try {
-        const { orderId, code } = req.body;
-        const order = await Order.findById(orderId);
+        const order = await Order.findById(req.body.orderId);
         if (order) {
-            if (order.reseveCode != code) {
-                return res.status(500).json({
-                    error: true,
-                    message: "الكود غير صحيح",
-                });
-            }
             order.status = "onWay";
             order.type = "onWay";
             await order.save();
-            const store = await Store.findById(order.storeId)
-            order._doc.shopName = store.name
-            order._doc.shopImage = store.picture
-            order._doc.deliveryFee = store.deliveryCostByKilo
-
             res.status(200).json({
                 error: false,
-                data: order,
+                data: 'تمت العملية بنجاح',
             });
 
         } else {
