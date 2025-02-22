@@ -339,6 +339,11 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
             });
         }
 
+        const store = await Store.findById(order.storeId)
+        order.shopName = store.name
+        order.shopImage = store.picture
+        order.deliveryFee = store.deliveryCostByKilo
+
         res.status(200).json({
             error: false,
             data: order,
