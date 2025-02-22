@@ -275,7 +275,7 @@ router.get("/getAcceptedOrdersForStore", auth, async (req, res) => {
 router.get("/getReadyOrdersForStore", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ storeId: userId, status: "ready" });
+        const orders = await Order.find({ storeId: userId, status: "driverAccepted" });
 
         res.status(200).json({
             error: false,
