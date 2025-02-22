@@ -52,7 +52,7 @@ route.post("/login", async (req, res) => {
                     name: exist.name,
                     phone: exist.phone,
                     userType,
-                    registerCondition: exist.registerCondition,
+                    status: exist.status ? exist.status : null,
                     picture: userType == "Store" ? exist.Picture : null
                 }
             }
