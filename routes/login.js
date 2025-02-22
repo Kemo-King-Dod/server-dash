@@ -54,7 +54,7 @@ route.post("/login", async (req, res) => {
                     phone: exist.phone,
                     userType,
                     status: exist.status ? exist.status : null,
-                    picture: storeType ? exist.Picture : null
+                    picture: storeType ? exist.picture : null
                 }
             }
         }
