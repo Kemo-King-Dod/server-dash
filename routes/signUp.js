@@ -6,6 +6,7 @@ const User = require('../database/users');
 const Driver = require('../database/driver');
 const Store = require('../database/store');
 const fs = require('fs');
+const path = require('path');
 
 const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
 
@@ -16,7 +17,8 @@ const sign = function (id, type) {
 const deleteUploadedFile = async (filePath) => {
     try {
         if (!filePath) return;
-        await fs.unlink(filePath);
+        if (fs.existsSync(path.join(__dirname, '..', filePath)))
+            await fs.unlink(path.join(__dirname, '..', filePath));
     } catch (error) {
         console.error('Error deleting file:', error);
     }
@@ -165,7 +167,7 @@ router.post('/driver', async (req, res) => {
         await deleteUploadedFile(req.body.passportImage);
         await deleteUploadedFile(req.body.CarBookImage);
         await deleteUploadedFile(req.body.CarImage);
-        // console.log(error)
+        console.log(error)
         res.status(500).json({
             error: true,
             message: error
