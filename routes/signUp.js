@@ -90,6 +90,7 @@ router.post('/user', async (req, res) => {
 // Driver Signup
 router.post('/driver', async (req, res) => {
     try {
+        console.log(req.body)
         const { name, phone, age, gender, viacleType, licenseNumber, licenseImage, passportImage, CarBookImage, CarImage } = req.body.driver;
         const password = req.body.password
 
