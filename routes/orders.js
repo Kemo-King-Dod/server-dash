@@ -294,7 +294,7 @@ router.get("/getReadyOrdersForStore", auth, async (req, res) => {
 
 
 // driver
-router.get("/getReadyOrderForDriver", async (req, res) => {
+router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     try {
         const order = await Order.
             aggregate([
@@ -320,6 +320,35 @@ router.get("/getReadyOrderForDriver", async (req, res) => {
         res.status(500).json({
             error: true,
             message: err
+        });
+    }
+});
+
+router.post("/driverAcceptOrder", auth, async (req, res) => {
+    try {
+        const id = req.body.orderId;
+        const order = await Order.findById(id);
+        if (order) {
+            order.status = "onway";
+            order.type = "onway";
+            await order.save();
+        } else {
+            res.status(500).json({
+                error: true,
+                message: "الطلب غير موجود",
+            });
+        }
+
+        res.status(200).json({
+            error: false,
+            data: order,
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: true,
+            message: "Error adding order",
+            error: err.message,
         });
     }
 });
