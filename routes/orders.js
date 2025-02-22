@@ -239,7 +239,6 @@ router.get("/getOrdersForStore", auth, async (req, res) => {
         const userId = req.userId;
         const orders = await Order.find({ storeId: userId });
 
-        console.log(orders)
         res.status(200).json({
             error: false,
             data: orders,
@@ -356,6 +355,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
         if (order) {
             order.status = "driverAccepted";
             order.type = "driverAccepted";
+            order.driverId = req.userId;
             await order.save();
             const store = await Store.findById(order.storeId)
             order._doc.shopName = store.name
