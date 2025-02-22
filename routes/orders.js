@@ -305,7 +305,7 @@ router.get("/getReadyOrderForDriver", async (req, res) => {
         //             $match: { status: "ready" }
         //         }
         //     ])
-        const order = Order.findOne({ status: "ready" })
+        const order = await Order.findOne({ status: "ready" })
 
         console.log(order)
         res.status(200).json({
