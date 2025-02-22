@@ -41,6 +41,7 @@ route.post("/login", async (req, res) => {
 
         // Generate response based on user type
         const userType = exist.userType
+        const storeType = exist.storeType
         const token = sign(exist._id, userType)
 
         const response = {
@@ -53,7 +54,7 @@ route.post("/login", async (req, res) => {
                     phone: exist.phone,
                     userType,
                     status: exist.status ? exist.status : null,
-                    picture: userType == "Store" ? exist.Picture : null
+                    picture: storeType ? exist.Picture : null
                 }
             }
         }
