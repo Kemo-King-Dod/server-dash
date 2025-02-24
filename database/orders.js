@@ -5,14 +5,14 @@ const orders = new Schema({
   orderId: {
     type: String
   },
-  customerId: {
-    type: String
+  customer: {
+    type: Object
   },
-  storeId: {
-    type: String
+  driver: {
+    type: Object
   },
-  driverId: {
-    type: String
+  store: {
+    type: Object
   },
   date: {
     type: Date
@@ -41,7 +41,7 @@ const orders = new Schema({
   },
   chat: {
     type: Object
-  },
+  }
 });
 
 module.exports = mongoose.model("Order", orders);

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Order = require("../database/orders");
 const Store = require("../database/store");
+const Driver = require("../database/driver");
 const Address = require("../database/address");
 const User = require("../database/users");
 const Item = require("../database/items");
@@ -31,6 +32,7 @@ router.post("/addOrder", auth, async (req, res) => {
         const StoreId = req.body.storeId;
         const theAddress = await Address.findById(req.body.addressId);
 
+        const store = await Store.findById(StoreId);
         const user = await User.findById(userId);
         let totalprice = 0;
 
@@ -59,9 +61,21 @@ router.post("/addOrder", auth, async (req, res) => {
         // Create new order
         const order = new Order({
             orderId: await read(),
-            customerId: userId,
-            storeId: StoreId,
-            driverId: null,
+            customer: {
+                id: user._id,
+                name: user.name,
+                gender: user.gender
+            },
+            store: {
+                id: store._id,
+                name: store.name,
+                picture: store.picture,
+                deliveryCostByKilo: store.deliveryCostByKilo,
+                storeType: store.storeType,
+                location: store.location,
+                address: store.address
+            },
+            driver: null,
             date: new Date(),
             items: itemsdata,
             totalPrice: totalprice,
@@ -211,7 +225,7 @@ router.patch("/deleteOrder", async (req, res) => {
 router.get("/getOrdersForUser", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ customerId: userId });
+        const orders = await Order.find({ "customer.id": userId });
 
         for (let i = 0; i < orders.length; i++) {
             orders.reseveCode = "";
@@ -237,7 +251,7 @@ router.get("/getOrdersForUser", auth, async (req, res) => {
 router.get("/getOrdersForStore", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ storeId: userId });
+        const orders = await Order.find({ "store:id": userId });
 
         res.status(200).json({
             error: false,
@@ -256,7 +270,7 @@ router.get("/getOrdersForStore", auth, async (req, res) => {
 router.get("/getAcceptedOrdersForStore", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ storeId: userId, status: "accepted" });
+        const orders = await Order.find({ "store:id": userId, status: "accepted" });
 
         res.status(200).json({
             error: false,
@@ -277,7 +291,7 @@ router.get("/getReadyOrdersForStore", auth, async (req, res) => {
         console.log(9999)
         const userId = req.userId;
         const orders = await Order.find({
-            storeId: userId,
+            "store:id": userId,
             status: { $in: ["driverAccepted", "ready"] }
         });
         console.log(orders)
@@ -301,13 +315,8 @@ router.get("/getReadyOrdersForStore", auth, async (req, res) => {
 router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     try {
         const id = req.userId
-        const acceptedorder = await Order.findOne({ driverId: id, status: "driverAccepted" })
+        const acceptedorder = await Order.findOne({ "driver:id": id, status: "driverAccepted" })
         if (acceptedorder) {
-            const store = await Store.findById(acceptedorder.storeId)
-            acceptedorder.shopName = store.name
-            acceptedorder.shopImage = store.picture
-            acceptedorder.deliveryFee = store.deliveryCostByKilo
-
             return res.status(200).json({
                 error: false,
                 data: acceptedorder,
@@ -330,11 +339,6 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
             });
         }
 
-        const store = await Store.findById(order[0].storeId)
-        order[0].shopName = store.name
-        order[0].shopImage = store.picture
-        order[0].deliveryFee = store.deliveryCostByKilo
-
         res.status(200).json({
             error: false,
             data: order[0],
@@ -351,20 +355,17 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
 router.post("/driverAcceptOrder", auth, async (req, res) => {
     try {
         const id = req.body.orderId;
+        const driver = Driver.findById(req.body.orderId);
         const order = await Order.findById(id);
         if (order) {
             order.status = "driverAccepted";
             order.type = "driverAccepted";
-            order.driverId = req.userId;
+            order.driver = {
+                id: req.userId,
+                name: driver.name,
+                gender: driver.gender
+            };
             await order.save();
-            const store = await Store.findById(order.storeId)
-            order._doc.shopName = store.name
-            order._doc.shopImage = store.picture
-            order._doc.deliveryFee = store.deliveryCostByKilo
-            const customer = await User.findById(order.customerId)
-            order._doc.name = customer.name
-            order._doc.phone = customer.phone
-            order._doc.gender = customer.gender
 
             res.status(200).json({
                 error: false,
@@ -377,7 +378,6 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
                 message: "الطلب غير موجود",
             });
         }
-
     } catch (err) {
         console.log(err);
         res.status(500).json({
