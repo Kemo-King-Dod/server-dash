@@ -35,6 +35,7 @@ async function connect(socket) {
                   { _id: data.id },
                   { $set: { connection: true, connectionId: socket.id } }
                 );
+                socket.to(socket.id).emit("getDriverResponse", data)
                 socket.join("drivers");
 
                 if (!exist) {
