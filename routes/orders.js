@@ -256,7 +256,6 @@ router.get("/getOrdersForStore", async (req, res) => {
     try {
         const userId = req.body.userId;
         const orders = await Order.find({ "store.id": new mongoose.ObjectId(userId) });
-        console.log(orders)
 
         res.status(200).json({
             error: false,

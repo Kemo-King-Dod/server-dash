@@ -39,7 +39,7 @@ async function connect(socket) {
                 orders : exist.orders.length,
                 funds : exist.funds
               }
-              socket.to(socket.id).emit("updateStore", data)
+              socket.to(socket.id).emit("updateDriver", data)
               socket.join("drivers");
 
               if (!exist) {
