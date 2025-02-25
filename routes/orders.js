@@ -365,6 +365,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
                 name: driver.name,
                 gender: driver.gender
             };
+            console.log(order.driver)
             await order.save();
 
             res.status(200).json({
