@@ -352,7 +352,7 @@ router.get("/getReadyOrderForDriver", async (req, res) => {
     }
 });
 
-router.post("/driverAcceptOrder", async (req, res) => {
+router.post("/driverAcceptOrder",auth, async (req, res) => {
     try {
         const id = req.body.orderId;
         const driver = await Driver.findById(req.userId);
