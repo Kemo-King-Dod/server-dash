@@ -15,6 +15,10 @@ const users = new Schema({
         length: 10,
         require: [true, 'رقم الهاتف مطلوب']
     },
+    gender: {
+        type: String,
+        require: [true, 'الجنس مطلوب']
+    },
     locations: {
         type: Array
     },
