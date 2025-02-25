@@ -35,6 +35,11 @@ async function connect(socket) {
                   { _id: data.id },
                   { $set: { connection: true, connectionId: socket.id } }
                 );
+                data = {
+                  name: exist.name,
+                  orders: exist.orders.length,
+                  funds: exist.funds
+                }
                 socket.to(socket.id).emit("getDriverResponse", data)
                 socket.join("drivers");
 
@@ -97,29 +102,7 @@ async function connect(socket) {
     socket.to("drivers").emit("updateDriver", data)
   });
 
-  socket.on("getDriver", (socket) => {
-    console.log(2)
-    if (socket.handshake.headers.authorization) {
-      jwt.verify(
-        socket.handshake.headers.authorization,
-        "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
-        async (err, data) => {
-          if (err) {
-            console.log(err);
-            console.log("يرجى تسجيل الدخول");
-          } else {
-            const driver = Driver.findById(data.id)
-            console.log(driver)
-            const data = {
-              name: driver.name,
-              orders: driver.orders.length,
-              funds: driver.funds
-            }
-            socket.to(driver.connectionId).emit("updateDriver", data)
-          }
-        })
-    }
-  });
+
 
   socket.on("reconnect", async (token) => {
     if (token) {
