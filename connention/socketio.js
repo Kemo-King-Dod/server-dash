@@ -97,6 +97,7 @@ async function connect(socket) {
   });
 
   socket.on("getDriver", (socket) => {
+    console.log(2)
     if (socket.handshake.headers.authorization) {
       jwt.verify(
         socket.handshake.headers.authorization,
