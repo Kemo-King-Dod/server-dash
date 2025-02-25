@@ -252,9 +252,9 @@ router.get("/getOrdersForUser", auth, async (req, res) => {
 
 
 // store
-router.get("/getOrdersForStore", async (req, res) => {
+router.get("/getOrdersForStore", auth, async (req, res) => {
     try {
-        const userId = req.body.userId;
+        const userId = req.userId;
         const orders = await Order.find({ "store.id": new mongoose.ObjectId(userId) });
 
         res.status(200).json({
