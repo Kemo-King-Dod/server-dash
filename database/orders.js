@@ -14,6 +14,9 @@ const orders = new Schema({
   store: {
     type: Object
   },
+  companyFee: {
+    type: Number
+  },
   date: {
     type: Date
   },

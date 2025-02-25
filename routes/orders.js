@@ -78,6 +78,7 @@ router.post("/addOrder", auth, async (req, res) => {
                 address: store.address
             },
             driver: null,
+            companyFee: store.deliveryCostByKilo * 20 / 100,
             date: new Date(),
             items: itemsdata,
             totalPrice: totalprice,
@@ -227,7 +228,7 @@ router.patch("/deleteOrder", async (req, res) => {
 router.get("/getOrdersForUser", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ "customer:id": userId });
+        const orders = await Order.find({ "customer.id": userId });
 
         for (let i = 0; i < orders.length; i++) {
             orders[i].reserveCode = "";
@@ -253,7 +254,7 @@ router.get("/getOrdersForUser", auth, async (req, res) => {
 router.get("/getOrdersForStore", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ "store:id": userId });
+        const orders = await Order.find({ "store.id": userId });
 
         res.status(200).json({
             error: false,
@@ -272,7 +273,7 @@ router.get("/getOrdersForStore", auth, async (req, res) => {
 router.get("/getAcceptedOrdersForStore", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ "store:id": userId, status: "accepted" });
+        const orders = await Order.find({ "store.id": userId, status: "accepted" });
 
         res.status(200).json({
             error: false,
@@ -290,10 +291,9 @@ router.get("/getAcceptedOrdersForStore", auth, async (req, res) => {
 
 router.get("/getReadyOrdersForStore", auth, async (req, res) => {
     try {
-        console.log(9999)
         const userId = req.userId;
         const orders = await Order.find({
-            "store:id": userId,
+            "store.id": userId,
             status: { $in: ["driverAccepted", "ready"] }
         });
         console.log(orders)
@@ -314,10 +314,10 @@ router.get("/getReadyOrdersForStore", auth, async (req, res) => {
 
 
 // driver
-router.get("/getReadyOrderForDriver", async (req, res) => {
+router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     try {
         const id = req.userId
-        const acceptedorder = await Order.findOne({ "driver:id": id, status: "driverAccepted" })
+        const acceptedorder = await Order.findOne({ "driver.id": id, status: "driverAccepted" })
         if (acceptedorder) {
             return res.status(200).json({
                 error: false,

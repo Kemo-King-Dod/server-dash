@@ -27,9 +27,9 @@ const deleteUploadedFile = async (filePath) => {
 // User Signup
 router.post('/user', async (req, res) => {
     try {
-        const { name, password, phone, locations, fcmToken } = req.body;
+        const { name, password, gender, phone, locations, fcmToken } = req.body;
 
-        if (!name || !password || !phone) {
+        if (!name || !password || !phone /* || !gender */) {
             res.status(400).json({
                 error: true,
                 data: 'جميع الحقول مطلوبة'
@@ -51,6 +51,7 @@ router.post('/user', async (req, res) => {
             name,
             password: hashedPassword,
             phone,
+            gender,
             locations: locations || [],
             registerCondition: "active",
             orders: [],

@@ -85,7 +85,7 @@ const drivers = new Schema({
     },
     fcmToken: {
         type: String
-    }
+    },
 })
 
 module.exports = mongoose.model('Driver', drivers)

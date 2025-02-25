@@ -34,7 +34,14 @@ async function connect(socket) {
                 { _id: data.id },
                 { $set: { connection: true, connectionId: socket.id } }
               );
+              var data = {
+                name : exist.name,
+                orders : exist.orders.length,
+                funds : exist.funds
+              }
+              socket.to(socket.id).emit("updateStore", data)
               socket.join("drivers");
+
               if (!exist) {
                 console.log("access denied");
               }
