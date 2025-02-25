@@ -16,49 +16,54 @@ function createserver(server) {
   });
 }
 async function connect(socket) {
-  if (socket.handshake.headers.authorization) {
-    await jwt.verify(
-      socket.handshake.headers.authorization,
-      "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
-      async (err, data) => {
-        if (err) {
-          console.log(err);
-          console.log("يرجى تسجيل الدخول");
-        } else {
-          let exist = await User.findOne({ _id: data.id });
-          if (!exist) {
-            exist = await Store.findOne({ _id: data.id });
+  try {
+    if (socket.handshake.headers.authorization) {
+      await jwt.verify(
+        socket.handshake.headers.authorization,
+        "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
+        async (err, data) => {
+          if (err) {
+            console.log(err);
+            console.log("يرجى تسجيل الدخول");
+          } else {
+            let exist = await User.findOne({ _id: data.id });
             if (!exist) {
-              exist = await Driver.findOne({ _id: data.id });
-              await Driver.updateOne(
+              exist = await Store.findOne({ _id: data.id });
+              if (!exist) {
+                exist = await Driver.findOne({ _id: data.id });
+                await Driver.updateOne(
+                  { _id: data.id },
+                  { $set: { connection: true, connectionId: socket.id } }
+                );
+                var data = {
+                  name: exist.name,
+                  orders: exist.orders.length,
+                  funds: exist.funds
+                }
+                console.log(data)
+                socket.to(socket.id).emit("updateDriver", data)
+                socket.join("drivers");
+
+                if (!exist) {
+                  console.log("access denied");
+                }
+              }
+              await Store.updateOne(
                 { _id: data.id },
                 { $set: { connection: true, connectionId: socket.id } }
               );
-              var data = {
-                name : exist.name,
-                orders : exist.orders.length,
-                funds : exist.funds
-              }
-              socket.to(socket.id).emit("updateDriver", data)
-              socket.join("drivers");
-
-              if (!exist) {
-                console.log("access denied");
-              }
+            } else {
+              await User.updateOne(
+                { _id: data.id },
+                { $set: { connection: true, connectionId: socket.id } }
+              );
             }
-            await Store.updateOne(
-              { _id: data.id },
-              { $set: { connection: true, connectionId: socket.id } }
-            );
-          } else {
-            await User.updateOne(
-              { _id: data.id },
-              { $set: { connection: true, connectionId: socket.id } }
-            );
           }
         }
-      }
-    );
+      );
+    }
+  } catch (error) {
+    console.log(error)
   }
 
   socket.on("updateUser", async (data) => {
