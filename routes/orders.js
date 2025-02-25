@@ -182,7 +182,7 @@ router.post("/readyOrder", auth, async (req, res) => {
     }
 });
 
-// Delete order
+// send order to order history
 router.patch("/deleteOrder", async (req, res) => {
     try {
         const order = await Order.findById(req.body.orderId);
@@ -225,10 +225,10 @@ router.patch("/deleteOrder", async (req, res) => {
 router.get("/getOrdersForUser", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ "customer.id": userId });
+        const orders = await Order.find({ "customer:id": userId });
 
         for (let i = 0; i < orders.length; i++) {
-            orders.reseveCode = "";
+            orders[i].reserveCode = "";
         }
 
         res.status(200).json({
@@ -312,7 +312,7 @@ router.get("/getReadyOrdersForStore", auth, async (req, res) => {
 
 
 // driver
-router.get("/getReadyOrderForDriver", auth, async (req, res) => {
+router.get("/getReadyOrderForDriver", async (req, res) => {
     try {
         const id = req.userId
         const acceptedorder = await Order.findOne({ "driver:id": id, status: "driverAccepted" })
@@ -355,7 +355,7 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
 router.post("/driverAcceptOrder", auth, async (req, res) => {
     try {
         const id = req.body.orderId;
-        const driver = Driver.findById(req.body.orderId);
+        const driver = Driver.findById(req.userId);
         const order = await Order.findById(id);
         if (order) {
             order.status = "driverAccepted";
