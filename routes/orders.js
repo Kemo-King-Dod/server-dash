@@ -64,10 +64,12 @@ router.post("/addOrder", auth, async (req, res) => {
             customer: {
                 id: user._id,
                 name: user.name,
+                phone: user.phone,
                 gender: user.gender
             },
             store: {
                 id: store._id,
+                phone: store.phone,
                 name: store.name,
                 picture: store.picture,
                 deliveryCostByKilo: store.deliveryCostByKilo,
@@ -352,7 +354,7 @@ router.get("/getReadyOrderForDriver", async (req, res) => {
     }
 });
 
-router.post("/driverAcceptOrder",auth, async (req, res) => {
+router.post("/driverAcceptOrder", auth, async (req, res) => {
     try {
         const id = req.body.orderId;
         const driver = await Driver.findById(req.userId);
@@ -363,7 +365,9 @@ router.post("/driverAcceptOrder",auth, async (req, res) => {
             order.driver = {
                 id: req.userId,
                 name: driver.name,
-                gender: driver.gender
+                gender: driver.gender,
+                phone: driver.phone,
+
             };
             console.log(order.driver)
             await order.save();
