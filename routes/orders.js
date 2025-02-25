@@ -9,6 +9,7 @@ const Item = require("../database/items");
 const fs = require("fs").promises;
 const path = require("path");
 const { auth } = require("../middleware/auth");
+const { default: mongoose } = require("mongoose");
 
 let ordersNum;
 
@@ -251,10 +252,11 @@ router.get("/getOrdersForUser", auth, async (req, res) => {
 
 
 // store
-router.get("/getOrdersForStore", auth, async (req, res) => {
+router.get("/getOrdersForStore", async (req, res) => {
     try {
-        const userId = req.userId;
-        const orders = await Order.find({ "store.id": userId });
+        const userId = req.body.userId;
+        const orders = await Order.find({ "store.id": new mongoose.Types.ObjectId(userId) });
+        console.log(orders)
 
         res.status(200).json({
             error: false,
