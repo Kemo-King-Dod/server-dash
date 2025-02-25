@@ -86,8 +86,8 @@ router.post("/addOrder", auth, async (req, res) => {
             status: "waiting",
             type: "waiting",
             address: theAddress,
-            distenationPrice: Store.deliveryCostByKilo,
-            reseveCode: Math.round(Math.random(100000) * 100000),
+            distenationPrice: store.deliveryCostByKilo,
+            reserveCode: Math.round(Math.random() * 100000),
             chat: {},
         });
 
@@ -136,16 +136,15 @@ router.post("/acceptOrder", auth, async (req, res) => {
             order.status = "accepted";
             order.type = "accepted";
             await order.save();
-        } else {
-            res.status(500).json({
-                error: true,
-                message: "الطلب غير موجود",
+            res.status(200).json({
+                error: false,
+                data: order,
             });
+            return;
         }
-
-        res.status(200).json({
-            error: false,
-            data: order,
+        res.status(500).json({
+            error: true,
+            message: "الطلب غير موجود",
         });
     } catch (err) {
         console.log(err);
@@ -229,7 +228,7 @@ router.patch("/deleteOrder", async (req, res) => {
 router.get("/getOrdersForUser", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ "customer.id": userId });
+        const orders = await Order.find({ "customer.id": new mongoose.Types.ObjectId(userId) });
 
         for (let i = 0; i < orders.length; i++) {
             orders[i].reserveCode = "";
@@ -271,49 +270,6 @@ router.get("/getOrdersForStore", auth, async (req, res) => {
     }
 });
 
-router.get("/getAcceptedOrdersForStore", auth, async (req, res) => {
-    try {
-        const userId = req.userId;
-        const orders = await Order.find({ "store.id": userId, status: "accepted" });
-
-        res.status(200).json({
-            error: false,
-            data: orders,
-        });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({
-            error: true,
-            message: "Error adding order",
-            error: err.message,
-        });
-    }
-});
-
-router.get("/getReadyOrdersForStore", auth, async (req, res) => {
-    try {
-        const userId = req.userId;
-        const orders = await Order.find({
-            "store.id": userId,
-            status: { $in: ["driverAccepted", "ready"] }
-        });
-        console.log(orders)
-        res.status(200).json({
-            error: false,
-            data: orders,
-        });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({
-            error: true,
-            message: "Error adding order",
-            error: err.message,
-        });
-    }
-});
-
-
-
 // driver
 router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     try {
@@ -325,15 +281,14 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
                 data: acceptedorder,
             });
         }
-        const order = await Order.
-            aggregate([
-                {
-                    $match: { status: "ready" }
-                },
-                {
-                    $sample: { size: 1 }
-                }
-            ])
+        const order = await Order.aggregate([
+            {
+                $match: { status: { $in: ["ready","driverAccepted","onWay","confirmed"] } }
+            },
+            {
+                $sample: { size: 1 }
+            }
+        ]);
 
         if (order.length == 0) {
             return res.status(300).json({
