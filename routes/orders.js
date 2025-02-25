@@ -255,7 +255,7 @@ router.get("/getOrdersForUser", auth, async (req, res) => {
 router.get("/getOrdersForStore", auth, async (req, res) => {
     try {
         const userId = req.userId;
-        const orders = await Order.find({ "store.id": new mongoose.ObjectId(userId) });
+        const orders = await Order.find({ "store.id": new mongoose.Types.ObjectId(userId) });
 
         res.status(200).json({
             error: false,
@@ -276,8 +276,6 @@ router.get("/getAcceptedOrdersForStore", auth, async (req, res) => {
         const userId = req.userId;
         const orders = await Order.find({ "store.id": userId, status: "accepted" });
 
-        console.log(orders)
-        
         res.status(200).json({
             error: false,
             data: orders,
