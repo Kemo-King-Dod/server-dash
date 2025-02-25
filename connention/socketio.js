@@ -40,9 +40,7 @@ async function connect(socket) {
                   orders: exist.orders.length,
                   funds: exist.funds
                 }
-                try{socket.to(socket.id).emit("getDriverResponse", data).then(() => {
-                  console.log("user connected");
-                });}catch(error){
+                try { socket.to(socket.id).emit("getDriverResponse", data) } catch (error) {
                   console.log(error)
                 }
                 socket.join("drivers");
