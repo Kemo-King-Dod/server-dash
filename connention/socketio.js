@@ -41,7 +41,8 @@ async function connect(socket) {
                   funds: exist.funds
                 }
                 console.log(data)
-                socket.to(socket.id).emit("updateDriver", data)
+                console.log(socket.id)
+                emit(socket.id)
                 socket.join("drivers");
 
                 if (!exist) {
@@ -227,6 +228,10 @@ function userisstillconnected(socket) {
   clearTimeout(isconnected);
   isconnected = false;
   isuserconnected(socket);
+}
+
+function emit(id) {
+  socket.to(id).emit("updateDriver", data)
 }
 
 module.exports = { createserver, connect };
