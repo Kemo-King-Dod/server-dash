@@ -55,6 +55,9 @@ app.use(store);
 const user = require("./routes/user.js");
 app.use(user);
 
+const driver = require("./routes/driver.js");
+app.use(driver);
+
 const orders = require("./routes/orders.js");
 app.use(orders);
 
