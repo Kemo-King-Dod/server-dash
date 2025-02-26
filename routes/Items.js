@@ -110,7 +110,7 @@ route.post("/updateItem", auth, async (req, res) => {
         options: options,
         addOns: addOns,
         isActive: isActive,
-        imageUrl: imageUrl
+        imageUrl: imageUrl.split("4000/")[1],
       },
     });
     res.status(200).json({
