@@ -8,7 +8,7 @@ const items = new Schema({
     category: {
         type: String
     },
-    imageUrl:{
+    imageUrl: {
         type: String
     },
     gender: {
@@ -17,6 +17,10 @@ const items = new Schema({
     },
     storeID: {
         type: Schema.Types.ObjectId
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     },
     store_register_condition: {
         type: String

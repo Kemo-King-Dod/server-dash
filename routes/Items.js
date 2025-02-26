@@ -1,6 +1,5 @@
 const express = require("express");
 const route = express.Router();
-const path = require("path");
 const jwt = require("jsonwebtoken");
 const fs = require("fs").promises;
 const items = require("../database/items");
@@ -28,6 +27,7 @@ route.post("/additems", auth, async (req, res) => {
       name,
       price,
       gender,
+      isActive,
       description,
       stock,
       options,
@@ -54,6 +54,7 @@ route.post("/additems", auth, async (req, res) => {
       options,
       gender,
       addOns,
+      isActive,
       stock,
       category: the_store.storeType,
       imageUrl: imageUrl,
@@ -91,6 +92,7 @@ route.post("/updateitem", auth, async (req, res) => {
       name,
       price,
       gender,
+      isActive,
       description,
       stock,
       options,
@@ -106,6 +108,7 @@ route.post("/updateitem", auth, async (req, res) => {
         stock: stock,
         options: options,
         addOns: addOns,
+        isActive: isActive,
         imageUrl: imageUrl
       },
     });

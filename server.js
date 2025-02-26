@@ -64,6 +64,9 @@ app.use(orders);
 const categiries = require("./routes/getcategiries.js");
 app.use(categiries);
 
+const wallet = require("./routes/wallet.js");
+app.use(wallet);
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
 })
