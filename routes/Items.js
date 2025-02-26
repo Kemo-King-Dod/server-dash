@@ -15,7 +15,7 @@ let data = []
 const deleteUploadedFile = async (filePath) => {
   try {
     if (!filePath) return;
-    await fs.unlink(path.join(__dirname, '..', filePath));
+    await fs.unlink(path.join('server-dash', filePath));
   } catch (error) {
     console.error("Error deleting file:", error);
   }
