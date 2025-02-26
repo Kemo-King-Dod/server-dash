@@ -283,7 +283,7 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
         }
         const order = await Order.aggregate([
             {
-                $match: { status: { $in: ["ready","driverAccepted","onWay","confirmed"] } }
+                $match: { status: { $in: ["ready", "driverAccepted", "onWay", "confirmed"] } }
             },
             {
                 $sample: { size: 1 }
@@ -358,6 +358,15 @@ router.post("/examineCode", auth, async (req, res) => {
             order.status = "onWay";
             order.type = "onWay";
             await order.save();
+            
+            const store = await Store.findById(order.store.id)
+            store.funds += order.totalPrice;
+            await store.save();
+
+            const driver = await Driver.findById(req.userId)
+            driver.funds += order.totalPrice;
+            await driver.save();
+
             res.status(200).json({
                 error: false,
                 data: 'تمت العملية بنجاح',

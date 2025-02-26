@@ -77,6 +77,7 @@ const drivers = new Schema({
     currentOrder: {
         type: Object
     },
+    // اللي نبوه من السائق
     funds: {
         type: Number
     },

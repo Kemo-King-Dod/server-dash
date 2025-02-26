@@ -117,7 +117,7 @@ const stores = new Schema({
         type: Date,
         default: null
     },
-    // رصيد
+    // اللي المحل يبيه منا
     funds: {
         type: Number,
         default: null
