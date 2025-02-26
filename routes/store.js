@@ -8,7 +8,7 @@ const { auth } = require('../middleware/auth')
 router.get('/getStore', auth, async (req, res) => {
     try {
         const id = req.userId
-        const store = Store.findById(id, { password: 0 })
+        const store = await Store.findById(id, { password: 0 })
         res.status(200).json({
             error: false,
             data: store
@@ -107,7 +107,7 @@ router.post('/alterStore', auth, async (req, res) => {
         const userId = req.userId
         const store = await Store.findById(userId)
         store.name = req.body.name
-        store.storeType = req.body.storeType
+        store.storeType = req.body.category
         store.discription = req.body.discription
         store.picture = req.body.picture
         await store.save()
