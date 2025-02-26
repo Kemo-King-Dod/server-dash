@@ -23,30 +23,19 @@ const deleteUploadedFile = async (filePath) => {
 
 route.post("/additems", auth, async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
+    const userId = req.userId
     const {
       name,
       price,
+      gender,
       description,
       stock,
       options,
       addOns,
       imageUrl,
     } = req.body;
-    if (!token) {
-      await deleteUploadedFile(imageUrl);
-      return res.status(401).json({
-        error: true,
-        message: "Token not provided",
-      });
-    }
 
-    const the_store = await Store.findOne({
-      _id: await jwt.verify(
-        token,
-        "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman"
-      ).id,
-    });
+    const the_store = await Store.findById(userId)
 
     if (!the_store || the_store.registerCondition !== "accepted") {
       await deleteUploadedFile(imageUrl);
@@ -63,6 +52,7 @@ route.post("/additems", auth, async (req, res) => {
       price,
       description: description,
       options,
+      gender,
       addOns,
       stock,
       category: the_store.storeType,
@@ -97,12 +87,26 @@ route.post("/additems", auth, async (req, res) => {
 
 route.post("/updateitem", auth, async (req, res) => {
   try {
+    const {
+      name,
+      price,
+      gender,
+      description,
+      stock,
+      options,
+      addOns,
+      imageUrl,
+    } = req.body;
     await items.findByIdAndUpdate(req.body.id, {
       $set: {
-        name: req.body.name,
-        price: req.body.price,
-        desc: req.body.desc,
-        options: req.body.options,
+        name: name,
+        price: price,
+        gender: gender,
+        desc: description,
+        stock: stock,
+        options: options,
+        addOns: addOns,
+        imageUrl: imageUrl
       },
     });
     res.status(200).json({
@@ -147,14 +151,43 @@ route.get("/getAllItems", async (req, res) => {
       id = decoded.id;
     }
 
-    
+
 
     // Get all available items
-    const data = await items.aggregate([
-      {
-        $sample: { size: 4 }
+    if (id) {
+      var user = await User.findById(id)
+      let data
+      if (user.gender == 'male') {
+        data = await items.aggregate([
+          {
+            $match: { gender: { $in: ['all', 'male'] } }
+          },
+          {
+            $sample: { size: 4 }
+          }
+        ])
       }
-    ])
+      else {
+        data = await items.aggregate([
+          {
+            $match: { gender: { $in: ['all', 'female'] } }
+          },
+          {
+            $sample: { size: 4 }
+          }
+        ])
+      }
+    }
+    else {
+      data = await items.aggregate([
+        {
+          $match: { gender: { $in: ['all'] } }
+        },
+        {
+          $sample: { size: 4 }
+        }
+      ])
+    }
 
 
     for (let i = 0; i < data.length; i++) {
@@ -256,7 +289,7 @@ route.post("/getStoreItems", async (req, res) => {
   }
 });
 
-route.get("/storeItems",auth , async (req, res) => {
+route.get("/storeItems", auth, async (req, res) => {
   try {
     const userId = req.userId;
     const allItems = [];
@@ -294,7 +327,7 @@ route.post("/category", async (req, res) => {
       id = decoded.id;
     }
 
-    
+
 
     // Get all available items
     const allStores = await Store.aggregate([

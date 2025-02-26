@@ -29,7 +29,7 @@ router.post('/user', async (req, res) => {
     try {
         const { name, password, gender, phone, locations, fcmToken } = req.body;
 
-        if (!name || !password || !phone /* || !gender */) {
+        if (!name || !password || !phone  || !gender ) {
             res.status(400).json({
                 error: true,
                 data: 'جميع الحقول مطلوبة'

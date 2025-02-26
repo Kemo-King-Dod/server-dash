@@ -53,4 +53,117 @@ router.get('/getStores', auth, async (req, res) => {
     }
 })
 
+
+router.post('/alterStorePassword', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const store = await Store.findById(userId)
+        const valied = await bcrypt.compare(req.body.currentPassword, store.password)
+        if (valied) {
+            const salt = await bcrypt.genSalt(10)
+            store.password = await bcrypt.hash(req.body.newPassword, salt)
+            await store.save()
+            res.status(200).json({
+                error: false,
+                message: 'تم تحديث كلمة المرور بنجاح'
+            })
+        }
+        else {
+            res.status(200).json({
+                error: true,
+                message: 'كلمة المرور الحالية غير صحيحة'
+            })
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
+        })
+    }
+})
+
+
+// alter name
+router.post('/alterStoreName', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const store = await Store.findById(userId)
+        store.name = req.body.name
+        await store.save()
+        res.status(200).json({
+            error: false,
+            message: 'تم تحديث البيانات بنجاح'
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
+        })
+    }
+})
+
+// alter storeType
+router.post('/alterStoreStoreType', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const store = await Store.findById(userId)
+        store.storeType = req.body.storeType
+        await store.save()
+        res.status(200).json({
+            error: false,
+            message: 'تم تحديث البيانات بنجاح'
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
+        })
+    }
+})
+
+
+// alter discription
+router.post('/alterStoreDiscription', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const store = await Store.findById(userId)
+        store.discription = req.body.discription
+        await store.save()
+        res.status(200).json({
+            error: false,
+            message: 'تم تحديث البيانات بنجاح'
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
+        })
+    }
+})
+
+
+// alter picture
+router.post('/alterStorePicture', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const store = await Store.findById(userId)
+        store.picture = req.body.picture
+        await store.save()
+        res.status(200).json({
+            error: false,
+            message: 'تم تحديث البيانات بنجاح'
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
+        })
+    }
+})
+
 module.exports = router

@@ -11,6 +11,10 @@ const items = new Schema({
     imageUrl:{
         type: String
     },
+    gender: {
+        type: String,
+        require: [true, 'الجنس مطلوب']
+    },
     storeID: {
         type: Schema.Types.ObjectId
     },
