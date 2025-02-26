@@ -102,18 +102,25 @@ route.post("/updateItem", auth, async (req, res) => {
     } = req.body;
     console.log(req.body)
     const item = await items.findById(req.body.id);
-    await deleteUploadedFile(item.imageUrl);
+    
+    // Only delete the old image if a new one is provided
+    if (imageUrl && imageUrl !== item.imageUrl) {
+      await deleteUploadedFile(item.imageUrl);
+    }
+
+    // Update the item with the new data
     await items.findByIdAndUpdate(req.body.id, {
       $set: {
-        name: name,
-        price: price,
-        gender: gender,
-        description: description,
-        stock: stock,
-        options: options,
-        addOns: addOns,
-        imageUrl: imageUrl.split("4000/")[1],
-        isActive: isActive,
+        name,
+        price,
+        gender,
+        description,
+        stock,
+        options,
+        addOns,
+        // Only update imageUrl if a new one is provided
+        ...(imageUrl ? { imageUrl: imageUrl.includes('4000/') ? imageUrl.split("4000/")[1] : imageUrl } : {}),
+        isActive,
       },
     });
 
