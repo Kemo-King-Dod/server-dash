@@ -86,7 +86,7 @@ route.post("/additems", auth, async (req, res) => {
   }
 });
 
-route.post("/updateitem", auth, async (req, res) => {
+route.post("/updateItem", auth, async (req, res) => {
   try {
     const {
       name,

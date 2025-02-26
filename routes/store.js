@@ -52,10 +52,6 @@ router.get('/getStores', auth, async (req, res) => {
             }
         }
 
-        for (let i = 0; i < stores.length; i++) {
-            console.log(stores[i])
-        }
-
 
         res.status(200).json({
             error: false,
