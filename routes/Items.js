@@ -15,7 +15,7 @@ let data = []
 const deleteUploadedFile = async (filePath) => {
   try {
     if (!filePath) return;
-    await fs.unlink(path.join('http://178.16.130.89:4000/', filePath));
+    await fs.unlink(filePath);
   } catch (error) {
     console.error("Error deleting file:", error);
   }
