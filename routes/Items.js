@@ -6,6 +6,7 @@ const items = require("../database/items");
 const Store = require("../database/store");
 const User = require("../database/users");
 const { auth } = require("../middleware/auth");
+const path = require("path");
 
 let random = []
 let data = []
@@ -14,7 +15,7 @@ let data = []
 const deleteUploadedFile = async (filePath) => {
   try {
     if (!filePath) return;
-    await fs.unlink(filePath);
+    await fs.unlink(path.join(__dirname, '..', filePath));
   } catch (error) {
     console.error("Error deleting file:", error);
   }
