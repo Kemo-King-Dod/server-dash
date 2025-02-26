@@ -49,8 +49,11 @@ route.get('/driverWallet', auth, async (req, res) => {
         const userId = req.userId
         const driver = await Driver.findById(userId);
         res.status(200).json({
-            funds: driver.funds,
-            balance: driver.balance
+            error: false,
+            data: {
+                funds: driver.funds,
+                balance: driver.balance
+            }
         })
     } catch (error) {
         console.log(error);
