@@ -99,6 +99,7 @@ route.post("/updateItem", auth, async (req, res) => {
       addOns,
       imageUrl,
     } = req.body;
+    console.log(req.body)
     await items.findByIdAndUpdate(req.body.id, {
       $set: {
         name: name,
