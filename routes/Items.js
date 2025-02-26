@@ -15,7 +15,7 @@ let data = []
 const deleteUploadedFile = async (filePath) => {
   try {
     if (!filePath) return;
-    await fs.unlink(`${filePath}`);
+    await fs.unlink(path.join(__dirname, '..', filePath));
   } catch (error) {
     console.error("Error deleting file:", error);
   }
@@ -102,7 +102,7 @@ route.post("/updateItem", auth, async (req, res) => {
     } = req.body;
     console.log(req.body)
     const item = await items.findById(req.body.id);
-    
+
     // Only delete the old image if a new one is provided
     if (imageUrl && imageUrl !== item.imageUrl) {
       await deleteUploadedFile(item.imageUrl);
