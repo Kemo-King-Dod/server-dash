@@ -6,6 +6,7 @@ const Store = require("../database/store");
 const Driver = require("../database/driver");
 const User = require("../database/users");
 const { auth } = require("../middleware/auth");
+const { error } = require("console");
 
 // user
 route.get('/userWallet', auth, async (req, res) => {
@@ -30,8 +31,11 @@ route.get('/storeWallet', auth, async (req, res) => {
         res.status(200).json({
             // moneyRecord: store.moneyRecord,
             // totalCommission: store.totalCommission, // what he wants from us
-            funds: store.funds,
-            lastWidrawal: store.lastWidrawal
+            error: false,
+            data: {
+                funds: store.funds,
+                lastWidrawal: store.lastWidrawal
+            }
         })
     } catch (error) {
         console.log(error);
