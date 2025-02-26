@@ -50,10 +50,10 @@ const stores = new Schema({
         type: String,
         require: [true, 'العنوان مطلوب']
     },
-    ownerName:{
+    ownerName: {
         type: String
     },
-    city:{
+    city: {
         type: String
     },
     picture: {
@@ -122,10 +122,14 @@ const stores = new Schema({
         type: Number,
         default: null
     },
+    lastWidrawal: {
+        type: Number,
+        default: null
+    },
     userType: {
         type: String
     },
-    fcmToken:{
+    fcmToken: {
         type: String
     }
 })
