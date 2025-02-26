@@ -8,7 +8,7 @@ const { auth } = require('../middleware/auth')
 router.get('/getStore', auth, async (req, res) => {
     try {
         const id = req.userId
-        const store = await Store.findById(id, { password: 0 })
+        const store = await Store.findById(id, { password: 0, items: 0 })
         res.status(200).json({
             error: false,
             data: store
