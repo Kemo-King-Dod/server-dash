@@ -5,6 +5,23 @@ const Driver = require('../database/driver');
 const Store = require('../database/store');
 const { auth } = require('../middleware/auth')
 
+router.get('/getStore', auth, async (req, res) => {
+    try {
+        const id = req.userId
+        const store = Store.findById(id, { password: 0 })
+        res.status(200).json({
+            error: false,
+            data: store
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
+        })
+    }
+})
+
 router.get('/getStores', auth, async (req, res) => {
     try {
 
@@ -85,72 +102,13 @@ router.post('/alterStorePassword', auth, async (req, res) => {
 
 
 // alter name
-router.post('/alterStoreName', auth, async (req, res) => {
+router.post('/alterStore', auth, async (req, res) => {
     try {
         const userId = req.userId
         const store = await Store.findById(userId)
         store.name = req.body.name
-        await store.save()
-        res.status(200).json({
-            error: false,
-            message: 'تم تحديث البيانات بنجاح'
-        })
-    } catch (err) {
-        console.log(err)
-        res.status(500).json({
-            error: true,
-            message: err
-        })
-    }
-})
-
-// alter storeType
-router.post('/alterStoreStoreType', auth, async (req, res) => {
-    try {
-        const userId = req.userId
-        const store = await Store.findById(userId)
         store.storeType = req.body.storeType
-        await store.save()
-        res.status(200).json({
-            error: false,
-            message: 'تم تحديث البيانات بنجاح'
-        })
-    } catch (err) {
-        console.log(err)
-        res.status(500).json({
-            error: true,
-            message: err
-        })
-    }
-})
-
-
-// alter discription
-router.post('/alterStoreDiscription', auth, async (req, res) => {
-    try {
-        const userId = req.userId
-        const store = await Store.findById(userId)
         store.discription = req.body.discription
-        await store.save()
-        res.status(200).json({
-            error: false,
-            message: 'تم تحديث البيانات بنجاح'
-        })
-    } catch (err) {
-        console.log(err)
-        res.status(500).json({
-            error: true,
-            message: err
-        })
-    }
-})
-
-
-// alter picture
-router.post('/alterStorePicture', auth, async (req, res) => {
-    try {
-        const userId = req.userId
-        const store = await Store.findById(userId)
         store.picture = req.body.picture
         await store.save()
         res.status(200).json({
