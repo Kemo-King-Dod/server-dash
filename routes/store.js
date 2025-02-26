@@ -108,7 +108,6 @@ router.post('/alterStore', auth, async (req, res) => {
         const store = await Store.findById(userId)
         store.name = req.body.name
         store.storeType = req.body.category
-        store.discription = req.body.discription
         store.picture = req.body.picture
         await store.save()
         res.status(200).json({
