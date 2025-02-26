@@ -107,12 +107,12 @@ route.post("/updateItem", auth, async (req, res) => {
         name: name,
         price: price,
         gender: gender,
-        desc: description,
+        description: description,
         stock: stock,
         options: options,
         addOns: addOns,
-        isActive: isActive,
         imageUrl: imageUrl.split("4000/")[1],
+        isActive: isActive,
       },
     });
 
