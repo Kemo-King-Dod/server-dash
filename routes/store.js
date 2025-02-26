@@ -9,6 +9,7 @@ router.get('/getStore', auth, async (req, res) => {
     try {
         const id = req.userId
         const store = await Store.findById(id, { password: 0 })
+        console.log(store)
         res.status(200).json({
             error: false,
             data: store
