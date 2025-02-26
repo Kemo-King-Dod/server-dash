@@ -100,6 +100,8 @@ route.post("/updateItem", auth, async (req, res) => {
       imageUrl,
     } = req.body;
     console.log(req.body)
+    const item = await items.findById(req.body.id);
+    await deleteUploadedFile(item.imageUrl);
     await items.findByIdAndUpdate(req.body.id, {
       $set: {
         name: name,
@@ -113,6 +115,7 @@ route.post("/updateItem", auth, async (req, res) => {
         imageUrl: imageUrl.split("4000/")[1],
       },
     });
+
     res.status(200).json({
       error: false,
       operation: "editProduct",
