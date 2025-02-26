@@ -29,10 +29,10 @@ route.get('/storeWallet', auth, async (req, res) => {
         const userId = req.userId
         const store = await Store.findById(userId);
         res.status(200).json({
-            // moneyRecord: store.moneyRecord,
-            // totalCommission: store.totalCommission, // what he wants from us
             error: false,
             data: {
+                // moneyRecord: store.moneyRecord,
+                // totalCommission: store.totalCommission, // what he wants from us
                 funds: store.funds,
                 lastWidrawal: store.lastWidrawal
             }
