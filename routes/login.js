@@ -51,21 +51,6 @@ route.post("/login", async (req, res) => {
             })
         }
 
-        // Check for blocked status based on cancelOrderLimit
-        if (exist.userType === 'user' && exist.cancelOrderLimit >= 5) {
-            return res.status(403).json({
-                error: true,
-                data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
-            });
-        }
-
-        if (exist.userType === 'driver' && exist.cancelOrderLimit >= 20) {
-            return res.status(403).json({
-                error: true,
-                data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
-            });
-        }
-
         // Generate response based on user type
         const userType = exist.userType
         const storeType = exist.storeType

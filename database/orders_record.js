@@ -41,6 +41,9 @@ const orders_record = new Schema({
   },
   chat: {
     type: Object
+  },
+  canceledby: {
+    type: "String"
   }
 });
 

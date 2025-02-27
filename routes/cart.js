@@ -111,6 +111,14 @@ router.post("/addtocart", auth, async (req, res) => {
       });
     }
 
+    // Check for blocked status based on cancelOrderLimit
+    if (user.cancelOrderLimit >= 5) {
+      return res.status(403).json({
+        error: true,
+        data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
+      });
+    }
+
     for (var i = 0; i < cartItem.options.length; i++) {
       if (cartItem.options[i].isSelected) {
         cartItem.price += cartItem.options[i].price;

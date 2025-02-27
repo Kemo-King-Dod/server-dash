@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Order = require("../database/orders");
+const OrderRecodr = require("../database/orders_record")
 const Store = require("../database/store");
 const Driver = require("../database/driver");
 const Address = require("../database/address");
@@ -314,6 +315,14 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
     try {
         const id = req.body.orderId;
         const driver = await Driver.findById(req.userId);
+
+        if (driver.cancelOrderLimit >= 5) {
+            return res.status(403).json({
+                error: true,
+                data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
+            });
+        }
+
         const order = await Order.findById(id);
         if (order) {
             order.status = "driverAccepted";
@@ -349,7 +358,6 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
     }
 });
 
-
 // examine code
 router.post("/examineCode", auth, async (req, res) => {
     try {
@@ -358,7 +366,7 @@ router.post("/examineCode", auth, async (req, res) => {
             order.status = "onWay";
             order.type = "onWay";
             await order.save();
-            
+
             const store = await Store.findById(order.store.id)
             store.funds += order.totalPrice;
             await store.save();
@@ -399,14 +407,32 @@ router.post("/confirmOrder", auth, async (req, res) => {
             });
         }
 
-        order.status = "confirmed";
-        order.type = "confirmed";
-        await order.save();
+        // Create record in OrderRecord collection
+        const orderRecord = new OrderRecodr({
+            orderId: order.orderId,
+            customer: order.customer,
+            driver: order.driver,
+            store: order.store,
+            date: order.date,
+            items: order.items,
+            totalPrice: order.totalPrice,
+            status: "confirmed",
+            type: "confirmed",
+            address: order.address,
+            distenationPrice: order.distenationPrice,
+            reseveCode: order.reserveCode,
+            chat: order.chat,
+            canceledby: null
+        });
+        await orderRecord.save();
+
+        // Delete original order
+        await Order.findByIdAndDelete(req.body.orderId);
 
         res.status(200).json({
             error: false,
             message: "تم تأكيد الطلب بنجاح",
-            data: order,
+            data: orderRecord,
         });
     } catch (err) {
         console.log(err);
@@ -422,14 +448,6 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
     try {
         const userId = req.userId;
         const user = await User.findById(userId);
-        
-        // Check if user is already blocked
-        if (user.cancelOrderLimit >= 5) {
-            return res.status(403).json({
-                error: true,
-                message: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
-            });
-        }
 
         const order = await Order.findById(req.body.orderId);
         if (!order) {
@@ -439,9 +457,27 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
             });
         }
 
-        order.status = "cancelled";
-        order.type = "cancelled";
-        await order.save();
+        // Create record in OrderRecord collection
+        const orderRecord = new OrderRecodr({
+            orderId: order.orderId,
+            customer: order.customer,
+            driver: order.driver,
+            store: order.store,
+            date: order.date,
+            items: order.items,
+            totalPrice: order.totalPrice,
+            status: "cancelled",
+            type: "cancelled",
+            address: order.address,
+            distenationPrice: order.distenationPrice,
+            reseveCode: order.reserveCode,
+            chat: order.chat,
+            canceledby: "user"
+        });
+        await orderRecord.save();
+
+        // Delete original order
+        await Order.findByIdAndDelete(req.body.orderId);
 
         // Increment cancel limit
         user.cancelOrderLimit = (user.cancelOrderLimit || 0) + 1;
@@ -452,8 +488,10 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
 
         res.status(200).json({
             error: false,
-            message: "تم إلغاء الطلب بنجاح",
-            remainingCancels: 5 - user.cancelOrderLimit
+            data: {
+                message: "تم إلغاء الطلب بنجاح",
+                remainingCancels: 5 - user.cancelOrderLimit
+            }
         });
     } catch (err) {
         console.log(err);
@@ -475,9 +513,27 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
             });
         }
 
-        order.status = "cancelled";
-        order.type = "cancelled";
-        await order.save();
+        // Create record in OrderRecord collection
+        const orderRecord = new OrderRecodr({
+            orderId: order.orderId,
+            customer: order.customer,
+            driver: order.driver,
+            store: order.store,
+            date: order.date,
+            items: order.items,
+            totalPrice: order.totalPrice,
+            status: "cancelled",
+            type: "cancelled",
+            address: order.address,
+            distenationPrice: order.distenationPrice,
+            reseveCode: order.reserveCode,
+            chat: order.chat,
+            canceledby: "store"
+        });
+        await orderRecord.save();
+
+        // Delete original order
+        await Order.findByIdAndDelete(req.body.orderId);
 
         res.status(200).json({
             error: false,
@@ -497,14 +553,6 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
     try {
         const driverId = req.userId;
         const driver = await Driver.findById(driverId);
-        
-        // Check if driver is already blocked
-        if (driver.cancelOrderLimit >= 20) {
-            return res.status(403).json({
-                error: true,
-                message: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
-            });
-        }
 
         const order = await Order.findById(req.body.orderId);
         if (!order) {
@@ -514,22 +562,41 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
             });
         }
 
-        order.status = "ready"; // Reset to ready so other drivers can accept
-        order.type = "ready";
-        order.driver = null; // Remove driver assignment
-        await order.save();
+        // Create record in OrderRecord collection
+        const orderRecord = new OrderRecodr({
+            orderId: order.orderId,
+            customer: order.customer,
+            driver: order.driver,
+            store: order.store,
+            date: order.date,
+            items: order.items,
+            totalPrice: order.totalPrice,
+            status: "cancelled",
+            type: "cancelled",
+            address: order.address,
+            distenationPrice: order.distenationPrice,
+            reseveCode: order.reserveCode,
+            chat: order.chat,
+            canceledby: "driver"
+        });
+        await orderRecord.save();
+
+        // Delete original order
+        await Order.findByIdAndDelete(req.body.orderId);
 
         // Increment cancel limit
         driver.cancelOrderLimit = (driver.cancelOrderLimit || 0) + 1;
-        if (driver.cancelOrderLimit >= 20) {
+        if (driver.cancelOrderLimit >= 5) {
             driver.status = "blocked";
         }
         await driver.save();
 
         res.status(200).json({
             error: false,
-            message: "تم إلغاء الطلب بنجاح",
-            remainingCancels: 20 - driver.cancelOrderLimit
+            data: {
+                message: "تم إلغاء الطلب بنجاح",
+                remainingCancels: 5 - driver.cancelOrderLimit
+            }
         });
     } catch (err) {
         console.log(err);
