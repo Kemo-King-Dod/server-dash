@@ -523,8 +523,8 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
             });
         }
 
-        order.status = "ready"
-        order.type = "ready"
+        order.status = "cancelled"
+        order.type = "cancelled"
         await order.save()
 
         // Increment cancel limit
