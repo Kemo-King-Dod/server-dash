@@ -66,6 +66,9 @@ const users = new Schema({
     },
     likedItems: {
         type: Array
+    },
+    followedStores: {
+        type: Array
     }
 })
 

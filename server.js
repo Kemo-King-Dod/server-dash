@@ -42,6 +42,8 @@ app.use(cart);
 const favorite = require("./routes/favorite.js");
 app.use(favorite);
 
+const follow = require("./routes/follow.js");
+app.use(follow);
 
 const admin = require("./routes/admin.js");
 app.use(admin);
