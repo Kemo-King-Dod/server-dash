@@ -168,10 +168,10 @@ route.get("/getAllItems", async (req, res) => {
 
 
 
+    let data
     // Get all available items
     if (id) {
       var user = await User.findById(id)
-      let data
       if (user.gender == 'male') {
         data = await items.aggregate([
           {

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../database/users');
 const Driver = require('../database/driver');
+const Ordre = require('../database/orders');
 const Store = require('../database/store');
 const { auth } = require('../middleware/auth')
 
@@ -106,6 +107,13 @@ router.post('/alterStore', auth, async (req, res) => {
         store.storeType = req.body.category
         store.picture = req.body.picture
         await store.save()
+
+        await Ordre.updateMany({ "store.id": req.userId }, {
+            "store.name": req.body.name,
+            "store.category": req.body.category,
+            "store.picture": req.body.picture
+        })
+
         res.status(200).json({
             error: false,
             message: 'تم تحديث البيانات بنجاح'
