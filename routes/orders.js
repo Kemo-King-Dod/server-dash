@@ -526,19 +526,18 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         if (order.status == "onWay") {
             order.status = "cancelled"
             order.type = "cancelled"
+            // Increment cancel limit
+            driver.cancelOrderLimit = (driver.cancelOrderLimit || 0) + 1;
+            if (driver.cancelOrderLimit >= 5) {
+                driver.status = "blocked";
+            }
+            await driver.save();
         }
         else {
             order.status = "ready"
             order.type = "ready"
         }
         await order.save()
-
-        // Increment cancel limit
-        driver.cancelOrderLimit = (driver.cancelOrderLimit || 0) + 1;
-        if (driver.cancelOrderLimit >= 5) {
-            driver.status = "blocked";
-        }
-        await driver.save();
 
         res.status(200).json({
             error: false,
