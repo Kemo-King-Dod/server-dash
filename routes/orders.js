@@ -536,6 +536,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         else {
             order.status = "ready"
             order.type = "ready"
+            order.driver = null
         }
         await order.save()
 
