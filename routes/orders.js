@@ -186,44 +186,6 @@ router.post("/readyOrder", auth, async (req, res) => {
     }
 });
 
-// send order to order history
-router.patch("/deleteOrder", async (req, res) => {
-    try {
-        const order = await Order.findById(req.body.orderId);
-        if (!order) {
-            return res.status(404).json({
-                error: true,
-                message: "Order not found",
-            });
-        }
-
-        // Remove order from store's orders array
-        await Store.findByIdAndUpdate(order.store_id, {
-            $pull: { orders: req.body.orderId },
-        });
-
-        // Remove order from user's orders array
-        await User.findByIdAndUpdate(order.customer_id, {
-            $pull: { orders: req.body.orderId },
-        });
-
-        // Delete the order
-        await Order.findByIdAndDelete(req.body.orderId);
-
-        res.status(200).json({
-            error: false,
-            message: "Order deleted successfully",
-        });
-    } catch (error) {
-        res.status(500).json({
-            error: true,
-            message: "Error deleting order",
-            error: error.message,
-        });
-    }
-});
-
-
 
 // user
 router.get("/getOrdersForUser", auth, async (req, res) => {
