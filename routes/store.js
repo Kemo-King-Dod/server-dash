@@ -48,6 +48,7 @@ router.get('/getStores', auth, async (req, res) => {
                     console.log(user.favorateStors[0])
                     console.log(user.favorateStors.length)
                     console.log(user.favorateStors)
+                    console.log(user)
                     if (user.favorateStors[j]._id == stores[i]._id) {
                         stores[i]._doc.isFavorite = true;
                     }
