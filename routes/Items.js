@@ -233,6 +233,23 @@ route.get("/getAllItems", async (req, res) => {
       }
     }
 
+    // Add like property to each item
+    for (var i = 0; i < data.length; i++) {
+      data[i].like = false;
+    }
+
+    if (id) {
+      const user = await User.findOne({ _id: id });
+      for (var i = 0; i < data.length; i++) {
+        for (var j = 0; j < user.likedItems.length; j++) {
+          if (user.likedItems[j] == null) continue;
+          if (user.likedItems[j]._id.toString() == data[i]._id.toString()) {
+            data[i].like = true;
+          }
+        }
+      }
+    }
+
     res.json({ error: false, items: data });
   } catch (error) {
     console.log(error.message);
@@ -289,6 +306,25 @@ route.post("/getStoreItems", async (req, res) => {
             user.favorateItems[j]._id.toString() == allItems[i]._id.toString()
           ) {
             allItems[i]._doc.isFavorite = true;
+          }
+        }
+      }
+    }
+
+    // Add like property to each item
+    for (var i = 0; i < allItems.length; i++) {
+      allItems[i]._doc.like = false;
+    }
+
+    if (userid) {
+      const user = await User.findOne({ _id: userid });
+      for (var i = 0; i < allItems.length; i++) {
+        for (var j = 0; j < user.likedItems.length; j++) {
+          if (user.likedItems[j] == null) continue;
+          if (
+            user.likedItems[j]._id.toString() == allItems[i]._id.toString()
+          ) {
+            allItems[i]._doc.like = true;
           }
         }
       }

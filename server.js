@@ -69,6 +69,9 @@ app.use(categiries);
 const wallet = require("./routes/wallet.js");
 app.use(wallet);
 
+const likes = require("./routes/likes.js");
+app.use(likes);
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
 })
