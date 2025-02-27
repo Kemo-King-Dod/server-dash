@@ -30,11 +30,10 @@ router.get('/getStores', auth, async (req, res) => {
         const stores = await Store.find({}, { password: 0, items: 0 })
 
         if (req.headers.isvisiter && req.headers.isvisiter == 'true') {
-            res.status(200).json({
+            return res.status(200).json({
                 error: false,
                 data: stores
             })
-            return
         }
 
         // Add isFavorite property to each item
@@ -47,6 +46,8 @@ router.get('/getStores', auth, async (req, res) => {
             for (var i = 0; i < stores.length; i++) {
                 for (var j = 0; j < user.favorateStors.length; j++) {
                     console.log(user.favorateStors[j])
+                    console.log(user.favorateStors.length)
+                    console.log(user.favorateStors)
                     if (user.favorateStors[j]._id == stores[i]._id) {
                         stores[i]._doc.isFavorite = true;
                     }
