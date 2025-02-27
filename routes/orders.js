@@ -389,4 +389,156 @@ router.post("/examineCode", auth, async (req, res) => {
     }
 });
 
+router.post("/confirmOrder", auth, async (req, res) => {
+    try {
+        const order = await Order.findById(req.body.orderId);
+        if (!order) {
+            return res.status(404).json({
+                error: true,
+                message: "الطلب غير موجود",
+            });
+        }
+
+        order.status = "confirmed";
+        order.type = "confirmed";
+        await order.save();
+
+        res.status(200).json({
+            error: false,
+            message: "تم تأكيد الطلب بنجاح",
+            data: order,
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: true,
+            message: "Error confirming order",
+            error: err.message,
+        });
+    }
+});
+
+router.post("/cancelOrderUser", auth, async (req, res) => {
+    try {
+        const userId = req.userId;
+        const user = await User.findById(userId);
+        
+        // Check if user is already blocked
+        if (user.cancelOrderLimit >= 5) {
+            return res.status(403).json({
+                error: true,
+                message: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
+            });
+        }
+
+        const order = await Order.findById(req.body.orderId);
+        if (!order) {
+            return res.status(404).json({
+                error: true,
+                message: "الطلب غير موجود",
+            });
+        }
+
+        order.status = "cancelled";
+        order.type = "cancelled";
+        await order.save();
+
+        // Increment cancel limit
+        user.cancelOrderLimit = (user.cancelOrderLimit || 0) + 1;
+        if (user.cancelOrderLimit >= 5) {
+            user.status = "blocked";
+        }
+        await user.save();
+
+        res.status(200).json({
+            error: false,
+            message: "تم إلغاء الطلب بنجاح",
+            remainingCancels: 5 - user.cancelOrderLimit
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: true,
+            message: "Error cancelling order",
+            error: err.message,
+        });
+    }
+});
+
+router.post("/cancelOrderStore", auth, async (req, res) => {
+    try {
+        const order = await Order.findById(req.body.orderId);
+        if (!order) {
+            return res.status(404).json({
+                error: true,
+                message: "الطلب غير موجود",
+            });
+        }
+
+        order.status = "cancelled";
+        order.type = "cancelled";
+        await order.save();
+
+        res.status(200).json({
+            error: false,
+            message: "تم إلغاء الطلب بنجاح",
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: true,
+            message: "Error cancelling order",
+            error: err.message,
+        });
+    }
+});
+
+router.post("/cancelOrderDriver", auth, async (req, res) => {
+    try {
+        const driverId = req.userId;
+        const driver = await Driver.findById(driverId);
+        
+        // Check if driver is already blocked
+        if (driver.cancelOrderLimit >= 20) {
+            return res.status(403).json({
+                error: true,
+                message: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
+            });
+        }
+
+        const order = await Order.findById(req.body.orderId);
+        if (!order) {
+            return res.status(404).json({
+                error: true,
+                message: "الطلب غير موجود",
+            });
+        }
+
+        order.status = "ready"; // Reset to ready so other drivers can accept
+        order.type = "ready";
+        order.driver = null; // Remove driver assignment
+        await order.save();
+
+        // Increment cancel limit
+        driver.cancelOrderLimit = (driver.cancelOrderLimit || 0) + 1;
+        if (driver.cancelOrderLimit >= 20) {
+            driver.status = "blocked";
+        }
+        await driver.save();
+
+        res.status(200).json({
+            error: false,
+            message: "تم إلغاء الطلب بنجاح",
+            remainingCancels: 20 - driver.cancelOrderLimit
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: true,
+            message: "Error cancelling order",
+            error: err.message,
+        });
+    }
+});
+
 module.exports = router;

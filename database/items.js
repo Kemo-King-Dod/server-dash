@@ -45,6 +45,10 @@ const items = new Schema({
     },
     retrenchment_percent: {
         type: Number
+    },
+    likes: {
+        type: Number,
+        default: 0
     }
 })
 

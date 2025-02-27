@@ -87,6 +87,10 @@ const drivers = new Schema({
     fcmToken: {
         type: String
     },
+    cancelOrderLimit: {
+        type: Number,
+        default: 0
+    }
 })
 
 module.exports = mongoose.model('Driver', drivers)

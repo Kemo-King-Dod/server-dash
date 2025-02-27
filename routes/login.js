@@ -6,12 +6,24 @@ const Store = require("../database/store")
 const User = require("../database/users")
 const Driver = require("../database/driver")
 const Admin = require("../database/admin")
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const Verification = require("../database/verifications")
 
 const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman"
 
 const sign = function (id, type) {
     return jwt.sign({ id, type }, JWT_SECRET)
 }
+
+// Configure nodemailer (add your email service credentials)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'your-email@gmail.com',
+        pass: 'your-app-specific-password'
+    }
+});
 
 route.post("/login", async (req, res) => {
     try {
@@ -39,6 +51,21 @@ route.post("/login", async (req, res) => {
             })
         }
 
+        // Check for blocked status based on cancelOrderLimit
+        if (exist.userType === 'user' && exist.cancelOrderLimit >= 5) {
+            return res.status(403).json({
+                error: true,
+                data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
+            });
+        }
+
+        if (exist.userType === 'driver' && exist.cancelOrderLimit >= 20) {
+            return res.status(403).json({
+                error: true,
+                data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
+            });
+        }
+
         // Generate response based on user type
         const userType = exist.userType
         const storeType = exist.storeType
@@ -54,7 +81,8 @@ route.post("/login", async (req, res) => {
                     phone: exist.phone,
                     userType,
                     status: exist.status ? exist.status : null,
-                    picture: storeType ? exist.picture : null
+                    picture: storeType ? exist.picture : null,
+                    cancelOrderLimit: exist.cancelOrderLimit || 0
                 }
             }
         }
@@ -69,5 +97,141 @@ route.post("/login", async (req, res) => {
         })
     }
 })
+
+route.post("/forgotPassword", async (req, res) => {
+    try {
+        const { phone } = req.body;
+
+        // Find user across all collections
+        let user = await Admin.findOne({ phone });
+        if (!user) user = await Store.findOne({ phone });
+        if (!user) user = await User.findOne({ phone });
+        if (!user) user = await Driver.findOne({ phone });
+
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                data: "رقم الهاتف غير موجود"
+            });
+        }
+
+        // Generate a 6-digit verification code
+        const verificationCode = Math.floor(100000 + Math.random() * 900000);
+        
+        // Store the code in the database
+        await Verification.create({
+            phone,
+            code: verificationCode,
+            expiresAt: new Date(Date.now() + 600000) // 10 minutes from now
+        });
+
+        // In a real application, you would send this code via SMS
+        console.log(`Verification code for ${phone}: ${verificationCode}`);
+
+        res.status(200).json({
+            error: false,
+            data: "تم إرسال رمز التحقق"
+        });
+
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        res.status(500).json({
+            error: true,
+            data: "حدث خطأ في إرسال رمز التحقق"
+        });
+    }
+});
+
+route.post("/verifyCode", async (req, res) => {
+    try {
+        const { phone, code } = req.body;
+
+        const verification = await Verification.findOne({ 
+            phone,
+            code: parseInt(code)
+        });
+
+        if (!verification) {
+            return res.status(400).json({
+                error: true,
+                data: "رمز التحقق غير صحيح"
+            });
+        }
+
+        // Code is valid
+        res.status(200).json({
+            error: false,
+            data: "تم التحقق من الرمز بنجاح"
+        });
+
+    } catch (error) {
+        console.error('Verify code error:', error);
+        res.status(500).json({
+            error: true,
+            data: "حدث خطأ في التحقق من الرمز"
+        });
+    }
+});
+
+route.post("/resetPassword", async (req, res) => {
+    try {
+        const { phone, code, newPassword } = req.body;
+
+        // Verify the code
+        const verification = await Verification.findOne({
+            phone,
+            code: parseInt(code)
+        });
+
+        if (!verification) {
+            return res.status(400).json({
+                error: true,
+                data: "رمز التحقق غير صالح"
+            });
+        }
+
+        // Find user across all collections
+        let user = await Admin.findOne({ phone });
+        if (!user) user = await Store.findOne({ phone });
+        if (!user) user = await User.findOne({ phone });
+        if (!user) user = await Driver.findOne({ phone });
+
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                data: "رقم الهاتف غير موجود"
+            });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password based on user type
+        if (user.userType === 'admin') {
+            await Admin.findByIdAndUpdate(user._id, { password: hashedPassword });
+        } else if (user.userType === 'store') {
+            await Store.findByIdAndUpdate(user._id, { password: hashedPassword });
+        } else if (user.userType === 'user') {
+            await User.findByIdAndUpdate(user._id, { password: hashedPassword });
+        } else if (user.userType === 'driver') {
+            await Driver.findByIdAndUpdate(user._id, { password: hashedPassword });
+        }
+
+        // Delete the verification code
+        await Verification.deleteOne({ _id: verification._id });
+
+        res.status(200).json({
+            error: false,
+            data: "تم تغيير كلمة المرور بنجاح"
+        });
+
+    } catch (error) {
+        console.error('Reset password error:', error);
+        res.status(500).json({
+            error: true,
+            data: "حدث خطأ في تغيير كلمة المرور"
+        });
+    }
+});
 
 module.exports = route

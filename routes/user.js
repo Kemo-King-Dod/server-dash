@@ -6,6 +6,7 @@ const Store = require('../database/store')
 const Addresse = require('../database/address')
 const bcrypt = require('bcrypt')
 const { auth } = require('../middleware/auth')
+const Items = require('../database/items');
 
 router.post('/addAddress', auth, async (req, res) => {
     try {
@@ -136,5 +137,77 @@ router.post('/alterUserPassword', auth, async (req, res) => {
     }
 })
 
+router.post('/likeItem', auth, async (req, res) => {
+    try {
+        const { itemId } = req.body;
+        const userId = req.userId;
+
+        const user = await User.findById(userId);
+        const item = await Items.findById(itemId);
+
+        if (!item) {
+            return res.status(200).json({
+                error: true,
+                message: 'العنصر غير موجود'
+            });
+        }
+
+        // Check if item is already liked
+        if (!user.likedItems.includes(itemId)) {
+            user.likedItems.push(itemId);
+            item.likes += 1;
+            await user.save();
+            await item.save();
+        }
+
+        res.status(200).json({
+            error: false,
+            message: 'تم الإعجاب بالمنتج بنجاح'
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            error: true,
+            message: error
+        });
+    }
+});
+
+router.post('/unlikeItem', auth, async (req, res) => {
+    try {
+        const { itemId } = req.body;
+        const userId = req.userId;
+
+        const user = await User.findById(userId);
+        const item = await Items.findById(itemId);
+
+        if (!item) {
+            return res.status(200).json({
+                error: true,
+                message: 'العنصر غير موجود'
+            });
+        }
+
+        // Check if item is liked before removing
+        const index = user.likedItems.indexOf(itemId);
+        if (index > -1) {
+            user.likedItems.splice(index, 1);
+            item.likes = Math.max(0, item.likes - 1); // Ensure likes don't go below 0
+            await user.save();
+            await item.save();
+        }
+
+        res.status(200).json({
+            error: false,
+            message: 'تم إلغاء الإعجاب بالمنتج بنجاح'
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            error: true,
+            message: error
+        });
+    }
+});
 
 module.exports = router

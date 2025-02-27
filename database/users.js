@@ -27,13 +27,13 @@ const users = new Schema({
         require: [true, 'الموقع مطلوب'],
         default: "waiting"
     },
-    orders:{
+    orders: {
         type: Array
     },
-    cart:{
+    cart: {
         type: Array
     },
-    connection:{
+    connection: {
         type: Boolean,
         require: [true, 'الإتصال مطلوب'],
         default: false
@@ -44,21 +44,28 @@ const users = new Schema({
     moneyRecord: {
         type: Array
     },
-    notificationsCondition:{
+    notificationsCondition: {
         type: Boolean,
-        default:true
+        default: true
     },
-    favorateItems:{
+    favorateItems: {
         type: Array
     },
-    favorateStors:{
+    favorateStors: {
         type: Array
     },
     userType: {
         type: String
     },
-    fcmToken:{
+    fcmToken: {
         type: String
+    },
+    cancelOrderLimit: {
+        type: Number,
+        default: 0
+    },
+    likedItems: {
+        type: Array
     }
 })
 
