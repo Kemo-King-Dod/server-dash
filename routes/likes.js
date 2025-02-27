@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Item = require('../models/item');
-const User = require('../models/user');
+const Item = require('../database/items');
+const User = require('../database/users');
 const auth = require('../middleware/auth');
 
 // Get all favorites
