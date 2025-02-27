@@ -553,7 +553,6 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
     try {
         const driverId = req.userId;
         const driver = await Driver.findById(driverId);
-
         const order = await Order.findById(req.body.orderId);
         if (!order) {
             return res.status(404).json({
@@ -562,27 +561,9 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
             });
         }
 
-        // Create record in OrderRecord collection
-        const orderRecord = new OrderRecodr({
-            orderId: order.orderId,
-            customer: order.customer,
-            driver: order.driver,
-            store: order.store,
-            date: order.date,
-            items: order.items,
-            totalPrice: order.totalPrice,
-            status: "cancelled",
-            type: "cancelled",
-            address: order.address,
-            distenationPrice: order.distenationPrice,
-            reseveCode: order.reserveCode,
-            chat: order.chat,
-            canceledby: "driver"
-        });
-        await orderRecord.save();
-
-        // Delete original order
-        await Order.findByIdAndDelete(req.body.orderId);
+        order.status = "ready"
+        order.type = "ready"
+        await order.save()
 
         // Increment cancel limit
         driver.cancelOrderLimit = (driver.cancelOrderLimit || 0) + 1;
