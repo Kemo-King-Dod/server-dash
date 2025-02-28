@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const Item = require('../database/items');
 const User = require('../database/users');
-const auth = require('../middleware/auth');
+const {auth} = require('../middleware/auth');
 
 // Get all favorites
 router.get('/getLikeitems', auth, async (req, res) => {
     try {
         const userId = req.userId;
         const user = await User.findById(userId);
-
+ 
         for (var i = 0; i < user.likedItems.length; i++) {
             user.likedItems[i].like = true;
         }
