@@ -226,7 +226,7 @@ route.get("/getAllItems", async (req, res) => {
       for (var i = 0; i < data.length; i++) {
         for (var j = 0; j < user.favorateItems.length; j++) {
           if (user.favorateItems[j] == null) continue;
-          if (user.favorateItems[j]._id.toString() == data[i]._id.toString()) {
+          if (user.favorateItems[j].toString() == data[i]._id.toString()) {
             data[i].isFavorite = true;
           }
         }
