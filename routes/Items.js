@@ -243,7 +243,7 @@ route.get("/getAllItems", async (req, res) => {
       for (var i = 0; i < data.length; i++) {
         for (var j = 0; j < user.likedItems.length; j++) {
           if (user.likedItems[j] == null) continue;
-          if (user.likedItems[j]._id.toString() == data[i]._id.toString()) {
+          if (user.likedItems[j] == data[i]._id.toString()) {
             data[i].like = true;
           }
         }
