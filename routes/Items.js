@@ -252,7 +252,7 @@ route.get("/getAllItems", async (req, res) => {
 
     res.json({ error: false, items: data });
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     res.status(401).json({
       error: true,
       message: error.message,
