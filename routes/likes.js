@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const Item = require('../database/items');
 const User = require('../database/users');
-const {auth} = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 
 // Get all favorites
 router.get('/getLikeitems', auth, async (req, res) => {
     try {
         const userId = req.userId;
         const user = await User.findById(userId);
- 
+
         for (var i = 0; i < user.likedItems.length; i++) {
             user.likedItems[i].like = true;
         }
@@ -41,7 +41,7 @@ router.post('/like', auth, async (req, res) => {
         // Check if user already liked the item
         const user = await User.findById(userId);
         if (user.likedItems.includes(itemId)) {
-            return res.status(400).json({ message: 'Item already liked' });
+            return res.status(400).json({ error: true, message: 'Item already liked' });
         }
 
         // Add item to user's liked items
@@ -52,9 +52,9 @@ router.post('/like', auth, async (req, res) => {
         item.likes += 1;
         await item.save();
 
-        res.json({ message: 'Item liked successfully' });
+        res.json({ error: false, message: 'Item liked successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: true, message: error.message });
     }
 });
 
@@ -67,13 +67,13 @@ router.post('/unlike', auth, async (req, res) => {
         // Check if item exists
         const item = await Item.findById(itemId);
         if (!item) {
-            return res.status(404).json({ message: 'Item not found' });
+            return res.status(404).json({ error: true, message: 'Item not found' });
         }
 
         // Check if user has liked the item
         const user = await User.findById(userId);
         if (!user.likedItems.includes(itemId)) {
-            return res.status(400).json({ message: 'Item not liked yet' });
+            return res.status(400).json({ error: true, message: 'Item not liked yet' });
         }
 
         // Remove item from user's liked items
@@ -84,9 +84,9 @@ router.post('/unlike', auth, async (req, res) => {
         item.likes = Math.max(0, item.likes - 1); // Ensure likes don't go below 0
         await item.save();
 
-        res.json({ message: 'Item unliked successfully' });
+        res.json({ error: false, message: 'Item unliked successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: true, message: error.message });
     }
 });
 
@@ -97,9 +97,9 @@ router.get('/mostLiked', async (req, res) => {
             .sort({ likes: -1 }) // Sort by likes in descending order
             .limit(10);           // Get only 4 items
 
-        res.json(topItems);
+        res.json({ error: false, data: topItems });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: true, message: error.message });
     }
 });
 
