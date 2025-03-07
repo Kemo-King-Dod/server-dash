@@ -52,7 +52,7 @@ router.post('/like', auth, async (req, res) => {
         item.likes += 1;
         await item.save();
 
-        res.json({ error: false, message: 'Item liked successfully' });
+        res.status(200).json({ error: false, message: 'Item liked successfully' });
     } catch (error) {
         res.status(500).json({ error: true, message: error.message });
     }
@@ -84,7 +84,7 @@ router.post('/unlike', auth, async (req, res) => {
         item.likes = Math.max(0, item.likes - 1); // Ensure likes don't go below 0
         await item.save();
 
-        res.json({ error: false, message: 'Item unliked successfully' });
+        res.status(200).json({ error: false, message: 'Item unliked successfully' });
     } catch (error) {
         res.status(500).json({ error: true, message: error.message });
     }
@@ -97,7 +97,7 @@ router.get('/mostLiked', async (req, res) => {
             .sort({ likes: -1 }) // Sort by likes in descending order
             .limit(10);           // Get only 4 items
 
-        res.json({ error: false, data: topItems });
+        res.status(200).json({ error: false, data: topItems });
     } catch (error) {
         res.status(500).json({ error: true, message: error.message });
     }
