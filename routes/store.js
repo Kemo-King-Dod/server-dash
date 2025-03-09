@@ -53,6 +53,23 @@ router.get('/getStores', auth, async (req, res) => {
         }
 
 
+        // Add isFollow property to each item
+        for (var i = 0; i < stores.length; i++) {
+            stores[i]._doc.isFollow = false;
+        }
+
+        if (id) {
+            const user = await User.findOne({ _id: id });
+            for (var i = 0; i < stores.length; i++) {
+                for (var j = 0; j < user.followedStores.length; j++) {
+                    if (user.followedStores[j] == stores[i]._id) {
+                        stores[i]._doc.isFollow = true;
+                    }
+                }
+            }
+        }
+
+
         res.status(200).json({
             error: false,
             data: stores

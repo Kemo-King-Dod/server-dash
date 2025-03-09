@@ -11,7 +11,7 @@ router.post('/followStore', auth, async (req, res) => {
         const userId = req.userId;
 
         const user = await User.findById(userId)
-        const store = await Store.findOne({ _id: id })
+        const store = await Store.findOne({ _id: id }, { password: 0 })
         if (!store) {
             res.status(200).json({
                 error: true,
@@ -25,11 +25,9 @@ router.post('/followStore', auth, async (req, res) => {
             }
         }
 
-        user.followedStores.push(store);
+        user.followedStores.push(store._id);
         await user.save();
-
-        console.log(2)
-
+        
         res.status(200).json({
             error: false,
             data: 'تمت الإضافة إلى المفضلة'
