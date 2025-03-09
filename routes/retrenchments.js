@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
-const Retrenchments = require('../database/retrenchments');
+const Retrenchments = require('../database/Retrenchments');
 
 router.post('./retrenchments', auth, async (req, res) => {
 
