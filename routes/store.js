@@ -53,7 +53,7 @@ router.get('/getStores', auth, async (req, res) => {
         }
 
 
-        // Add isFollow property to each item
+        // Add isFollow property to each store
         for (var i = 0; i < stores.length; i++) {
             stores[i]._doc.isFollow = false;
         }

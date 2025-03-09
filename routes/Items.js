@@ -420,7 +420,7 @@ route.post("/category", async (req, res) => {
     // you are not a visitor
 
     // favorite for stores
-    // Add isFavorite property to each item
+    // Add isFavorite property to each store
     for (var i = 0; i < allStores.length; i++) {
       allStores[i].isFavorite = false;
     }
@@ -432,6 +432,22 @@ route.post("/category", async (req, res) => {
           if (favorateStors[j] == null) continue;
           if (user.favorateStors[j]._id.toString() == allStores[i]._id.toString()) {
             allStores[i].isFavorite = true;
+          }
+        }
+      }
+    }
+
+    // Add isFollow property to each store
+    for (var i = 0; i < allStores.length; i++) {
+      allStores[i].isFollow = false;
+    }
+
+    if (id) {
+      const user = await User.findOne({ _id: id });
+      for (var i = 0; i < allStores.length; i++) {
+        for (var j = 0; j < user.followedStores.length; j++) {
+          if (user.followedStores[j] == allStores[i]._id) {
+            allStores[i].isFollow = true;
           }
         }
       }
@@ -451,6 +467,24 @@ route.post("/category", async (req, res) => {
           if (user.favorateItems[j] == null) continue;
           if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
             allItems[i].isFavorite = true;
+          }
+        }
+      }
+    }
+
+
+    // Add like property to each item
+    for (var i = 0; i < allItems.length; i++) {
+      allItems[i].like = false;
+    }
+
+    if (id) {
+      const user = await User.findOne({ _id: id });
+      for (var i = 0; i < allItems.length; i++) {
+        for (var j = 0; j < user.likedItems.length; j++) {
+          if (user.likedItems[j] == null) continue;
+          if (user.likedItems[j] == allItems[i]._id.toString()) {
+            allItems[i].like = true;
           }
         }
       }
