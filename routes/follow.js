@@ -21,7 +21,10 @@ router.post('/followStore', auth, async (req, res) => {
 
         for (let i = 0; i < user.followedStores.length; i++) {
             if (user.followedStores[i].toString() == store._id.toString()) {
-                throw new Error();
+                return res.status(200).json({
+                    error: true,
+                    data: 'المتجر تم متابعته بالفعل'
+                });
             }
         }
 
