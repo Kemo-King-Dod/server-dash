@@ -20,14 +20,14 @@ router.post('/followStore', auth, async (req, res) => {
         }
 
         for (let i = 0; i < user.followedStores.length; i++) {
-            if (user.followedStores[i]._id.toString() == store._id.toString()) {
+            if (user.followedStores[i].toString() == store._id.toString()) {
                 throw new Error();
             }
         }
 
         user.followedStores.push(store._id);
         await user.save();
-        
+
         res.status(200).json({
             error: false,
             data: 'تمت الإضافة إلى المفضلة'
@@ -51,7 +51,7 @@ router.post('/unFollow', auth, async (req, res) => {
 
         let flag = false
         for (let i = 0; i < user.followedStores.length; i++) {
-            if (user.followedStores[i]._id.toString() == id.toString()) {
+            if (user.followedStores[i].toString() == id.toString()) {
                 user.followedStores.splice(i, 1)
                 flag = true
                 break
