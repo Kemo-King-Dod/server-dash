@@ -62,7 +62,7 @@ router.get('/getStores', auth, async (req, res) => {
             const user = await User.findOne({ _id: id });
             for (var i = 0; i < stores.length; i++) {
                 for (var j = 0; j < user.followedStores.length; j++) {
-                    if (user.followedStores[j] == stores[i]._id) {
+                    if (user.followedStores[j].toString() == stores[i]._id.toString()) {
                         stores[i]._doc.isFollow = true;
                     }
                 }
@@ -71,7 +71,6 @@ router.get('/getStores', auth, async (req, res) => {
 
         for (let i = 0; i < stores.length; i++) {
             console.log(stores[i]._doc.isFollow)
-            console.log(stores[i].isFollow)
         }
 
         res.status(200).json({
