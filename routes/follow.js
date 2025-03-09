@@ -49,34 +49,23 @@ router.post('/unFollow', auth, async (req, res) => {
     try {
         const id = req.body.id;
         const userId = req.userId;
-
         const user = await User.findById(userId);
 
-        let flag = false
         for (let i = 0; i < user.followedStores.length; i++) {
             if (user.followedStores[i].toString() == id.toString()) {
                 user.followedStores.splice(i, 1)
-                flag = true
-                break
+                await user.save()
+                return res.status(200).json({
+                    error: false,
+                    data: 'تم حذف المحل من المفضلة بنجاح'
+                });
             }
         }
 
-        if (flag) {
-            await user.save()
-            res.status(200).json({
-                error: false,
-                data: 'تم حذف المحل من المفضلة بنجاح'
-            });
-        }
-        else {
-            res.status(200).json({
-                error: false,
-                data: 'المحل غير موجود في المفضلة'
-            });
-        }
-
-
-
+        res.status(200).json({
+            error: false,
+            data: 'المحل غير موجود في المفضلة'
+        });
     } catch (error) {
         res.status(200).json({
             error: true,
