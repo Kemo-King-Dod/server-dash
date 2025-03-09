@@ -72,6 +72,9 @@ app.use(wallet);
 const likes = require("./routes/likes.js");
 app.use(likes);
 
+const retrenchments = require("./routes/retrenchments.js");
+app.use(retrenchments);
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
 })

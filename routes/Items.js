@@ -505,4 +505,151 @@ route.post("/category", async (req, res) => {
   }
 });
 
+
+route.post('/search', async (req, res) => {
+  try {
+    var id = null;
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (token) {
+      const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
+      const decoded = jwt.verify(token, JWT_SECRET);
+      id = decoded.id;
+    }
+
+
+
+    // Get all available items
+    const allStores = await Store.aggregate([
+      {
+        $match: { name: req.body.keyWord }
+      },
+      {
+        $sample: { size: 2 }
+      }
+    ])
+    const allItems = await items.aggregate([
+      {
+        $match: { name: req.body.keyWord }
+      },
+      {
+        $sample: { size: 4 }
+      }
+    ])
+
+    // add store name and image to the items
+    for (let i = 0; i < allItems.length; i++) {
+      if (!allItems[i]) continue
+      var itemStore = await Store.findById(allItems[i].storeID);
+      allItems[i].storeName = itemStore.name;
+      allItems[i].storeImage = itemStore.picture;
+    }
+
+    // are you visitor 
+    if (req.headers.isvisiter && req.headers.isvisiter == "true") {
+      res.json({
+        error: false, data: {
+          products: allItems,
+          stores: allStores
+        }
+      });
+      return;
+    }
+
+
+    // you are not a visitor
+
+    // favorite for stores
+    // Add isFavorite property to each store
+    for (var i = 0; i < allStores.length; i++) {
+      if (!allStores[i]) continue
+      allStores[i].isFavorite = false;
+    }
+
+    if (id) {
+      const user = await User.findOne({ _id: id });
+      for (var i = 0; i < allStores.length; i++) {
+        if (!allStores[i]) continue
+        for (var j = 0; j < user.favorateStors.length; j++) {
+          if (favorateStors[j] == null) continue;
+          if (user.favorateStors[j]._id.toString() == allStores[i]._id.toString()) {
+            allStores[i].isFavorite = true;
+          }
+        }
+      }
+    }
+
+    // Add isFollow property to each store
+    for (var i = 0; i < allStores.length; i++) {
+      if (!allStores[i]) continue
+      allStores[i].isFollow = false;
+    }
+
+    if (id) {
+      const user = await User.findOne({ _id: id });
+      for (var i = 0; i < allStores.length; i++) {
+        if (!allStores[i]) continue
+        for (var j = 0; j < user.followedStores.length; j++) {
+          if (user.followedStores[j] == allStores[i]._id) {
+            allStores[i].isFollow = true;
+          }
+        }
+      }
+    }
+
+
+    // favorite for data
+    // Add isFavorite property to each item
+    for (var i = 0; i < allItems.length; i++) {
+      if (!allItems[i]) continue
+      allItems[i].isFavorite = false;
+    }
+
+    if (id) {
+      const user = await User.findOne({ _id: id });
+      for (var i = 0; i < allItems.length; i++) {
+        if (!allItems[i]) continue
+        for (var j = 0; j < user.favorateItems.length; j++) {
+          if (user.favorateItems[j] == null) continue;
+          if (user.favorateItems[j]._id.toString() == allItems[i]._id.toString()) {
+            allItems[i].isFavorite = true;
+          }
+        }
+      }
+    }
+
+
+    // Add like property to each item
+    for (var i = 0; i < allItems.length; i++) {
+      if (!allItems[i]) continue
+      allItems[i].like = false;
+    }
+
+    if (id) {
+      const user = await User.findOne({ _id: id });
+      for (var i = 0; i < allItems.length; i++) {
+        if (!allItems[i]) continue
+        for (var j = 0; j < user.likedItems.length; j++) {
+          if (user.likedItems[j] == null) continue;
+          if (user.likedItems[j] == allItems[i]._id.toString()) {
+            allItems[i].like = true;
+          }
+        }
+      }
+    }
+
+    res.json({
+      error: false, data: {
+        products: allItems,
+        stores: allStores
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(401).json({
+      error: true,
+      message: error.message,
+    });
+  }
+})
+
 module.exports = route
