@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const store = require('./store')
 const Schema = mongoose.Schema
 
 const items = new Schema({
@@ -52,5 +53,6 @@ const items = new Schema({
     }
 })
 
+items.index({ name: 'text' });
 
 module.exports = mongoose.model('Item', items)

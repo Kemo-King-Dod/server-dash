@@ -131,7 +131,13 @@ const stores = new Schema({
     },
     fcmToken: {
         type: String
+    },
+    followersNumber: {
+        type: Number,
+        default: 0
     }
 })
+
+stores.index({ name: 'text' });
 
 module.exports = mongoose.model('Store', stores)

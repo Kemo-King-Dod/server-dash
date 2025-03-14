@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
-const fireAdmin= require("./firebase/firebase_admin.js")
+const fireAdmin = require("./firebase/firebase_admin.js")
 const path = require("path");
-const {sendNotification} =require("./firebase/notification.js")
+const { sendNotification } = require("./firebase/notification.js")
 // database
 const { createserver, connect } = require("./connention/socketio.js");
 const connecting = require("./database/database.js");
@@ -19,14 +19,12 @@ const expressserver = app.listen(4000, () => {
 const io = createserver(expressserver);
 io.on("connection", connect);
 
-// Error handling middleware (should be last)
+
 // const errorHandler = require('./middleware/ErrorHandler');
 // app.use(errorHandler.AppError);
 // app.use(errorHandler.catchAsync);
 // app.use(errorHandler.errorHandler);
 
-// const notificationRoutes = require('./routes/notification');
-// app.use('/api/notifications', notificationRoutes);
 
 const loadphoto = require("./routes/loadPhoto.js");
 app.use(loadphoto);
@@ -76,33 +74,10 @@ app.use(likes);
 const retrenchments = require("./routes/retrenchments.js");
 app.use(retrenchments);
 
+const search = require("./routes/search.js");
+app.use(search);
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
 })
-sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
- 
-   
-// const ShopLogin = require("./routess/shopLogin.js");
-// const showshpsrequists = require("./routess/showshpsrequists.js");
-// const acceptshop = require("./routess/acceptshop.js");
-// const addItems = require("./routess/addItems.js");
-// const getshopItems = require("./routess/getshopitems.js");
-// const getitems = require("./routess/getitems.js");
-// const usersignup = require("./routess/usersignup.js");
-// const add_to_favorite = require("./routess/add_to_favorite.js");
-// const addtocart = require("./routess/addtocart.js");
-// const locations = require("./routess/locations.js");
-// const requist = require("./routess/requist.js");
-// app.use(ShopLogin);
-// app.use(acceptshop);
-// app.use(showshpsrequists);
-// app.use(addItems);
-// app.use(getshopItems);
-// app.use(getitems);
-// app.use(usersignup);
-// app.use(add_to_favorite);
-// app.use(addtocart);
-// app.use(requist);   
-// app.use(locations);
-    
-     
+// sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
