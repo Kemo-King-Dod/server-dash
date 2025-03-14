@@ -6,7 +6,7 @@ const { auth } = require("../middleware/auth");
 
 route.get('/driverChat', auth, async (req, res) => {
     try {
-        const id = req.userId
+        const id = req.body.id
         const order = await Order.findOne({ 'driver.id': id })
         res.status(200).json({
             error: false,
@@ -20,10 +20,10 @@ route.get('/driverChat', auth, async (req, res) => {
         })
     }
 })
-route.get('/userChat', auth, async (req, res) => {
+route.get('/storeChat', auth, async (req, res) => {
     try {
         const id = req.userId
-        const order = await Order.findOne({ 'customer.id': id })
+        const order = await Order.findOne({ 'store.id': id })
         res.status(200).json({
             error: false,
             data: order.chat
@@ -82,7 +82,7 @@ route.post('/driverSendMassege', auth, async (req, res) => {
     }
 });
 
-route.post('/userSendMassege', auth, async (req, res) => {
+route.post('/storeSendMassege', auth, async (req, res) => {
     try {
         const id = req.body.id
         const { message } = req.body.message;
@@ -99,7 +99,7 @@ route.post('/userSendMassege', auth, async (req, res) => {
 
         // Create a new message object
         const newMessage = {
-            sender: 'customer',
+            sender: 'store',
             content: message,
             timestamp: new Date()
         };
