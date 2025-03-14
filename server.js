@@ -77,6 +77,9 @@ app.use(retrenchments);
 const search = require("./routes/search.js");
 app.use(search);
 
+const chat = require("./routes/chat.js");
+app.use(chat);
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
 })
