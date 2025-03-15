@@ -4,7 +4,7 @@ const Order = require("../database/orders");
 
 const { auth } = require("../middleware/auth");
 
-route.post('/driverChat', auth, async (req, res) => {
+route.post('/driverChat', async (req, res) => {
     try {
         const id = req.body.id
         const order = await Order.findById(id)
@@ -42,7 +42,7 @@ route.post('/userChat', async (req, res) => {
     }
 })
 
-route.post('/driverSendMessage', auth, async (req, res) => {
+route.post('/driverSendMessage', async (req, res) => {
     try {
         const id = req.body.id
         const { message } = req.body.message;
@@ -64,13 +64,7 @@ route.post('/driverSendMessage', auth, async (req, res) => {
             timestamp: new Date()
         };
 
-        // Add the message to the chat array
-        if (!order.chat) {
-            order.chat = [];
-        }
         order.chat.push(newMessage);
-
-        // Save the updated order
         await order.save();
 
         res.status(200).json({
@@ -111,13 +105,8 @@ route.post('/userSendMessage', async (req, res) => {
             timestamp: new Date()
         };
 
-        // Add the message to the chat array
-        if (!order.chat) {
-            order.chat = [];
-        }
+        
         order.chat.push(newMessage);
-
-        // Save the updated order
         await order.save();
 
         res.status(200).json({
