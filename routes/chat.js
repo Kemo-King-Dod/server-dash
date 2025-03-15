@@ -66,7 +66,7 @@ route.post('/driverSendMessage', async (req, res) => {
         };
 
         order.chat.push(newMessage);
-        await Order.findOneAndUpdate({ _id: id }, { $set: { chat: order.chat } }); 
+        await Order.findOneAndUpdate({ _id: id }, { $set: { chat: order.chat } });
 
         res.status(200).json({
             error: false,
@@ -106,7 +106,8 @@ route.post('/userSendMessage', async (req, res) => {
 
 
         order.chat.push(newMessage)
-        await order.save()
+        await Order.findOneAndUpdate({ _id: id }, { $set: { chat: order.chat } });
+
 
 
         res.status(200).json({
