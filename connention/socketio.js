@@ -60,9 +60,25 @@ async function connect(socket) {
   }
 
   socket.on("updateUser", async (data) => {
-    // عمليات
-    console.log(data);
-    console.log("updateUser");
+    try {
+      if (socket.handshake.headers.authorization) {
+        await jwt.verify(
+          socket.handshake.headers.authorization,
+          "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
+          async (err, d) => {
+            if (err) {
+              console.log(err);
+              console.log("يرجى تسجيل الدخول");
+            } else {
+              let user = await User.findOne({ _id: d.id })
+              if (user.connection == true)
+                socket.to(user.connectionId).emit("updateDriver", data)
+            }
+          })
+      }
+    } catch (error) {
+      console.log(error)
+    }
   });
 
   socket.on("updateStore", async (data) => {

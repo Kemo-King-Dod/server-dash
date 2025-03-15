@@ -104,9 +104,6 @@ router.get('/mostLiked', async (req, res) => {
             topItems[i]._doc.storeImage = itemStore.picture;
         }
 
-        console.log(topItems[0]);
-
-
         res.status(200).json({ error: false, data: topItems });
     } catch (error) {
         console.log(error)
