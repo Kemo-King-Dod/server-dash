@@ -5,21 +5,6 @@ const items = require("../database/items");
 const Store = require("../database/store");
 const User = require("../database/users");
 
-// Create indexes when the application starts
-async function createIndexes() {
-    try {
-        // Create text indexes for both collections
-        await Store.collection.createIndex({ name: "text" });
-        await items.collection.createIndex({ name: "text" });
-        console.log('Text indexes created successfully');
-    } catch (error) {
-        console.error('Error creating text indexes:', error);
-    }
-}
-
-// Call createIndexes when your application starts
-createIndexes();
-
 route.post('/search', async (req, res) => {
     try {
         var id = null;
