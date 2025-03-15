@@ -86,7 +86,7 @@ route.post('/driverSendMessage', auth, async (req, res) => {
     }
 });
 
-route.post('/userSendMessage', auth, async (req, res) => {
+route.post('/userSendMessage', async (req, res) => {
     try {
         const id = req.body.id
         const { message } = req.body.message;
