@@ -138,6 +138,4 @@ const stores = new Schema({
     }
 })
 
-stores.index({ name: 'text' });
-
 module.exports = mongoose.model('Store', stores)

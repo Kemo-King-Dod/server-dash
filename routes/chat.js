@@ -10,7 +10,9 @@ route.get('/driverChat', auth, async (req, res) => {
         const order = await Order.findById(id)
         res.status(200).json({
             error: false,
-            data: order.chat
+            data: {
+                messages: order.chat
+            }
         })
     } catch (error) {
         console.log(error)
@@ -26,7 +28,9 @@ route.get('/userChat', auth, async (req, res) => {
         const order = await Order.findById(id)
         res.status(200).json({
             error: false,
-            data: order.chat
+            data: {
+                messages: order.chat
+            }
         })
     } catch (error) {
         console.log(error)

@@ -53,6 +53,4 @@ const items = new Schema({
     }
 })
 
-items.index({ name: 'text' });
-
 module.exports = mongoose.model('Item', items)
