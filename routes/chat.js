@@ -27,6 +27,9 @@ route.post('/userChat', auth, async (req, res) => {
     try {
         const id = req.body.id
         const order = await Order.findById(id)
+
+        console.log(req.headers.authorization)
+
         res.status(200).json({
             error: false,
             data: {
