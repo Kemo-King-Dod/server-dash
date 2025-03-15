@@ -88,8 +88,10 @@ route.post('/driverSendMessage', auth, async (req, res) => {
 
 route.post('/userSendMessage', async (req, res) => {
     try {
+        console.log(req.headers.authorization)
+        console.log(req.body)
         const id = req.body.id
-        const { message } = req.body.message;
+        const message = req.body.message;
 
         if (!message) {
             return res.status(400).json({
