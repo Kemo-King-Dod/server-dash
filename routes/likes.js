@@ -97,6 +97,13 @@ router.get('/mostLiked', async (req, res) => {
             .sort({ likes: -1 }) // Sort by likes in descending order
             .limit(10);           // Get only 4 items
 
+        for (var i = 0; i < topItems.length; i++) {
+            var itemStore = await Store.findById(topItems[i].storeID);
+            data[i].storeName = itemStore.name;
+            data[i].storeImage = itemStore.picture;
+        }
+
+
         res.status(200).json({ error: false, data: topItems });
     } catch (error) {
         res.status(500).json({ error: true, message: error.message });
