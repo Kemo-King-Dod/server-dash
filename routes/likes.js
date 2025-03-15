@@ -100,8 +100,8 @@ router.get('/mostLiked', async (req, res) => {
 
         for (var i = 0; i < topItems.length; i++) {
             var itemStore = await Store.findById(topItems[i].storeID);
-            data[i].storeName = itemStore.name;
-            data[i].storeImage = itemStore.picture;
+            topItems[i].storeName = itemStore.name;
+            topItems[i].storeImage = itemStore.picture;
         }
 
 
