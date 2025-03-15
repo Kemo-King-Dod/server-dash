@@ -61,6 +61,12 @@ async function connect(socket) {
   }
 
   socket.on("updateUser", async (data) => {
+    if (data.type == "chat") {
+      const user = await User.findOne({ phone: data.id })
+      if (user.connection)
+        socket.to(user.connectionId).emit("updateUser", data);
+    }
+
     // socket.to().emit("updateDriver", data)
   })
 
