@@ -23,7 +23,7 @@ route.post('/driverChat', auth, async (req, res) => {
     }
 })
 
-route.post('/userChat', auth, async (req, res) => {
+route.post('/userChat', async (req, res) => {
     try {
         const id = req.body.id
         const order = await Order.findById(id)
