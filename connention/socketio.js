@@ -2,6 +2,7 @@ const { Server } = require("socket.io");
 const Store = require("../database/store");
 const User = require("../database/users");
 const Driver = require("../database/driver");
+const Order = require("../database/orders");
 const jwt = require("jsonwebtoken");
 const { auth } = require("../middleware/auth");
 
@@ -60,26 +61,8 @@ async function connect(socket) {
   }
 
   socket.on("updateUser", async (data) => {
-    try {
-      if (socket.handshake.headers.authorization) {
-        await jwt.verify(
-          socket.handshake.headers.authorization,
-          "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
-          async (err, d) => {
-            if (err) {
-              console.log(err);
-              console.log("يرجى تسجيل الدخول");
-            } else {
-              let user = await User.findOne({ _id: d.id })
-              if (user.connection == true)
-                socket.to(user.connectionId).emit("updateDriver", data)
-            }
-          })
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  });
+    // socket.to().emit("updateDriver", data)
+  })
 
   socket.on("updateStore", async (data) => {
     try {
@@ -109,7 +92,14 @@ async function connect(socket) {
   });
 
   socket.on("updateDriver", async (data) => {
-    socket.to("drivers").emit("updateDriver", data)
+    if (data.type == "chat") {
+      const order = await Order.findById(data.id);
+      const driver = await Driver.findById(order.driver.id);
+      if (driver.connection)
+        socket.to(driver.connectionId).emit("updateDriver", data);
+    }
+    else
+      socket.to("drivers").emit("updateDriver", data)
   });
 
 
