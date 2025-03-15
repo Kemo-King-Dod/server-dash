@@ -28,8 +28,6 @@ route.post('/userChat', async (req, res) => {
         const id = req.body.id
         const order = await Order.findById(id)
 
-        console.log(req.headers.authorization)
-
         res.status(200).json({
             error: false,
             data: {
@@ -48,7 +46,7 @@ route.post('/userChat', async (req, res) => {
 route.post('/driverSendMessage', async (req, res) => {
     try {
         const id = req.body.id
-        const { message } = req.body.message;
+        const message = req.body.message;
 
         if (!message) {
             return res.status(400).json({
@@ -68,7 +66,15 @@ route.post('/driverSendMessage', async (req, res) => {
         };
 
         order.chat.push(newMessage);
-        await order.save();
+        try {
+            await order.save();
+        } catch (saveError) {
+            console.log('Error saving order:', saveError);
+            return res.status(500).json({
+                error: true,
+                message: "Failed to save message: " + saveError.message
+            });
+        }
 
         res.status(200).json({
             error: false,
@@ -107,9 +113,8 @@ route.post('/userSendMessage', async (req, res) => {
         };
 
 
-        order.chat.push(newMessage);
-        console.log(order.chat)
-        await order.save().then(s => console.log(s))
+        order.chat.push(newMessage)
+        await order.save()
 
 
         res.status(200).json({
