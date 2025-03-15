@@ -4,7 +4,7 @@ const Order = require("../database/orders");
 
 const { auth } = require("../middleware/auth");
 
-route.get('/driverChat', auth, async (req, res) => {
+route.post('/driverChat', auth, async (req, res) => {
     try {
         const id = req.body.id
         const order = await Order.findById(id)
@@ -22,7 +22,8 @@ route.get('/driverChat', auth, async (req, res) => {
         })
     }
 })
-route.get('/userChat', auth, async (req, res) => {
+
+route.post('/userChat', auth, async (req, res) => {
     try {
         const id = req.body.id
         const order = await Order.findById(id)
