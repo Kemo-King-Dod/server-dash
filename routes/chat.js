@@ -7,7 +7,7 @@ const { auth } = require("../middleware/auth");
 route.get('/driverChat', auth, async (req, res) => {
     try {
         const id = req.body.id
-        const order = await Order.findOne({ 'driver.id': id })
+        const order = await Order.findById(id)
         res.status(200).json({
             error: false,
             data: order.chat
@@ -22,8 +22,8 @@ route.get('/driverChat', auth, async (req, res) => {
 })
 route.get('/userChat', auth, async (req, res) => {
     try {
-        const id = req.userId
-        const order = await Order.findOne({ 'customer.id': id })
+        const id = req.body.id
+        const order = await Order.findById(id)
         res.status(200).json({
             error: false,
             data: order.chat
