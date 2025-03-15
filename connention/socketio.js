@@ -93,8 +93,7 @@ async function connect(socket) {
 
   socket.on("updateDriver", async (data) => {
     if (data.type == "chat") {
-      const order = await Order.findById(data.id);
-      const driver = await Driver.findById(order.driver.id);
+      const driver = await Driver.findById(data.id)
       if (driver.connection)
         socket.to(driver.connectionId).emit("updateDriver", data);
     }
