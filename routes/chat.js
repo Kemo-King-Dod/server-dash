@@ -41,7 +41,7 @@ route.get('/userChat', auth, async (req, res) => {
     }
 })
 
-route.post('/driverSendMassege', auth, async (req, res) => {
+route.post('/driverSendMessage', auth, async (req, res) => {
     try {
         const id = req.body.id
         const { message } = req.body.message;
@@ -86,7 +86,7 @@ route.post('/driverSendMassege', auth, async (req, res) => {
     }
 });
 
-route.post('/userSendMassege', auth, async (req, res) => {
+route.post('/userSendMessage', auth, async (req, res) => {
     try {
         const id = req.body.id
         const { message } = req.body.message;
