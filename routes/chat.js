@@ -109,7 +109,8 @@ route.post('/userSendMessage', async (req, res) => {
 
         order.chat.push(newMessage);
         console.log(order.chat)
-        await order.save();
+        await order.save().then(s => console.log(s))
+
 
         res.status(200).json({
             error: false,
