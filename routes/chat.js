@@ -66,15 +66,7 @@ route.post('/driverSendMessage', async (req, res) => {
         };
 
         order.chat.push(newMessage);
-        try {
-            await order.save();
-        } catch (saveError) {
-            console.log('Error saving order:', saveError);
-            return res.status(500).json({
-                error: true,
-                message: "Failed to save message: " + saveError.message
-            });
-        }
+        await Order.findOneAndUpdate({ _id: id }, { $set: { chat: order.chat } }); 
 
         res.status(200).json({
             error: false,
