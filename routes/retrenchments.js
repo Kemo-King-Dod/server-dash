@@ -22,8 +22,7 @@ router.post('/discount', auth, async (req, res) => {
         // make discount for items
         await Item.updateMany(
             {
-                _id: { $in: applicableProducts },
-                storeID: userId
+                _id: { $in: applicableProducts }
             },
             {
                 $set: {
@@ -31,13 +30,12 @@ router.post('/discount', auth, async (req, res) => {
                     retrenchment_percent: percent
                 }
             }
-        );
+        )
 
         res.status(200).json({
             error: false,
             message: 'تم إضافة التخفيض بنجاح',
         })
-
     } catch (error) {
         console.log(error);
         res.status(401).json({

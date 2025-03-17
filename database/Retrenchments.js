@@ -15,10 +15,10 @@ const retrenchments = new Schema({
         type: Number
     },
     retrenchment_start: {
-        type: Date
+        type: String
     },
     retrenchment_end: {
-        type: Date
+        type: String
     }
 })
 
