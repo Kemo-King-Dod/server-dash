@@ -10,14 +10,16 @@ router.post('/discount', auth, async (req, res) => {
         const userId = req.userId
         const { name, applicableProducts, percent, startDate, endDate } = req.body
 
-        await Retrenchments.create({
+        const discount = {
             name,
             items: applicableProducts,
             store_id: userId,
             retrenchment_percent: percent,
             retrenchment_start: startDate,
             retrenchment_end: endDate
-        })
+        }
+        let r = await Retrenchments.create(discount)
+        console.log(r)
 
         // make discount for items
         await Item.updateMany(
