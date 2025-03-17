@@ -224,12 +224,13 @@ route.get("/getAllItems", async (req, res) => {
       }
     }
 
-    // delete if retrenchment_end is bigger than now
+    // delete if retrenchment_end is bigger than or equl now
     Retrenchments.deleteMany(
       {
-        retrenchment_end: { $lt: Date.now() }
+        retrenchment_end: { $lt: Date.now() },
       }
     )
+
 
 
     for (let i = 0; i < data.length; i++) {
