@@ -7,6 +7,8 @@ const Store = require("../database/store");
 const User = require("../database/users");
 const { auth } = require("../middleware/auth");
 const path = require("path");
+const Retrenchments = require('../database/Retrenchments');
+
 
 let random = []
 let data = []
@@ -203,6 +205,31 @@ route.get("/getAllItems", async (req, res) => {
         }
       ])
     }
+
+    let discoundIds = []
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].retrenchment_end < Date.now()) {
+        discoundIds.push(data[i]._id)
+        data[i].retrenchment_end = null
+        data[i].retrenchment_percent = null
+        data[i].is_retrenchment = false
+        await items.findByIdAndUpdate(data[i]._id, {
+          $set: {
+            retrenchment_end: null,
+            retrenchment_percent: null,
+            is_retrenchment: false
+          }
+        })
+      }
+    }
+
+    // delete if retrenchment_end is bigger than now
+    Retrenchments.deleteMany(
+      {
+        retrenchment_end: { $lt: Date.now() }
+      }
+    )
 
 
     for (let i = 0; i < data.length; i++) {

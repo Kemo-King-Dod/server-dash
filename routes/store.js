@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../database/users');
-const Driver = require('../database/driver');
 const Ordre = require('../database/orders');
 const Store = require('../database/store');
 const { auth } = require('../middleware/auth')
