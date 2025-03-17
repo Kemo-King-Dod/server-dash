@@ -8,7 +8,7 @@ router.post('/discount', auth, async (req, res) => {
     try {
         console.log(req.body)
         const userId = req.userId
-        const { name, applicableProducts, percent, startDate, endDate } = req.body
+        const { name, applicableProducts, percent, startDate, endDate } = req.body.discountDetails
 
         const discount = {
             name,
