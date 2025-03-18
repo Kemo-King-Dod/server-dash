@@ -4,7 +4,7 @@ const { auth } = require("../middleware/auth");
 const User = require("../database/users");
 const Item = require("../database/items");
 const Store = require("../database/store");
-const Retrenchments = require("../database/retrenchments");
+const Retrenchments = require("../database/Retrenchments");
 
 // Get all cart items
 router.get("/getfromcart", auth, async (req, res) => {
