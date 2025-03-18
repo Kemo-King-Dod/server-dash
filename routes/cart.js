@@ -4,6 +4,7 @@ const { auth } = require("../middleware/auth");
 const User = require("../database/users");
 const Item = require("../database/items");
 const Store = require("../database/store");
+const Retrenchments = require("../database/retrenchments");
 
 // Get all cart items
 router.get("/getfromcart", auth, async (req, res) => {
@@ -17,6 +18,43 @@ router.get("/getfromcart", auth, async (req, res) => {
         data: "المستخدم غير موجود",
       });
     }
+
+    // git shop discounts
+    let discoundIds = []
+
+    for (let i = 0; i < user.cart.length; i++) {
+      let the_item = await Item.find({
+        _id: user.cart[i].cartItem.id
+      });
+      if (the_item.retrenchment_end < Date.now()) {
+        discoundIds.push(the_item._id)
+        the_item.retrenchment_end = null
+        the_item.retrenchment_percent = null
+        the_item.is_retrenchment = false
+        await Item.findByIdAndUpdate(the_item._id, {
+          $set: {
+            retrenchment_end: null,
+            retrenchment_percent: null,
+            is_retrenchment: false
+          }
+        })
+      }
+      if (!the_item.is_retrenchment) {
+        user.cart[i].cartItem.price = the_item.price
+      } else {
+        user.cart[i].cartItem.price = the_item.price * (1 - the_item.retrenchment_percent / 100)
+      }
+    }
+
+    // delete if retrenchment_end is bigger than or equl now
+    Retrenchments.deleteMany(
+      {
+        retrenchment_end: { $lt: Date.now() },
+      }
+    )
+
+
+
     var thedata = [];
 
     for (var i = 0; i < user.cart.length; i++) {

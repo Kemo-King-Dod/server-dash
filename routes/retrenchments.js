@@ -48,7 +48,7 @@ router.post('/discount', auth, async (req, res) => {
 
 
 // get all retrenchments
-router.get('/discounts', auth, async (req, res) => {
+router.get('/getAllDiscounts', auth, async (req, res) => {
     try {
         const userId = req.userId
         const retrenchments = await Retrenchments.find({ store_id: userId })
