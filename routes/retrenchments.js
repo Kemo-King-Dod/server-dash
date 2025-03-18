@@ -47,4 +47,42 @@ router.post('/discount', auth, async (req, res) => {
 })
 
 
+// get all retrenchments
+router.get('/discounts', auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const retrenchments = await Retrenchments.find({ store_id: userId })
+        res.status(200).json({
+            error: false,
+            retrenchments
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(401).json({
+            error: true,
+            message: error.message,
+        })
+    }
+})
+
+
+// delete retrenchment
+router.post('/deleteDiscount', auth, async (req, res) => {
+    try {
+        const { id } = req.body
+        await Retrenchments.findByIdAndDelete(id)
+        res.status(200).json({
+            error: false,
+            message: 'تم حذف التخفيض بنجاح'
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(401).json({
+            error: true,
+            message: error.message,
+        })
+    }
+})
+
+
 module.exports = router

@@ -106,14 +106,24 @@ route.post('/search', async (req, res) => {
         }
 
         // Handle authenticated user case
-        // Add isFavorite property to stores
+        // Add isFollow property to each store
         for (var i = 0; i < allStores.length; i++) {
             if (!allStores[i]) continue;
+            allStores[i].isFollow = false;
             allStores[i].isFavorite = false;
+
         }
 
         if (id) {
             const user = await User.findOne({ _id: id });
+            for (var i = 0; i < allStores.length; i++) {
+                for (var j = 0; j < user.followedStores.length; j++) {
+                    if (user.followedStores[j] == allStores[i]._id) {
+                        allStores[i].isFollow = true;
+                    }
+                }
+            }
+            // Add isFavorite property to stores
             // Update store favorites
             for (var i = 0; i < allStores.length; i++) {
                 if (!allStores[i]) continue;

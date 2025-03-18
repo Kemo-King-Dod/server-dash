@@ -100,29 +100,29 @@ route.post("/forgotPassword", async (req, res) => {
             });
         }
 
-        // Generate a 6-digit verification code
-        const verificationCode = Math.floor(100000 + Math.random() * 900000);
-        
-        // Store the code in the database
-        await Verification.create({
-            phone,
-            code: verificationCode,
-            expiresAt: new Date(Date.now() + 600000) // 10 minutes from now
-        });
+        // // Generate a 6-digit verification code
+        // const verificationCode = Math.floor(100000 + Math.random() * 900000);
 
-        // In a real application, you would send this code via SMS
-        console.log(`Verification code for ${phone}: ${verificationCode}`);
+        // // Store the code in the database
+        // await Verification.create({
+        //     phone,
+        //     code: verificationCode,
+        //     expiresAt: new Date(Date.now() + 600000) // 10 minutes from now
+        // });
+
+        // // In a real application, you would send this code via SMS
+        // console.log(`Verification code for ${phone}: ${verificationCode}`);
 
         res.status(200).json({
             error: false,
-            data: "تم إرسال رمز التحقق"
+            data: "رقم الهاتف موجود"
         });
 
     } catch (error) {
         console.error('Forgot password error:', error);
         res.status(500).json({
             error: true,
-            data: "حدث خطأ في إرسال رمز التحقق"
+            message: "رقم الهاتف غير موجود"
         });
     }
 });
@@ -131,7 +131,7 @@ route.post("/verifyCode", async (req, res) => {
     try {
         const { phone, code } = req.body;
 
-        const verification = await Verification.findOne({ 
+        const verification = await Verification.findOne({
             phone,
             code: parseInt(code)
         });

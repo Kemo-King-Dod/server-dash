@@ -3,6 +3,7 @@ const router = express.Router();
 const { auth } = require('../middleware/auth');
 const User = require('../database/users');
 const Store = require('../database/store');
+const jwt = require('jsonwebtoken');
 
 // Add to favorites
 router.post('/followStore', auth, async (req, res) => {
@@ -75,13 +76,60 @@ router.post('/unFollow', auth, async (req, res) => {
     }
 });
 
-router.get('/MostFollowedStores', auth, async (req, res) => {
+router.get('/MostFollowedStores', async (req, res) => {
     try {
-        const stores = await Store.find({}).sort({ followersNumber: -1 }).limit(4);
-        res.status(200).json({
-            error: false,
-            data: stores
-        });
+        var id = null;
+        const token = req.header("Authorization")?.replace("Bearer ", "");
+        if (token) {
+            const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
+            const decoded = jwt.verify(token, JWT_SECRET);
+            id = decoded.id;
+        }
+        const stores = await Store.find({}).sort({ followersNumber: -1 }).limit(4)
+        // Handle authenticated user case
+        // Add isFollow property to each store
+        for (var i = 0; i < stores.length; i++) {
+            if (!stores[i]) continue;
+            stores[i].isFollow = false;
+            stores[i].isFavorite = false;
+        }
+
+        if (id) {
+            const user = await User.findOne({ _id: id });
+            for (var i = 0; i < stores.length; i++) {
+                for (var j = 0; j < user.followedStores.length; j++) {
+                    if (user.followedStores[j] == stores[i]._id) {
+                        stores[i].isFollow = true;
+                    }
+                }
+            }
+            // Add isFavorite property to stores
+            // Update store favorites
+            for (var i = 0; i < stores.length; i++) {
+                if (!stores[i]) continue;
+                for (var j = 0; j < user.favorateStors.length; j++) {
+                    if (!user.favorateStors[j]) continue;
+                    if (user.favorateStors[j]._id.toString() === stores[i]._id.toString()) {
+                        stores[i].isFavorite = true;
+                    }
+                }
+            }
+
+            // Add isFollow property to stores
+            for (var i = 0; i < stores.length; i++) {
+                if (!stores[i]) continue;
+                stores[i].isFollow = false;
+                for (var j = 0; j < user.followedStores.length; j++) {
+                    if (user.followedStores[j] == stores[i]._id) {
+                        stores[i].isFollow = true;
+                    }
+                }
+            }
+            res.status(200).json({
+                error: false,
+                data: stores
+            });
+        }
     } catch (error) {
         res.status(500).json({
             error: true,
