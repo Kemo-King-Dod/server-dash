@@ -135,7 +135,8 @@ const stores = new Schema({
     followersNumber: {
         type: Number,
         default: 0
-    },
+    }
+}, {
     timestamps: true
 })
 
