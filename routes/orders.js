@@ -10,7 +10,7 @@ const Item = require("../database/items");
 const fs = require("fs").promises;
 const path = require("path");
 const { auth } = require("../middleware/auth");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 
 let ordersNum;
 
