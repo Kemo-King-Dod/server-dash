@@ -136,7 +136,7 @@ const stores = new Schema({
         type: Number,
         default: 0
     },
-    Timestamp: true
+    timestamps: true
 })
 
 module.exports = mongoose.model('Store', stores)
