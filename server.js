@@ -62,6 +62,9 @@ app.use(driver);
 const orders = require("./routes/orders.js");
 app.use(orders);
 
+const orderRecord = require("./routes/orderRecord.js");
+app.use(orderRecord);
+
 const categiries = require("./routes/getcategiries.js");
 app.use(categiries);
 
@@ -79,6 +82,10 @@ app.use(search);
 
 const chat = require("./routes/chat.js");
 app.use(chat);
+
+const storeSettings = require("./routes/storeSettings.js");
+app.use(storeSettings);
+
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
