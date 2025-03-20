@@ -4,7 +4,7 @@ const Store = require('../database/store');
 const { auth } = require('../middleware/auth')
 
 
-router.post('/notifications', auth, async (req, res) => {
+router.post('/notificationCondition', auth, async (req, res) => {
     try {
         const id = req.userId
         const status = req.body.status
