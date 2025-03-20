@@ -65,12 +65,16 @@ route.post("/login", async (req, res) => {
                     name: exist.name,
                     phone: exist.phone,
                     userType,
+                    storeType: storeType,
+                    address: exist.address || '',
+                    createdAt: exist.createdAt || 0,
                     status: exist.status ? exist.status : null,
                     picture: storeType ? exist.picture : null,
                     cancelOrderLimit: exist.cancelOrderLimit || 0
                 }
             }
         }
+        console.log(response)
 
         res.status(200).json(response)
 

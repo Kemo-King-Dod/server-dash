@@ -68,10 +68,6 @@ router.get('/getStores', auth, async (req, res) => {
             }
         }
 
-        for (let i = 0; i < stores.length; i++) {
-            console.log(stores[i]._doc.isFollow)
-        }
-
         res.status(200).json({
             error: false,
             data: stores
