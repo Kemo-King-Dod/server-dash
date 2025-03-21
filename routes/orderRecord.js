@@ -4,7 +4,7 @@ const OrderRecord = require("../database/orders_record");
 const { auth } = require("../middleware/auth");
 const mongoose = require("mongoose");
 
-router.get("/getOrderRecordForStore", auth, async (req, res) => {
+router.get("/orderRecordForStore", auth, async (req, res) => {
     try {
         const userId = req.userId;
         const records = await OrderRecord.find({ "store.id": new mongoose.Types.ObjectId(userId) });
@@ -21,7 +21,7 @@ router.get("/getOrderRecordForStore", auth, async (req, res) => {
 
 // get Order Record For User
 
-router.get("/getOrderRecordForUser", auth, async (req, res) => {
+router.get("/orderRecordForUser", auth, async (req, res) => {
     try {
         const userId = req.userId;
         const records = await OrderRecord.find({ "customer.id": new mongoose.Types.ObjectId(userId) });
@@ -38,7 +38,7 @@ router.get("/getOrderRecordForUser", auth, async (req, res) => {
 
 
 // get Order Record For Driver
-router.get("/getOrderRecordForUser", auth, async (req, res) => {
+router.get("/orderRecordForUser", auth, async (req, res) => {
     try {
         const userId = req.userId;
         const records = await OrderRecord.find({ "driver.id": new mongoose.Types.ObjectId(userId) });
