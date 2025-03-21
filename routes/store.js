@@ -70,6 +70,7 @@ router.get('/getStores', auth, async (req, res) => {
         if (id) {
             // if data now is out of open close times make openCondition false
             for (var i = 0; i < stores.length; i++) {
+                console.log(1)
                 // if data now is out of open close times make openCondition false
                 for (var i = 0; i < stores.length; i++) {
                     const store = stores[i];
