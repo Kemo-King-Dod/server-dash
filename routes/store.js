@@ -67,68 +67,78 @@ router.get('/getStores', auth, async (req, res) => {
             }
         }
 
-        if (id) {
-            // if data now is out of open close times make openCondition false
-            for (var i = 0; i < stores.length; i++) {
-                console.log(1)
-                const store = stores[i];
+        // if (id) {
+        //     // if data now is out of open close times make openCondition false
+        //     for (var i = 0; i < stores.length; i++) {
+        //         const store = stores[i];
 
-                // Get current time
-                const now = new Date();
-                const currentHour = now.getHours();
-                const currentMinute = now.getMinutes();
-                const currentTime = currentHour * 60 + currentMinute; // Convert current time to minutes
+        //         // Get current time
+        //         const now = new Date();
+        //         const currentHour = now.getHours();
+        //         const currentMinute = now.getMinutes();
+        //         const currentTime = currentHour * 60 + currentMinute; // Convert current time to minutes
 
-                const openTimeAM = convertTimeToMinutes(store.opentimeam);
-                const closeTimeAM = convertTimeToMinutes(store.closetimeam);
-                const openTimePM = convertTimeToMinutes(store.opentimepm);
-                const closeTimePM = convertTimeToMinutes(store.closetimepm);
+        //         // Convert store times to minutes for easier comparison
+        //         const convertTimeToMinutes = (timeStr) => {
+        //             if (!timeStr) return null;
+        //             const [hours, minutes] = timeStr.split(':').map(Number);
+        //             return hours * 60 + minutes;
+        //         };
 
-                let isWithinOperatingHours = false;
+        //         const openTimeAM = convertTimeToMinutes(store.opentimeam);
+        //         const closeTimeAM = convertTimeToMinutes(store.closetimeam);
+        //         const openTimePM = convertTimeToMinutes(store.opentimepm);
+        //         const closeTimePM = convertTimeToMinutes(store.closetimepm);
 
-                // Check morning hours
-                if (openTimeAM !== null && closeTimeAM !== null) {
-                    if (closeTimeAM > openTimeAM) {
-                        // Normal morning period
-                        isWithinOperatingHours = isWithinOperatingHours ||
-                            (currentTime >= openTimeAM && currentTime <= closeTimeAM);
-                    } else {
-                        // Overnight morning period
-                        isWithinOperatingHours = isWithinOperatingHours ||
-                            (currentTime >= openTimeAM || currentTime <= closeTimeAM);
-                    }
-                }
+        //         console.log(openTimeAM + '' + closeTimeAM + '' + openTimePM + '' + openTimePM)
 
-                // Check evening hours
-                if (openTimePM !== null && closeTimePM !== null) {
-                    if (closeTimePM > openTimePM) {
-                        // Normal evening period
-                        isWithinOperatingHours = isWithinOperatingHours ||
-                            (currentTime >= openTimePM && currentTime <= closeTimePM);
-                    } else {
-                        // Overnight evening period
-                        isWithinOperatingHours = isWithinOperatingHours ||
-                            (currentTime >= openTimePM || currentTime <= closeTimePM);
-                    }
-                }
+        //         let isWithinOperatingHours = false;
 
-                // Update store's openCondition
-                await Store.findByIdAndUpdate(store._id, { openCondition: isWithinOperatingHours });
-                stores[i].openCondition = isWithinOperatingHours;
-            }
-        }
+        //         // Check morning hours
+        //         if (openTimeAM !== null && closeTimeAM !== null) {
+        //             if (closeTimeAM > openTimeAM) {
+        //                 // Normal morning period
+        //                 isWithinOperatingHours = isWithinOperatingHours ||
+        //                     (currentTime >= openTimeAM && currentTime <= closeTimeAM);
+        //             } else {
+        //                 // Overnight morning period
+        //                 isWithinOperatingHours = isWithinOperatingHours ||
+        //                     (currentTime >= openTimeAM || currentTime <= closeTimeAM);
+        //             }
+        //         }
+
+        //         // Check evening hours
+        //         if (openTimePM !== null && closeTimePM !== null) {
+        //             if (closeTimePM > openTimePM) {
+        //                 // Normal evening period
+        //                 isWithinOperatingHours = isWithinOperatingHours ||
+        //                     (currentTime >= openTimePM && currentTime <= closeTimePM);
+        //             } else {
+        //                 // Overnight evening period
+        //                 isWithinOperatingHours = isWithinOperatingHours ||
+        //                     (currentTime >= openTimePM || currentTime <= closeTimePM);
+        //             }
+        //         }
+
+        //         // Update store's openCondition
+        //         await Store.findByIdAndUpdate(store._id, { openCondition: isWithinOperatingHours });
+        //         stores[i].openCondition = isWithinOperatingHours;
+        //     }
+
+        // }
+    }
 
         res.status(200).json({
-            error: false,
-            data: stores
-        })
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            error: true,
-            message: error.message
-        })
-    }
+        error: false,
+        data: stores
+    })
+} catch (error) {
+    console.log(error)
+    res.status(500).json({
+        error: true,
+        message: error.message
+    })
+}
 })
 
 
@@ -220,9 +230,3 @@ router.post('/changeOpenTime', auth, async (req, res) => {
 })
 
 module.exports = router
-
-const convertTimeToMinutes = (timeStr) => {
-    if (!timeStr) return null;
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    return hours * 60 + minutes;
-}
