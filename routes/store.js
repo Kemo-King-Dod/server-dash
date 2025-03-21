@@ -71,54 +71,50 @@ router.get('/getStores', auth, async (req, res) => {
             // if data now is out of open close times make openCondition false
             for (var i = 0; i < stores.length; i++) {
                 console.log(1)
-                // if data now is out of open close times make openCondition false
-                for (var i = 0; i < stores.length; i++) {
-                    const store = stores[i];
+                const store = stores[i];
 
-                    // Get current time
-                    const now = new Date();
-                    const currentHour = now.getHours();
-                    const currentMinute = now.getMinutes();
-                    const currentTime = currentHour * 60 + currentMinute; // Convert current time to minutes
+                // Get current time
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinute = now.getMinutes();
+                const currentTime = currentHour * 60 + currentMinute; // Convert current time to minutes
 
-                    const openTimeAM = convertTimeToMinutes(store.opentimeam);
-                    const closeTimeAM = convertTimeToMinutes(store.closetimeam);
-                    const openTimePM = convertTimeToMinutes(store.opentimepm);
-                    const closeTimePM = convertTimeToMinutes(store.closetimepm);
+                const openTimeAM = convertTimeToMinutes(store.opentimeam);
+                const closeTimeAM = convertTimeToMinutes(store.closetimeam);
+                const openTimePM = convertTimeToMinutes(store.opentimepm);
+                const closeTimePM = convertTimeToMinutes(store.closetimepm);
 
-                    let isWithinOperatingHours = false;
+                let isWithinOperatingHours = false;
 
-                    // Check morning hours
-                    if (openTimeAM !== null && closeTimeAM !== null) {
-                        if (closeTimeAM > openTimeAM) {
-                            // Normal morning period
-                            isWithinOperatingHours = isWithinOperatingHours ||
-                                (currentTime >= openTimeAM && currentTime <= closeTimeAM);
-                        } else {
-                            // Overnight morning period
-                            isWithinOperatingHours = isWithinOperatingHours ||
-                                (currentTime >= openTimeAM || currentTime <= closeTimeAM);
-                        }
+                // Check morning hours
+                if (openTimeAM !== null && closeTimeAM !== null) {
+                    if (closeTimeAM > openTimeAM) {
+                        // Normal morning period
+                        isWithinOperatingHours = isWithinOperatingHours ||
+                            (currentTime >= openTimeAM && currentTime <= closeTimeAM);
+                    } else {
+                        // Overnight morning period
+                        isWithinOperatingHours = isWithinOperatingHours ||
+                            (currentTime >= openTimeAM || currentTime <= closeTimeAM);
                     }
-
-                    // Check evening hours
-                    if (openTimePM !== null && closeTimePM !== null) {
-                        if (closeTimePM > openTimePM) {
-                            // Normal evening period
-                            isWithinOperatingHours = isWithinOperatingHours ||
-                                (currentTime >= openTimePM && currentTime <= closeTimePM);
-                        } else {
-                            // Overnight evening period
-                            isWithinOperatingHours = isWithinOperatingHours ||
-                                (currentTime >= openTimePM || currentTime <= closeTimePM);
-                        }
-                    }
-
-                    // Update store's openCondition
-                    await Store.findByIdAndUpdate(store._id, { openCondition: isWithinOperatingHours });
-                    stores[i].openCondition = isWithinOperatingHours;
                 }
 
+                // Check evening hours
+                if (openTimePM !== null && closeTimePM !== null) {
+                    if (closeTimePM > openTimePM) {
+                        // Normal evening period
+                        isWithinOperatingHours = isWithinOperatingHours ||
+                            (currentTime >= openTimePM && currentTime <= closeTimePM);
+                    } else {
+                        // Overnight evening period
+                        isWithinOperatingHours = isWithinOperatingHours ||
+                            (currentTime >= openTimePM || currentTime <= closeTimePM);
+                    }
+                }
+
+                // Update store's openCondition
+                await Store.findByIdAndUpdate(store._id, { openCondition: isWithinOperatingHours });
+                stores[i].openCondition = isWithinOperatingHours;
             }
         }
 
