@@ -141,4 +141,32 @@ router.post('/alterStore', auth, async (req, res) => {
     }
 })
 
+router.post('/changeOpenTime', auth, async (req, res) => {
+    try {
+        const id = req.userId
+        const { closetimeam, closetimepm, opentimeam, opentimepm } = req.body
+        const store = await Store.findById(id, { password: 0, items: 0 })
+        store.closetimeam = closetimeam
+        store.closetimepm = closetimepm
+        store.opentimeam = opentimeam
+        store.opentimepm = opentimepm
+        await store.save()
+        res.status(200).json({
+            error: false,
+            data: {
+                closetimeam,
+                closetimepm,
+                opentimeam,
+                opentimepm
+            }
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
+        })
+    }
+})
+
 module.exports = router

@@ -174,26 +174,27 @@ route.get("/getAllItems", async (req, res) => {
     // Get all available items
     if (id) {
       var user = await User.findById(id)
-      if (user.gender == 'male') {
-        data = await items.aggregate([
-          {
-            $match: { gender: { $in: ['all', 'male'] } }
-          },
-          {
-            $sample: { size: 4 }
-          }
-        ])
-      }
-      else {
-        data = await items.aggregate([
-          {
-            $match: { gender: { $in: ['all', 'female'] } }
-          },
-          {
-            $sample: { size: 4 }
-          }
-        ])
-      }
+      if (user.gender)
+        if (user.gender == 'male') {
+          data = await items.aggregate([
+            {
+              $match: { gender: { $in: ['all', 'male'] } }
+            },
+            {
+              $sample: { size: 4 }
+            }
+          ])
+        }
+        else {
+          data = await items.aggregate([
+            {
+              $match: { gender: { $in: ['all', 'female'] } }
+            },
+            {
+              $sample: { size: 4 }
+            }
+          ])
+        }
     }
     else {
       data = await items.aggregate([

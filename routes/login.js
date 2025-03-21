@@ -70,7 +70,11 @@ route.post("/login", async (req, res) => {
                     picture: storeType ? exist.picture : null,
                     storeType: storeType,
                     status: exist.status ? exist.status : null,
-                    cancelOrderLimit: exist.cancelOrderLimit || 0
+                    cancelOrderLimit: exist.cancelOrderLimit || 0,
+                    opentimeam: exist.opentimeam || 0,
+                    opentimepm: exist.opentimepm || 0,
+                    closetimeam: exist.closetimeam || 0,
+                    closetimepm: exist.closetimepm || 0,
                 }
             }
         }

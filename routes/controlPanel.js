@@ -1,8 +1,133 @@
 const express = require('express');
 const router = express.Router();
 const Store = require('../database/store');
-const { auth } = require('../middleware/auth')
+const orderRecord = require('../database/orders_record');
+const { auth } = require('../middleware/auth');
 
+router.get('/controlPanel', auth, async (req, res) => {
+    try {
+        const storeId = req.userId;
 
+        const store = await Store.findById(storeId);
 
-module.exports = router
+        const orders = await orderRecord.find({ "store.id": storeId.toString() });
+
+        // Calculate total profit
+        const totalProfet = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+
+        // Calculate total orders number
+        const totalOrdersNumber = orders.length;
+
+        // Calculate completed orders number
+        const confirmedOrders = orders.filter(order => order.status === "confirmed");
+        const confirmedOrdersNumber = confirmedOrders.length;
+
+        // Calculate canceled orders number
+        const canceledOrdersNumber = orders.filter(order => order.status === "cancelled").length;
+
+        // Calculate average profit per sale
+        const averageSailProfet = confirmedOrdersNumber > 0
+            ? confirmedOrders.reduce((sum, order) => sum + (order.totalPrice || 0), 0) / confirmedOrdersNumber
+            : 0;
+
+        // Calculate average daily sales profit
+        const ordersByDate = {};
+        confirmedOrders.forEach(order => {
+            if (order.date) {
+                const date = new Date(order.date).toDateString();
+                if (!ordersByDate[date]) {
+                    ordersByDate[date] = { total: 0, count: 0 };
+                }
+                ordersByDate[date].total += order.totalPrice || 0;
+                ordersByDate[date].count += 1;
+            }
+        });
+
+        const totalDays = Object.keys(ordersByDate).length;
+        const averageDaylySailProfet = totalDays > 0
+            ? Object.values(ordersByDate).reduce((sum, day) => sum + day.total, 0) / totalDays
+            : 0;
+
+        // Calculate sales number for each month
+        const everymonthSailsNumber = {};
+        confirmedOrders.forEach(order => {
+            if (order.date) {
+                const date = new Date(order.date);
+                const monthYear = `${date.getMonth() + 1}-${date.getFullYear()}`;
+                if (!everymonthSailsNumber[monthYear]) {
+                    everymonthSailsNumber[monthYear] = 0;
+                }
+                everymonthSailsNumber[monthYear]++;
+            }
+        });
+
+        // Get opening and closing times
+        const opentime = {
+            am: store.opentimeam,
+            pm: store.opentimepm
+        };
+
+        const closetime = {
+            am: store.closetimeam,
+            pm: store.closetimepm
+        };
+
+        // Get open condition
+        const opencondition = store.openCondition;
+
+        // Calculate most liked items
+        const itemCountMap = {};
+
+        orders.forEach(order => {
+            if (order.items && Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    const itemId = item.id || item._id;
+                    if (itemId) {
+                        if (!itemCountMap[itemId]) {
+                            itemCountMap[itemId] = {
+                                count: 0,
+                                item: item
+                            };
+                        }
+                        itemCountMap[itemId].count += item.quantity || 1;
+                    }
+                });
+            }
+        });
+
+        // Get top 10 most ordered items
+        const itemsArray = Object.values(itemCountMap);
+        const mopstlikeditems = itemsArray
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 10)
+            .map(entry => ({
+                ...entry.item,
+                orderCount: entry.count
+            }));
+
+        // Create response object
+        const controlPanel = {
+            totalProfet,
+            averageDaylySailProfet,
+            totalOrdersNumber,
+            confirmedOrdersNumber,
+            canceledOrdersNumber,
+            averageSailProfet,
+            everymonthSailsNumber,
+            opentime,
+            closetime,
+            opencondition,
+            mopstlikeditems
+        }
+
+        console.log(controlPanel)
+
+        res.status(200).json(controlPanel);
+
+    } catch (error) {
+        console.error("Control Panel Error:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
+module.exports = router;
