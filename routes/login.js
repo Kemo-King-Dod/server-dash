@@ -31,7 +31,7 @@ route.post("/login", async (req, res) => {
 
         // Find user across all collections
         let exist = await Admin.findOne({ phone })
-        if (!exist) exist = await Store.findOne({ phone }, { items: 0 })
+        if (!exist) exist = await Store.findOne({ phone })
         if (!exist) exist = await User.findOne({ phone })
         if (!exist) exist = await Driver.findOne({ phone })
 
@@ -78,7 +78,7 @@ route.post("/login", async (req, res) => {
                 }
             }
         }
-        console.log(exist)
+        console.log(exist.opentimeam)
 
         res.status(200).json(response)
 
