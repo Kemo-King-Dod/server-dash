@@ -102,19 +102,19 @@ const stores = new Schema({
         type: Date
     },
     opentimeam: {
-        type: Date,
+        type: String,
         default: null
     },
     closetimeam: {
-        type: Date,
+        type: String,
         default: null
     },
     opentimepm: {
-        type: Date,
+        type: String,
         default: null
     },
     closetimepm: {
-        type: Date,
+        type: String,
         default: null
     },
     // اللي المحل يبيه منا
