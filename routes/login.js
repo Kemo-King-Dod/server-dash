@@ -78,7 +78,7 @@ route.post("/login", async (req, res) => {
                 }
             }
         }
-        console.log(response)
+        console.log(exist)
 
         res.status(200).json(response)
 
