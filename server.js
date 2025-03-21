@@ -86,6 +86,8 @@ app.use(chat);
 const storeSettings = require("./routes/storeSettings.js");
 app.use(storeSettings);
 
+const controlPanel = require("./routes/controlPanel.js");
+app.use(controlPanel);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
