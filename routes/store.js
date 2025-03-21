@@ -126,7 +126,7 @@ router.get('/getStores', auth, async (req, res) => {
         //     }
 
         // }
-    }
+    // }
 
         res.status(200).json({
         error: false,
