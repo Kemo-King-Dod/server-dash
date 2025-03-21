@@ -71,10 +71,10 @@ route.post("/login", async (req, res) => {
                     storeType: storeType,
                     status: exist.status ? exist.status : null,
                     cancelOrderLimit: exist.cancelOrderLimit || 0,
-                    opentimeam: exist.opentimeam || 0,
-                    opentimepm: exist.opentimepm || 0,
-                    closetimeam: exist.closetimeam || 0,
-                    closetimepm: exist.closetimepm || 0,
+                    opentimeam: exist.opentimeam || '',
+                    opentimepm: exist.opentimepm || '',
+                    closetimeam: exist.closetimeam || '',
+                    closetimepm: exist.closetimepm || '',
                 }
             }
         }
