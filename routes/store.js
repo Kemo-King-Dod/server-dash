@@ -24,7 +24,6 @@ router.get('/getStore', auth, async (req, res) => {
 
 router.get('/getStores', auth, async (req, res) => {
     try {
-
         const id = req.userId
         const stores = await Store.find({}, { password: 0, items: 0 })
 
@@ -65,6 +64,60 @@ router.get('/getStores', auth, async (req, res) => {
                         stores[i]._doc.isFollow = true;
                     }
                 }
+            }
+        }
+
+        if (id) {
+            // if data now is out of open close times make openCondition false
+            for (var i = 0; i < stores.length; i++) {
+                // if data now is out of open close times make openCondition false
+                for (var i = 0; i < stores.length; i++) {
+                    const store = stores[i];
+
+                    // Get current time
+                    const now = new Date();
+                    const currentHour = now.getHours();
+                    const currentMinute = now.getMinutes();
+                    const currentTime = currentHour * 60 + currentMinute; // Convert current time to minutes
+
+                    const openTimeAM = convertTimeToMinutes(store.opentimeam);
+                    const closeTimeAM = convertTimeToMinutes(store.closetimeam);
+                    const openTimePM = convertTimeToMinutes(store.opentimepm);
+                    const closeTimePM = convertTimeToMinutes(store.closetimepm);
+
+                    let isWithinOperatingHours = false;
+
+                    // Check morning hours
+                    if (openTimeAM !== null && closeTimeAM !== null) {
+                        if (closeTimeAM > openTimeAM) {
+                            // Normal morning period
+                            isWithinOperatingHours = isWithinOperatingHours ||
+                                (currentTime >= openTimeAM && currentTime <= closeTimeAM);
+                        } else {
+                            // Overnight morning period
+                            isWithinOperatingHours = isWithinOperatingHours ||
+                                (currentTime >= openTimeAM || currentTime <= closeTimeAM);
+                        }
+                    }
+
+                    // Check evening hours
+                    if (openTimePM !== null && closeTimePM !== null) {
+                        if (closeTimePM > openTimePM) {
+                            // Normal evening period
+                            isWithinOperatingHours = isWithinOperatingHours ||
+                                (currentTime >= openTimePM && currentTime <= closeTimePM);
+                        } else {
+                            // Overnight evening period
+                            isWithinOperatingHours = isWithinOperatingHours ||
+                                (currentTime >= openTimePM || currentTime <= closeTimePM);
+                        }
+                    }
+
+                    // Update store's openCondition
+                    await Store.findByIdAndUpdate(store._id, { openCondition: isWithinOperatingHours });
+                    stores[i].openCondition = isWithinOperatingHours;
+                }
+
             }
         }
 
@@ -170,3 +223,9 @@ router.post('/changeOpenTime', auth, async (req, res) => {
 })
 
 module.exports = router
+
+const convertTimeToMinutes = (timeStr) => {
+    if (!timeStr) return null;
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+}

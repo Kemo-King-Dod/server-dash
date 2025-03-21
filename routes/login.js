@@ -78,7 +78,6 @@ route.post("/login", async (req, res) => {
                 }
             }
         }
-        console.log(exist.opentimeam)
 
         res.status(200).json(response)
 
