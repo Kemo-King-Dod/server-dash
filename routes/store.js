@@ -48,8 +48,6 @@ router.get('/getStores', async (req, res) => {
             if (closePMHour < 7) {
                 closePMHour += 24;
             }
-            console.log(hours)
-
             if (hours < 7) {
                 if (closePMHour < 10) {
                     hours += 24;
