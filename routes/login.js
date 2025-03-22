@@ -93,6 +93,7 @@ route.post("/login", async (req, res) => {
 route.post("/isPhoneExist", async (req, res) => {
     try {
         const { phone } = req.body;
+        console.log(phone)
 
         // Find user across all collections
         let user = await Admin.findOne({ phone });
