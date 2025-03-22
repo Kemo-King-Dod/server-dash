@@ -197,6 +197,7 @@ router.post('/checkOtp', async (req, res) => {
 router.post('/newPassword', async (req, res) => {
     try {
         const { phone, newPassword, token } = req.body;
+        console.log(req.body)
 
         // Find user across all collections
         let user = await Admin.findOne({ phone });
