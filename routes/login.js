@@ -90,7 +90,7 @@ route.post("/login", async (req, res) => {
     }
 })
 
-route.post("/forgotPassword", async (req, res) => {
+route.post("/isPhoneExist", async (req, res) => {
     try {
         const { phone } = req.body;
 
