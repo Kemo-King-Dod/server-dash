@@ -44,15 +44,15 @@ router.get('/getStores', async (req, res) => {
             let closePMHour = parseInt(stores[i].closetimepm.split(':')[0]);
             const closePMMinute = parseInt(stores[i].closetimepm.split(':')[1]);
 
-            console.log(openAMHour + ' ' + openAMMinute)
-            console.log(closeAMHour + ' ' + closeAMMinute)
-            console.log(openPMHour + ' ' + openPMMinute)
-            console.log(closePMHour + ' ' + closePMMinute)
-
             // Handle after-midnight closing times (e.g., 2:00 AM becomes 26:00)
             if (closePMHour < 10) {
                 closePMHour += 24;
             }
+
+            console.log(openAMHour + ' ' + openAMMinute)
+            console.log(closeAMHour + ' ' + closeAMMinute)
+            console.log(openPMHour + ' ' + openPMMinute)
+            console.log(closePMHour + ' ' + closePMMinute)
 
             // Convert current time to minutes for easier comparison
             const currentTimeInMinutes = hours * 60 + minutes;
@@ -60,6 +60,13 @@ router.get('/getStores', async (req, res) => {
             const closeAMInMinutes = closeAMHour * 60 + closeAMMinute;
             const openPMInMinutes = openPMHour * 60 + openPMMinute;
             const closePMInMinutes = closePMHour * 60 + closePMMinute;
+
+
+            console.log(currentTimeInMinutes)
+            console.log(openAMInMinutes)
+            console.log(closeAMInMinutes)
+            console.log(openPMInMinutes)
+            console.log(closePMInMinutes)
 
             // Check if current time falls within either AM or PM opening hours
             stores[i].openCondition =
