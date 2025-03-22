@@ -6,7 +6,7 @@ const Store = require("../database/store")
 const User = require("../database/users")
 const Driver = require("../database/driver")
 const Admin = require("../database/admin")
-const crypto = require('crypto');
+const { auth } = require("../middleware/auth")
 // const nodemailer = require('nodemailer');
 const Verification = require("../database/verifications")
 
@@ -15,15 +15,6 @@ const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman"
 const sign = function (id, type) {
     return jwt.sign({ id, type }, JWT_SECRET)
 }
-
-// Configure nodemailer (add your email service credentials)
-// const transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//         user: 'your-email@gmail.com',
-//         pass: 'your-app-specific-password'
-//     }
-// });
 
 route.post("/login", async (req, res) => {
     try {
@@ -139,6 +130,7 @@ route.post("/isPhoneExist", async (req, res) => {
 route.post("/verifyCode", async (req, res) => {
     try {
         const { phone, code } = req.body;
+        console.log(req.body)
 
         const verification = await Verification.findOne({
             phone,
@@ -167,9 +159,10 @@ route.post("/verifyCode", async (req, res) => {
     }
 });
 
-route.post("/resetPassword", async (req, res) => {
+route.post("/resetPassword", auth, async (req, res) => {
     try {
         const { phone, code, newPassword } = req.body;
+        console.log(req.body)
 
         // Verify the code
         const verification = await Verification.findOne({
@@ -227,5 +220,7 @@ route.post("/resetPassword", async (req, res) => {
         });
     }
 });
+
+
 
 module.exports = route
