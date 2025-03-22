@@ -6,9 +6,9 @@ const Store = require("../database/store")
 const User = require("../database/users")
 const Driver = require("../database/driver")
 const Admin = require("../database/admin")
+const axios = require('axios')
 const { auth } = require("../middleware/auth")
-// const nodemailer = require('nodemailer');
-const Verification = require("../database/verifications")
+const router = require("./controlPanel")
 
 const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman"
 
@@ -81,7 +81,7 @@ route.post("/login", async (req, res) => {
     }
 })
 
-route.post("/isPhoneExist", async (req, res) => {
+route.post("/forgotPassword", async (req, res) => {
     try {
         const { phone } = req.body;
 
@@ -99,24 +99,36 @@ route.post("/isPhoneExist", async (req, res) => {
             });
         }
 
-        // // Generate a 6-digit verification code
-        // const verificationCode = Math.floor(100000 + Math.random() * 900000);
 
-        // // Store the code in the database
-        // await Verification.create({
-        //     phone,
-        //     code: verificationCode,
-        //     expiresAt: new Date(Date.now() + 600000) // 10 minutes from now
-        // });
+        const authResponse = await axios.post(
+            "http://otp.sadeem-factory.com/api/v1/login",
+            {
+                email: "khaliljaber2002@gmail.com",
+                password: "ANssIS@@*Kk",
+            },
+            { headers: { "Content-Type": "application/json" } }
+        );
 
-        // // In a real application, you would send this code via SMS
-        // console.log(`Verification code for ${phone}: ${verificationCode}`);
+        if (authResponse.status !== 200 || !authResponse.data.token) {
+            return res.status(403).json({
+                error: true,
+                message: "فشل في الحصول على التوكن"
+            })
+        }
 
-        res.status(200).json({
-            error: false,
-            isExist: true,
-            data: "رقم الهاتف موجود"
-        });
+        const token = authResponse.data.token.value;
+
+        // إرسال OTP
+        const otpResponse = await axios.post(
+            "https://otp.sadeem-factory.com/api/v1/pins?service_name=مُرافق",
+            { phone },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+
 
     } catch (error) {
         console.error('Forgot password error:', error);
@@ -127,55 +139,9 @@ route.post("/isPhoneExist", async (req, res) => {
     }
 });
 
-route.post("/verifyCode", async (req, res) => {
+router.post('/checkOtp', async (req, res) => {
     try {
-        const { phone, code } = req.body;
-        console.log(req.body)
-
-        const verification = await Verification.findOne({
-            phone,
-            code: parseInt(code)
-        });
-
-        if (!verification) {
-            return res.status(400).json({
-                error: true,
-                data: "رمز التحقق غير صحيح"
-            });
-        }
-
-        // Code is valid
-        res.status(200).json({
-            error: false,
-            data: "تم التحقق من الرمز بنجاح"
-        });
-
-    } catch (error) {
-        console.error('Verify code error:', error);
-        res.status(500).json({
-            error: true,
-            data: "حدث خطأ في التحقق من الرمز"
-        });
-    }
-});
-
-route.post("/resetPassword", auth, async (req, res) => {
-    try {
-        const { phone, code, newPassword } = req.body;
-        console.log(req.body)
-
-        // Verify the code
-        const verification = await Verification.findOne({
-            phone,
-            code: parseInt(code)
-        });
-
-        if (!verification) {
-            return res.status(400).json({
-                error: true,
-                data: "رمز التحقق غير صالح"
-            });
-        }
+        const { phone, otp } = req.body;
 
         // Find user across all collections
         let user = await Admin.findOne({ phone });
@@ -185,42 +151,78 @@ route.post("/resetPassword", auth, async (req, res) => {
 
         if (!user) {
             return res.status(404).json({
-                error: true,
+                error: false,
+                isExist: false,
                 data: "رقم الهاتف غير موجود"
             });
         }
 
-        // Hash the new password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        // Update password based on user type
-        if (user.userType === 'admin') {
-            await Admin.findByIdAndUpdate(user._id, { password: hashedPassword });
-        } else if (user.userType === 'store') {
-            await Store.findByIdAndUpdate(user._id, { password: hashedPassword });
-        } else if (user.userType === 'user') {
-            await User.findByIdAndUpdate(user._id, { password: hashedPassword });
-        } else if (user.userType === 'driver') {
-            await Driver.findByIdAndUpdate(user._id, { password: hashedPassword });
+        if (user.otp != otp) {
+            return res.status(403).json({
+                error: false,
+                data: "رقم التحقق غير صحيح"
+            })
         }
 
-        // Delete the verification code
-        await Verification.deleteOne({ _id: verification._id });
+        const token = sign(user._id, user.userType)
 
-        res.status(200).json({
+        res.status(201).json({
             error: false,
-            data: "تم تغيير كلمة المرور بنجاح"
+            data: {
+                token
+            }
         });
 
     } catch (error) {
-        console.error('Reset password error:', error);
+        console.error('Forgot password error:', error);
         res.status(500).json({
             error: true,
-            data: "حدث خطأ في تغيير كلمة المرور"
+            message: "رقم الهاتف غير موجود"
         });
     }
-});
+})
 
+
+router.post('/newPasswordAfterChange', async (req, res) => {
+    try {
+        const { phone, newPassword } = req.body;
+
+        // Find user across all collections
+        let user = await Admin.findOne({ phone });
+        if (!user) user = await Store.findOne({ phone });
+        if (!user) user = await User.findOne({ phone });
+        if (!user) user = await Driver.findOne({ phone });
+
+        if (!user) {
+            return res.status(404).json({
+                error: false,
+                isExist: false,
+                data: "رقم الهاتف غير موجود"
+            });
+        }
+
+        const salt = await bcrypt.genSalt(10)
+        user.password = await bcrypt.hash(req.body.newPassword, salt)
+        await user.save()
+        res.status(200).json({
+            error: false,
+            message: 'تم تحديث كلمة المرور بنجاح'
+        })
+
+        res.status(200).json({
+            error: false,
+            ischange: true,
+            massege: 'تم تغيير كلمة المرور'
+        });
+
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        res.status(500).json({
+            error: true,
+            message: "رقم الهاتف غير موجود"
+        });
+    }
+})
 
 
 module.exports = route

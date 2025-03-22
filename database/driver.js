@@ -90,6 +90,9 @@ const drivers = new Schema({
     cancelOrderLimit: {
         type: Number,
         default: 0
+    },
+    otp: {
+        type: String
     }
 })
 

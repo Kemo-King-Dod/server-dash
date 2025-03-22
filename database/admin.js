@@ -18,7 +18,10 @@ const admin = new Schema({
     userType: {
         type: String
     },
-    fcmToken:{
+    fcmToken: {
+        type: String
+    },
+    otp: {
         type: String
     }
 })

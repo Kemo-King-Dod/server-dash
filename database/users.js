@@ -69,6 +69,9 @@ const users = new Schema({
     },
     followedStores: {
         type: Array
+    },
+    otp: {
+        type: String
     }
 })
 

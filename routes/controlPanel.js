@@ -49,7 +49,7 @@ router.get('/controlPanel', auth, async (req, res) => {
             : 0;
 
         // Calculate sales number for each month
-        const everymonthSailsNumber = {};
+        const everymonthSailsNumber = [];
         confirmedOrders.forEach(order => {
             if (order.date) {
                 const date = new Date(order.date);
@@ -120,13 +120,17 @@ router.get('/controlPanel', auth, async (req, res) => {
             mopstlikeditems
         }
 
-        console.log(controlPanel)
-
-        res.status(200).json(controlPanel);
+        res.status(200).json({
+            error: false,
+            data: controlPanel
+        });
 
     } catch (error) {
         console.error("Control Panel Error:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({
+            error: true,
+            message: error
+        });
     }
 });
 
