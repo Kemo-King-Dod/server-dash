@@ -49,11 +49,6 @@ router.get('/getStores', async (req, res) => {
                 closePMHour += 24;
             }
 
-            console.log(openAMHour + ' ' + openAMMinute)
-            console.log(closeAMHour + ' ' + closeAMMinute)
-            console.log(openPMHour + ' ' + openPMMinute)
-            console.log(closePMHour + ' ' + closePMMinute)
-
             // Convert current time to minutes for easier comparison
             const currentTimeInMinutes = hours * 60 + minutes;
             const openAMInMinutes = openAMHour * 60 + openAMMinute;
@@ -61,7 +56,7 @@ router.get('/getStores', async (req, res) => {
             const openPMInMinutes = openPMHour * 60 + openPMMinute;
             const closePMInMinutes = closePMHour * 60 + closePMMinute;
 
-
+            console.log(stores[i].name)
             console.log(currentTimeInMinutes)
             console.log(openAMInMinutes)
             console.log(closeAMInMinutes)
