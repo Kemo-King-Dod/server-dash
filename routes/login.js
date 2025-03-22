@@ -81,7 +81,7 @@ route.post("/login", async (req, res) => {
     }
 })
 
-route.post("/forgotPassword", async (req, res) => {
+route.post("/isPhoneExist", async (req, res) => {
     try {
         const { phone } = req.body;
 
@@ -163,15 +163,19 @@ router.post('/checkOtp', async (req, res) => {
                 data: "رقم التحقق غير صحيح"
             })
         }
+        else {
+            const token = sign(user._id, user.userType)
 
-        const token = sign(user._id, user.userType)
+            res.status(201).json({
+                error: false,
+                data: {
+                    token
+                }
+            })
+            user.otp = ''
+            await user.save()
+        }
 
-        res.status(201).json({
-            error: false,
-            data: {
-                token
-            }
-        });
 
     } catch (error) {
         console.error('Forgot password error:', error);
@@ -183,7 +187,7 @@ router.post('/checkOtp', async (req, res) => {
 })
 
 
-router.post('/newPasswordAfterChange', async (req, res) => {
+router.post('/newPassword', async (req, res) => {
     try {
         const { phone, newPassword } = req.body;
 
@@ -202,7 +206,7 @@ router.post('/newPasswordAfterChange', async (req, res) => {
         }
 
         const salt = await bcrypt.genSalt(10)
-        user.password = await bcrypt.hash(req.body.newPassword, salt)
+        user.password = await bcrypt.hash(newPassword, salt)
         await user.save()
         res.status(200).json({
             error: false,
