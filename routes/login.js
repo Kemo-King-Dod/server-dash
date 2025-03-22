@@ -129,7 +129,7 @@ route.post("/isPhoneExist", async (req, res) => {
                 }
             })
 
-        user.otp = 
+        user.otp = otpResponse
 
         res.status(200).json({
             isExist: true,
