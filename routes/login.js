@@ -233,7 +233,7 @@ router.post('/newPassword', async (req, res) => {
         console.error('Forgot password error:', error);
         res.status(500).json({
             error: true,
-            message: "رقم الهاتف غير موجود"
+            message: error.message
         });
     }
 })
