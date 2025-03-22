@@ -196,8 +196,7 @@ router.post('/checkOtp', async (req, res) => {
 
 router.post('/newPassword', async (req, res) => {
     try {
-        const { phone, newPassword, token } = req.body;
-        console.log(req.body)
+        const { phone, password, token } = req.body
 
         // Find user across all collections
         let user = await Admin.findOne({ phone });
@@ -216,7 +215,7 @@ router.post('/newPassword', async (req, res) => {
         const decoded = await jwt.verify(token, JWT_SECRET)
 
         const salt = await bcrypt.genSalt(10)
-        user.password = await bcrypt.hash(newPassword, salt)
+        user.password = await bcrypt.hash(password, salt)
         await user.save()
 
         res.status(200).json({
