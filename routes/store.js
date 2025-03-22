@@ -44,6 +44,15 @@ router.get('/getStores', async (req, res) => {
             let closePMHour = parseInt(stores[i].closetimepm.split(':')[0]);
             const closePMMinute = parseInt(stores[i].closetimepm.split(':')[1]);
 
+            console.log(openAMHour)
+            console.log(openAMMinute)
+            console.log(closeAMHour)
+            console.log(closeAMMinute)
+            console.log(openPMHour)
+            console.log(openPMMinute)
+            console.log(closePMHour)
+            console.log(closePMMinute)
+
             // Handle after-midnight closing times (e.g., 2:00 AM becomes 26:00)
             if (closePMHour < 10) {
                 closePMHour += 24;
