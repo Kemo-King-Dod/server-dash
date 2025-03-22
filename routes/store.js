@@ -54,7 +54,13 @@ router.get('/getStores', async (req, res) => {
             }
 
             if (hours < 7) {
-                hours += 24;
+                if (closePMHour < 10) {
+                    console.log('+++++++++++++++++')
+                    console.log(closePMHour)
+                    hours += 24;
+                    console.log(closePMHour)
+                    console.log('+++++++++++++++++')
+                }
             }
 
             // Convert current time to minutes for easier comparison
