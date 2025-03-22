@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Store = require('../database/store');
+const Item = require('../database/items');
 const orderRecord = require('../database/orders_record');
 const { auth } = require('../middleware/auth');
 const mongoose = require('mongoose');
@@ -97,14 +98,9 @@ router.get('/controlPanel', auth, async (req, res) => {
         });
 
         // Get top 10 most ordered items
-        const itemsArray = Object.values(itemCountMap);
-        const mostLikedItems = itemsArray
-            .sort((a, b) => b.count - a.count)
-            .slice(0, 10)
-            .map(entry => ({
-                ...entry.item,
-                orderCount: entry.count
-            }));
+        const mostLikedItems = await Item.find({ storeID: userId })
+            .sort({ likes: -1 })
+            .limit(3);
 
         // Create response object
         const controlPanel = {
