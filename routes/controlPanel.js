@@ -12,7 +12,6 @@ router.get('/controlPanel', auth, async (req, res) => {
         const store = await Store.findById(userId);
 
         const orders = await orderRecord.find({ "store.id": new mongoose.Types.ObjectId(userId) })
-        console.log(orders)
 
         // Calculate total profit
         const totalProfet = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
