@@ -23,39 +23,10 @@ router.get('/getStore', auth, async (req, res) => {
     }
 })
 
-router.get('/getStores', auth, async (req, res) => {
+router.get('/getStores', async (req, res) => {
     try {
         const id = req.userId
         const stores = await Store.find({}, { password: 0, items: 0 })
-
-        if (req.headers.isvisiter && req.headers.isvisiter == 'true') {
-            return res.status(200).json({
-                error: false,
-                data: stores
-            })
-        }
-
-        // Add isFavorite property to each item
-        for (var i = 0; i < stores.length; i++) {
-            stores[i]._doc.isFollow = false;
-            stores[i]._doc.isFavorite = false;
-        }
-
-        if (id) {
-            const user = await User.findOne({ _id: id });
-            for (var i = 0; i < stores.length; i++) {
-                for (var j = 0; j < user.favorateStors.length; j++) {
-                    if (user.favorateStors[j]._id.toString() == stores[i]._id.toString()) {
-                        stores[i]._doc.isFavorite = true;
-                    }
-                }
-                for (var j = 0; j < user.followedStores.length; j++) {
-                    if (user.followedStores[j].toString() == stores[i]._id.toString()) {
-                        stores[i]._doc.isFollow = true;
-                    }
-                }
-            }
-        }
 
         // Check if current time is between opening and closing times
         for (let i = 0; i < stores.length; i++) {
@@ -86,6 +57,36 @@ router.get('/getStores', auth, async (req, res) => {
                 (currentTimeInMinutes >= openPMInMinutes && currentTimeInMinutes <= closePMInMinutes);
         }
 
+        if (req.headers.isvisiter && req.headers.isvisiter == 'true') {
+            return res.status(200).json({
+                error: false,
+                data: stores
+            })
+        }
+
+        // Add isFavorite property to each item
+        for (var i = 0; i < stores.length; i++) {
+            stores[i]._doc.isFollow = false;
+            stores[i]._doc.isFavorite = false;
+        }
+
+        if (id) {
+            const user = await User.findOne({ _id: id });
+            for (var i = 0; i < stores.length; i++) {
+                for (var j = 0; j < user.favorateStors.length; j++) {
+                    if (user.favorateStors[j]._id.toString() == stores[i]._id.toString()) {
+                        stores[i]._doc.isFavorite = true;
+                    }
+                }
+                for (var j = 0; j < user.followedStores.length; j++) {
+                    if (user.followedStores[j].toString() == stores[i]._id.toString()) {
+                        stores[i]._doc.isFollow = true;
+                    }
+                }
+            }
+        }
+
+        console.log(stores[0].openCondition)
 
         res.status(200).json({
             error: false,
