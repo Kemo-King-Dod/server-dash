@@ -51,18 +51,14 @@ router.get('/controlPanel', auth, async (req, res) => {
             : 0;
 
         // Calculate sales number for each month
-        const everyMonthSalesNumber = [];
-        confirmedOrders.forEach(order => {
-            if (order.date) {
-                const date = new Date(order.date);
-                const monthYear = `${date.getMonth() + 1}-${date.getFullYear()}`;
-                if (!everyMonthSalesNumber[monthYear]) {
-                    everyMonthSalesNumber[monthYear] = 0;
-                }
-                everyMonthSalesNumber[monthYear]++;
-            }
-        });
-
+        const lastSevenDays = [0, 0, 0, 0, 0, 0, 0];
+        for (var i = 0; i < 7; i++) {
+            const date = new Date().getDay() - i;
+            confirmedOrders.forEach(order => {
+                if (new Date(order.date).getDay() == date)
+                    lastSevenDays[i] += order.totalPrice
+            })
+        }
 
         // Get opening and closing times
         const opentime = {
@@ -111,7 +107,7 @@ router.get('/controlPanel', auth, async (req, res) => {
             confirmedOrdersNumber,
             canceledOrdersNumber,
             averageSaleProfit,
-            everyMonthSalesNumber,
+            lastSevenDays,
             opentime,
             closetime,
             opencondition,
