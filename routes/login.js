@@ -7,7 +7,6 @@ const User = require("../database/users")
 const Driver = require("../database/driver")
 const Admin = require("../database/admin")
 const axios = require('axios')
-const { auth } = require("../middleware/auth")
 const router = require("./controlPanel")
 
 const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman"
@@ -195,9 +194,9 @@ router.post('/checkOtp', async (req, res) => {
 })
 
 
-router.post('/newPassword', auth, async (req, res) => {
+router.post('/newPassword', async (req, res) => {
     try {
-        const { phone, newPassword } = req.body;
+        const { phone, newPassword, token } = req.body;
 
         // Find user across all collections
         let user = await Admin.findOne({ phone });
@@ -212,6 +211,8 @@ router.post('/newPassword', auth, async (req, res) => {
                 data: "رقم الهاتف غير موجود"
             });
         }
+
+        const decoded = await jwt.verify(token, JWT_SECRET)
 
         const salt = await bcrypt.genSalt(10)
         user.password = await bcrypt.hash(newPassword, salt)

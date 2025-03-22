@@ -13,8 +13,7 @@ const auth = async (req, res, next) => {
             });
         }
 
-        const decoded = jwt.verify(token, JWT_SECRET);
-        console.log(token)
+        const decoded = await jwt.verify(token, JWT_SECRET)
         req.userId = decoded.id;
         next();
     } catch (error) {
@@ -25,4 +24,4 @@ const auth = async (req, res, next) => {
     }
 };
 
-module.exports = {auth};
+module.exports = { auth };
