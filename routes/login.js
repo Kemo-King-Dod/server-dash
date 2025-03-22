@@ -132,6 +132,7 @@ route.post("/isPhoneExist", async (req, res) => {
         await user.save()
 
         res.status(200).json({
+            error: false,
             isExist: true,
             massege: 'قم بإدخال رمز التحقق عند الوصول'
         })
@@ -194,7 +195,7 @@ router.post('/checkOtp', async (req, res) => {
 })
 
 
-router.post('/newPassword', async (req, res) => {
+router.post('/newPassword', auth, async (req, res) => {
     try {
         const { phone, newPassword } = req.body;
 
