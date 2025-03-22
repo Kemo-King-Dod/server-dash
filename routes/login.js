@@ -129,6 +129,11 @@ route.post("/isPhoneExist", async (req, res) => {
                 }
             })
 
+        res.status(200).json({
+            isExist: true,
+            massege: 'قم بإدخال رمز التحقق عند الوصول'
+        })
+
 
     } catch (error) {
         console.error('Forgot password error:', error);
