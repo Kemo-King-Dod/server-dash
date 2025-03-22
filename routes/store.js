@@ -4,6 +4,7 @@ const User = require('../database/users');
 const Ordre = require('../database/orders');
 const Store = require('../database/store');
 const { auth } = require('../middleware/auth')
+const bcrypt = require('bcrypt');
 
 router.get('/getStore', auth, async (req, res) => {
     try {
@@ -36,6 +37,7 @@ router.get('/getStores', auth, async (req, res) => {
 
         // Add isFavorite property to each item
         for (var i = 0; i < stores.length; i++) {
+            stores[i]._doc.isFollow = false;
             stores[i]._doc.isFavorite = false;
         }
 
@@ -47,18 +49,6 @@ router.get('/getStores', auth, async (req, res) => {
                         stores[i]._doc.isFavorite = true;
                     }
                 }
-            }
-        }
-
-
-        // Add isFollow property to each store
-        for (var i = 0; i < stores.length; i++) {
-            stores[i]._doc.isFollow = false;
-        }
-
-        if (id) {
-            const user = await User.findOne({ _id: id });
-            for (var i = 0; i < stores.length; i++) {
                 for (var j = 0; j < user.followedStores.length; j++) {
                     if (user.followedStores[j].toString() == stores[i]._id.toString()) {
                         stores[i]._doc.isFollow = true;
@@ -67,78 +57,47 @@ router.get('/getStores', auth, async (req, res) => {
             }
         }
 
-        // if (id) {
-        //     // if data now is out of open close times make openCondition false
-        //     for (var i = 0; i < stores.length; i++) {
-        //         const store = stores[i];
+        // Check if current time is between opening and closing times
+        for (let i = 0; i < stores.length; i++) {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
 
-        //         // Get current time
-        //         const now = new Date();
-        //         const currentHour = now.getHours();
-        //         const currentMinute = now.getMinutes();
-        //         const currentTime = currentHour * 60 + currentMinute; // Convert current time to minutes
+            // Parse store hours
+            const openAMHour = parseInt(stores[i].opentimeam.split(':')[0]);
+            const openAMMinute = parseInt(stores[i].opentimeam.split(':')[1]);
+            const closeAMHour = parseInt(stores[i].closetimeam.split(':')[0]);
+            const closeAMMinute = parseInt(stores[i].closetimeam.split(':')[1]);
+            const openPMHour = parseInt(stores[i].opentimepm.split(':')[0]);
+            const openPMMinute = parseInt(stores[i].opentimepm.split(':')[1]);
+            const closePMHour = parseInt(stores[i].closetimepm.split(':')[0]);
+            const closePMMinute = parseInt(stores[i].closetimepm.split(':')[1]);
 
-        //         // Convert store times to minutes for easier comparison
-        //         const convertTimeToMinutes = (timeStr) => {
-        //             if (!timeStr) return null;
-        //             const [hours, minutes] = timeStr.split(':').map(Number);
-        //             return hours * 60 + minutes;
-        //         };
+            // Convert current time to minutes for easier comparison
+            const currentTimeInMinutes = hours * 60 + minutes;
+            const openAMInMinutes = openAMHour * 60 + openAMMinute;
+            const closeAMInMinutes = closeAMHour * 60 + closeAMMinute;
+            const openPMInMinutes = openPMHour * 60 + openPMMinute;
+            const closePMInMinutes = closePMHour * 60 + closePMMinute;
 
-        //         const openTimeAM = convertTimeToMinutes(store.opentimeam);
-        //         const closeTimeAM = convertTimeToMinutes(store.closetimeam);
-        //         const openTimePM = convertTimeToMinutes(store.opentimepm);
-        //         const closeTimePM = convertTimeToMinutes(store.closetimepm);
+            // Check if current time falls within either AM or PM opening hours
+            stores[i].openCondition =
+                (currentTimeInMinutes >= openAMInMinutes && currentTimeInMinutes <= closeAMInMinutes) ||
+                (currentTimeInMinutes >= openPMInMinutes && currentTimeInMinutes <= closePMInMinutes);
+        }
 
-        //         console.log(openTimeAM + '' + closeTimeAM + '' + openTimePM + '' + openTimePM)
-
-        //         let isWithinOperatingHours = false;
-
-        //         // Check morning hours
-        //         if (openTimeAM !== null && closeTimeAM !== null) {
-        //             if (closeTimeAM > openTimeAM) {
-        //                 // Normal morning period
-        //                 isWithinOperatingHours = isWithinOperatingHours ||
-        //                     (currentTime >= openTimeAM && currentTime <= closeTimeAM);
-        //             } else {
-        //                 // Overnight morning period
-        //                 isWithinOperatingHours = isWithinOperatingHours ||
-        //                     (currentTime >= openTimeAM || currentTime <= closeTimeAM);
-        //             }
-        //         }
-
-        //         // Check evening hours
-        //         if (openTimePM !== null && closeTimePM !== null) {
-        //             if (closeTimePM > openTimePM) {
-        //                 // Normal evening period
-        //                 isWithinOperatingHours = isWithinOperatingHours ||
-        //                     (currentTime >= openTimePM && currentTime <= closeTimePM);
-        //             } else {
-        //                 // Overnight evening period
-        //                 isWithinOperatingHours = isWithinOperatingHours ||
-        //                     (currentTime >= openTimePM || currentTime <= closeTimePM);
-        //             }
-        //         }
-
-        //         // Update store's openCondition
-        //         await Store.findByIdAndUpdate(store._id, { openCondition: isWithinOperatingHours });
-        //         stores[i].openCondition = isWithinOperatingHours;
-        //     }
-
-        // }
-    // }
 
         res.status(200).json({
-        error: false,
-        data: stores
-    })
-} catch (error) {
-    console.log(error)
-    res.status(500).json({
-        error: true,
-        message: error.message
-    })
-}
+            error: false,
+            data: stores
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            error: true,
+            message: error.message
+        })
+    }
 })
 
 
@@ -157,7 +116,7 @@ router.post('/alterStorePassword', auth, async (req, res) => {
             })
         }
         else {
-            res.status(200).json({
+            res.status(401).json({
                 error: true,
                 message: 'كلمة المرور الحالية غير صحيحة'
             })
@@ -166,7 +125,7 @@ router.post('/alterStorePassword', auth, async (req, res) => {
         console.log(err)
         res.status(500).json({
             error: true,
-            message: err
+            message: err.message
         })
     }
 })

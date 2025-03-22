@@ -129,6 +129,8 @@ route.post("/isPhoneExist", async (req, res) => {
                 }
             })
 
+        user.otp = 
+
         res.status(200).json({
             isExist: true,
             massege: 'قم بإدخال رمز التحقق عند الوصول'

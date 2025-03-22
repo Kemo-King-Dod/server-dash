@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../database/users');
-const Driver = require('../database/driver')
-const Store = require('../database/store')
+const User = require('../database/users')
 const Addresse = require('../database/address')
 const bcrypt = require('bcrypt')
 const { auth } = require('../middleware/auth')
