@@ -104,7 +104,6 @@ route.post("/isPhoneExist", async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 error: true,
-                isExist: true,
                 data: "رقم الهاتف غير موجود"
             });
         }
@@ -124,6 +123,7 @@ route.post("/isPhoneExist", async (req, res) => {
 
         res.status(200).json({
             error: false,
+            isExist: true,
             data: "رقم الهاتف موجود"
         });
 
