@@ -128,7 +128,7 @@ route.post("/isPhoneExist", async (req, res) => {
                     "Authorization": `Bearer ${token}`
                 }
             })
-
+        console.log(otpResponse)
         user.otp = otpResponse
         await user.save()
 
