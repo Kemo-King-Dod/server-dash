@@ -24,7 +24,7 @@ router.get('/controlPanel', auth, async (req, res) => {
         const confirmedOrdersNumber = confirmedOrders.length;
 
         // Calculate canceled orders number
-        const canceledOrdersNumber = orders.filter(order => order.status === "cancelled").length;
+        const canceledOrdersNumber = orders.filter(order => order.status === "canceled").length;
 
         // Calculate average profit per sale
         const averageSailProfet = confirmedOrdersNumber > 0
