@@ -428,8 +428,8 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
             date: order.date,
             items: order.items,
             totalPrice: order.totalPrice,
-            status: "cancelled",
-            type: "cancelled",
+            status: "canceled",
+            type: "canceled",
             address: order.address,
             distenationPrice: order.distenationPrice,
             reseveCode: order.reserveCode,
@@ -484,8 +484,8 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
             date: order.date,
             items: order.items,
             totalPrice: order.totalPrice,
-            status: "cancelled",
-            type: "cancelled",
+            status: "canceled",
+            type: "canceled",
             address: order.address,
             distenationPrice: order.distenationPrice,
             reseveCode: order.reserveCode,
@@ -524,8 +524,8 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         }
 
         if (order.status == "onWay") {
-            order.status = "cancelled"
-            order.type = "cancelled"
+            order.status = "canceled"
+            order.type = "canceled"
             // Increment cancel limit
             driver.cancelOrderLimit = (driver.cancelOrderLimit || 0) + 1;
             if (driver.cancelOrderLimit >= 5) {
