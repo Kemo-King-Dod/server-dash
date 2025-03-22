@@ -102,6 +102,7 @@ route.post("/isPhoneExist", async (req, res) => {
 
         if (!user) {
             return res.status(404).json({
+                error: false,
                 isExist: false,
                 data: "رقم الهاتف غير موجود"
             });
