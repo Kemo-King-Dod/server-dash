@@ -51,7 +51,7 @@ router.get('/controlPanel', auth, async (req, res) => {
             : 0;
 
         // Calculate sales number for each month
-        const lastSevenDays = [0, 0, 0, 0, 0, 0, 0];
+        const lastSevenDays = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
         for (var i = 0; i < 7; i++) {
             const date = new Date().getDay() - i;
             confirmedOrders.forEach(order => {
