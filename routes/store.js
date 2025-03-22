@@ -102,8 +102,6 @@ router.get('/getStores', async (req, res) => {
             }
         }
 
-        console.log(stores[0].openCondition)
-
         res.status(200).json({
             error: false,
             data: stores
