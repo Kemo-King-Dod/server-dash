@@ -120,7 +120,7 @@ route.post("/isPhoneExist", async (req, res) => {
 
         // إرسال OTP
         const otpResponse = await axios.post(
-            "https://otp.sadeem-factory.com/api/v1/pins?service_name=مُرافق",
+            "https://otp.sadeem-factory.com/api/v1/pins?service_name=مُرافق&test=true",
             { phone },
             {
                 headers: {
@@ -128,8 +128,7 @@ route.post("/isPhoneExist", async (req, res) => {
                     "Authorization": `Bearer ${token}`
                 }
             })
-        console.log(otpResponse)
-        user.otp = otpResponse
+        user.otp = otpResponse.data.pin
         await user.save()
 
         res.status(200).json({
