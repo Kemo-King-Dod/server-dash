@@ -51,7 +51,7 @@ router.get('/controlPanel', auth, async (req, res) => {
             : 0;
 
         // Calculate sales number for each month
-        const everyMonthSalesNumber = {};
+        const everyMonthSalesNumber = [];
         confirmedOrders.forEach(order => {
             if (order.date) {
                 const date = new Date(order.date);
