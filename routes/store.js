@@ -57,6 +57,7 @@ router.get('/getStores', async (req, res) => {
             }
 
             // Convert current time to minutes for easier comparison
+            // the server time is 2 hours late from libya that is way i added + 120
             const currentTimeInMinutes = hours * 60 + 120 + minutes;
             const openAMInMinutes = openAMHour * 60 + openAMMinute;
             const closeAMInMinutes = closeAMHour * 60 + closeAMMinute;
