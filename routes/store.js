@@ -106,6 +106,11 @@ router.get('/getStores', async (req, res) => {
             error: false,
             data: stores
         })
+
+        for (let i = 0; i < stores.length; i++) {
+            console.log(stores[i].openCondition)
+            await stores[i].save()
+        }
     } catch (error) {
         console.log(error)
         res.status(500).json({
