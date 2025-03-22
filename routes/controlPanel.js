@@ -3,6 +3,7 @@ const router = express.Router();
 const Store = require('../database/store');
 const orderRecord = require('../database/orders_record');
 const { auth } = require('../middleware/auth');
+const mongoose = require('mongoose');
 
 router.get('/controlPanel', auth, async (req, res) => {
     try {
@@ -10,7 +11,7 @@ router.get('/controlPanel', auth, async (req, res) => {
 
         const store = await Store.findById(storeId);
 
-        const orders = await orderRecord.find({ "store.id": storeId.toString() })
+        const orders = await orderRecord.find({ "store.id": new mongoose.Types.ObjectId(userId) })
         console.log(orders)
 
         // Calculate total profit
