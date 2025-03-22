@@ -46,49 +46,28 @@ router.get('/getStores', async (req, res) => {
 
             // Handle after-midnight closing times (e.g., 2:00 AM becomes 26:00)
             if (closePMHour < 7) {
-                console.log('----------------')
-                console.log(closePMHour)
                 closePMHour += 24;
-                console.log(closePMHour)
-                console.log('----------------')
             }
             console.log(hours)
 
             if (hours < 7) {
                 if (closePMHour < 10) {
-                    console.log('+++++++++++++++++')
-                    console.log(closePMHour)
                     hours += 24;
-                    console.log(closePMHour)
-                    console.log('+++++++++++++++++')
                 }
             }
 
             // Convert current time to minutes for easier comparison
-            const currentTimeInMinutes = hours * 60 + minutes;
+            const currentTimeInMinutes = hours * 60 + 120 + minutes;
             const openAMInMinutes = openAMHour * 60 + openAMMinute;
             const closeAMInMinutes = closeAMHour * 60 + closeAMMinute;
             const openPMInMinutes = openPMHour * 60 + openPMMinute;
             const closePMInMinutes = closePMHour * 60 + closePMMinute;
-
-            console.log(stores[i].name)
-            console.log(currentTimeInMinutes)
-            console.log(openAMInMinutes)
-            console.log(closeAMInMinutes)
-            console.log(openPMInMinutes)
-            console.log(closePMInMinutes)
 
             // Check if current time falls within either AM or PM opening hours
             stores[i].openCondition =
                 (currentTimeInMinutes >= openAMInMinutes && currentTimeInMinutes <= closeAMInMinutes) ||
                 (currentTimeInMinutes >= openPMInMinutes && currentTimeInMinutes <= closePMInMinutes)
         }
-
-        if ((1403 >= 690 && 1403 <= 718) || (1403 >= 1230 && 1403 <= 1430))
-            console.log(true)
-        else
-            console.log(false)
-
 
         if (req.headers.isvisiter && req.headers.isvisiter == 'true') {
             return res.status(200).json({
