@@ -14,7 +14,7 @@ router.get('/controlPanel', auth, async (req, res) => {
         const orders = await orderRecord.find({ "store.id": new mongoose.Types.ObjectId(userId) })
 
         // Calculate total profit
-        const totalProfet = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+        const totalProfit = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
 
         // Calculate total orders number
         const totalOrdersNumber = orders.length;
@@ -27,7 +27,7 @@ router.get('/controlPanel', auth, async (req, res) => {
         const canceledOrdersNumber = orders.filter(order => order.status === "canceled").length;
 
         // Calculate average profit per sale
-        const averageSailProfet = confirmedOrdersNumber > 0
+        const averageSaleProfit = confirmedOrdersNumber > 0
             ? confirmedOrders.reduce((sum, order) => sum + (order.totalPrice || 0), 0) / confirmedOrdersNumber
             : 0;
 
@@ -45,20 +45,20 @@ router.get('/controlPanel', auth, async (req, res) => {
         });
 
         const totalDays = Object.keys(ordersByDate).length;
-        const averageDaylySailProfet = totalDays > 0
+        const averageDailySaleProfit = totalDays > 0
             ? Object.values(ordersByDate).reduce((sum, day) => sum + day.total, 0) / totalDays
             : 0;
 
         // Calculate sales number for each month
-        const everymonthSailsNumber = [];
+        const everyMonthSalesNumber = {};
         confirmedOrders.forEach(order => {
             if (order.date) {
                 const date = new Date(order.date);
                 const monthYear = `${date.getMonth() + 1}-${date.getFullYear()}`;
-                if (!everymonthSailsNumber[monthYear]) {
-                    everymonthSailsNumber[monthYear] = 0;
+                if (!everyMonthSalesNumber[monthYear]) {
+                    everyMonthSalesNumber[monthYear] = 0;
                 }
-                everymonthSailsNumber[monthYear]++;
+                everyMonthSalesNumber[monthYear]++;
             }
         });
 
@@ -98,7 +98,7 @@ router.get('/controlPanel', auth, async (req, res) => {
 
         // Get top 10 most ordered items
         const itemsArray = Object.values(itemCountMap);
-        const mopstlikeditems = itemsArray
+        const mostLikedItems = itemsArray
             .sort((a, b) => b.count - a.count)
             .slice(0, 10)
             .map(entry => ({
@@ -108,17 +108,17 @@ router.get('/controlPanel', auth, async (req, res) => {
 
         // Create response object
         const controlPanel = {
-            totalProfet,
-            averageDaylySailProfet,
+            totalProfit,
+            averageDailySaleProfit,
             totalOrdersNumber,
             confirmedOrdersNumber,
             canceledOrdersNumber,
-            averageSailProfet,
-            everymonthSailsNumber,
+            averageSaleProfit,
+            everyMonthSalesNumber,
             opentime,
             closetime,
             opencondition,
-            mopstlikeditems
+            mostLikedItems
         }
 
         res.status(200).json({
@@ -130,7 +130,7 @@ router.get('/controlPanel', auth, async (req, res) => {
         console.error("Control Panel Error:", error);
         res.status(500).json({
             error: true,
-            message: error
+            message: error.message // Added .message to show only error message
         });
     }
 });
