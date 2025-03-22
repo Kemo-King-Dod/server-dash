@@ -52,6 +52,7 @@ router.get('/getStores', async (req, res) => {
                 console.log(closePMHour)
                 console.log('----------------')
             }
+            console.log(hours)
 
             if (hours < 7) {
                 if (closePMHour < 10) {
