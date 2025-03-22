@@ -45,7 +45,7 @@ router.get('/getStores', async (req, res) => {
             const closePMMinute = parseInt(stores[i].closetimepm.split(':')[1]);
 
             // Handle after-midnight closing times (e.g., 2:00 AM becomes 26:00)
-            if (closePMHour < 10) {
+            if (closePMHour.parseInt() < 10) {
                 closePMHour += 24;
             }
 
@@ -66,8 +66,13 @@ router.get('/getStores', async (req, res) => {
             // Check if current time falls within either AM or PM opening hours
             stores[i].openCondition =
                 (currentTimeInMinutes >= openAMInMinutes && currentTimeInMinutes <= closeAMInMinutes) ||
-                (currentTimeInMinutes >= openPMInMinutes && currentTimeInMinutes <= closePMInMinutes);
+                (currentTimeInMinutes >= openPMInMinutes && currentTimeInMinutes <= closePMInMinutes)
         }
+
+        if ((1403 >= 690 && 1403 <= 718) || (1403 >= 1230 && 1403 <= 1430))
+            console.log(true)
+        else
+            console.log(false)
 
 
         if (req.headers.isvisiter && req.headers.isvisiter == 'true') {
