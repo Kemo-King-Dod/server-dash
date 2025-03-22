@@ -7,9 +7,9 @@ const mongoose = require('mongoose');
 
 router.get('/controlPanel', auth, async (req, res) => {
     try {
-        const storeId = req.userId;
+        const userId = req.userId;
 
-        const store = await Store.findById(storeId);
+        const store = await Store.findById(userId);
 
         const orders = await orderRecord.find({ "store.id": new mongoose.Types.ObjectId(userId) })
         console.log(orders)
