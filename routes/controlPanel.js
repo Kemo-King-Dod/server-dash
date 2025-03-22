@@ -63,6 +63,7 @@ router.get('/controlPanel', auth, async (req, res) => {
             }
         });
 
+
         // Get opening and closing times
         const opentime = {
             am: store.opentimeam,
