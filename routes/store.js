@@ -31,32 +31,22 @@ router.get('/getStores', async (req, res) => {
         // Check if current time is between opening and closing times
         for (let i = 0; i < stores.length; i++) {
             const now = new Date();
-            let hours = now.getHours();
+            const hours = now.getHours();
             const minutes = now.getMinutes();
 
             // Parse store hours
-            let openAMHour = parseInt(stores[i].opentimeam.split(':')[0]);
+            const openAMHour = parseInt(stores[i].opentimeam.split(':')[0]);
             const openAMMinute = parseInt(stores[i].opentimeam.split(':')[1]);
-            let closeAMHour = parseInt(stores[i].closetimeam.split(':')[0]);
+            const closeAMHour = parseInt(stores[i].closetimeam.split(':')[0]);
             const closeAMMinute = parseInt(stores[i].closetimeam.split(':')[1]);
-            let openPMHour = parseInt(stores[i].opentimepm.split(':')[0]);
+            const openPMHour = parseInt(stores[i].opentimepm.split(':')[0]);
             const openPMMinute = parseInt(stores[i].opentimepm.split(':')[1]);
             let closePMHour = parseInt(stores[i].closetimepm.split(':')[0]);
             const closePMMinute = parseInt(stores[i].closetimepm.split(':')[1]);
 
             // Handle after-midnight closing times (e.g., 2:00 AM becomes 26:00)
-            if (closeAMHour < openAMHour) {
-                closeAMHour += 24;
-            }
-
-            if (closePMHour < openPMHour) {
+            if (closePMHour < 10) {
                 closePMHour += 24;
-            }
-
-            // If current time is after midnight but before 10 AM, add 24 to hours for comparison
-            // This helps when comparing with closing times that are after midnight
-            if (hours < 10) {
-                hours += 24;
             }
 
             // Convert current time to minutes for easier comparison
