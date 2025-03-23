@@ -89,6 +89,9 @@ app.use(storeSettings);
 const controlPanel = require("./routes/controlPanel.js");
 app.use(controlPanel);
 
+const getCity = require("./routes/getCities.js");
+app.use(getCity);
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
 })
