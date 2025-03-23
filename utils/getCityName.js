@@ -6,12 +6,15 @@ function getCityName(point) {
     for (const city of cities) {
         if (isPointInsidePolygon(point, city.boundary)) {
             cityName = city.Arabicname;
+            englishName = city.Englishname;
             break;
         }else{
+
             cityName = "خارج النطاق"
+            englishName = "Outside the scope"
         }
     }
-    return cityName;
+    return {cityName, englishName};
 }
 
 module.exports = getCityName;

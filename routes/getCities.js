@@ -15,7 +15,8 @@ try{
     return res.status(200).json({
         error:false,
         data:{
-            city:city,
+            city:city.cityName,
+            englishName:city.englishName
         }
     })
 
@@ -44,7 +45,7 @@ async function setCitiestoItems() {
                 }
 
                 // Set city based on store location
-                item.city = getCityName(store.location);
+                item.city = getCityName(store.location).cityName;
                 item.storeName = store.name;
                 item.storeImage = store.picture; 
  
