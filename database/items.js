@@ -54,6 +54,15 @@ const items = new Schema({
         type: Number,
         default: 0
     }
+    ,city: {
+        type: String,
+    },
+    storeName: {
+        type: String,
+    },
+    storeImage: {
+        type: String,
+    },
 })
 
 module.exports = mongoose.model('Item', items)

@@ -7,6 +7,8 @@ function getCityName(point) {
         if (isPointInsidePolygon(point, city.boundary)) {
             cityName = city.Arabicname;
             break;
+        }else{
+            cityName = "خارج النطاق"
         }
     }
     return cityName;

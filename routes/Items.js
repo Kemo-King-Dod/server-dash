@@ -8,6 +8,7 @@ const User = require("../database/users");
 const { auth } = require("../middleware/auth");
 const path = require("path");
 const Retrenchments = require('../database/Retrenchments');
+const getCityName = require("../utils/getCityName");
 
 
 let random = []
@@ -51,6 +52,9 @@ route.post("/additems", auth, async (req, res) => {
     }
 
     const item = {
+      city:getCityName(the_store.location),
+      storeName: the_store.name,
+      storeImage: the_store.picture,
       name,
       price,
       description: description,
