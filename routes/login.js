@@ -80,6 +80,39 @@ route.post("/login", async (req, res) => {
     }
 })
 
+router.post("/phoneExist",async(req,res)=>{
+    try {
+        const { phone } = req.body;
+
+        // Find user across all collections
+        let user = await Admin.findOne({ phone });
+        if (!user) user = await Store.findOne({ phone });
+        if (!user) user = await User.findOne({ phone });
+        if (!user) user = await Driver.findOne({ phone });
+
+        if (!user) {
+            return res.status(404).json({
+                error: false,
+                isExist: false,
+                data: "رقم الهاتف غير موجود"
+            });
+        }else{
+            return res.status(200).json({
+                error: false,
+                isExist: true,
+                data: "رقم الهاتف موجود مسبقا"
+            });
+        }
+        
+
+        
+}catch(error){
+    console.error('phoneExist error:', error)
+    res.status(500).json({
+        error: true,
+        data: "حدث خطأ أثناء تسجيل الدخول"
+    })
+}})
 route.post("/isPhoneExist", async (req, res) => {
     try {
         const { phone } = req.body;
