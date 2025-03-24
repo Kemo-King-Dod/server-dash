@@ -25,8 +25,13 @@ router.get('/getStore', auth, async (req, res) => {
 
 router.get('/getStores', async (req, res) => {
     try {
-        console.log(1111111111111)
-        const id = req.userId
+        var id = null;
+        const token = req.header("Authorization")?.replace("Bearer ", "");
+        if (token) {
+            const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
+            const decoded = jwt.verify(token, JWT_SECRET);
+            id = decoded.id;
+        }
         const stores = await Store.find({}, { password: 0, items: 0 })
 
         // Check if current time is between opening and closing times
@@ -83,12 +88,10 @@ router.get('/getStores', async (req, res) => {
         }
 
         if (id) {
-            console.log(true)
             const user = await User.findOne({ _id: id });
             for (var i = 0; i < stores.length; i++) {
                 for (var j = 0; j < user.favorateStors.length; j++) {
                     if (user.favorateStors[j].toString() == stores[i]._id.toString()) {
-                        console.log(stores[i]._doc.isFavorite)
                         stores[i]._doc.isFavorite = true;
                     }
                 }
