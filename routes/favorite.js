@@ -14,7 +14,7 @@ router.get('/getFavoriveitems', auth, async (req, res) => {
         const items = await Items.find({ _id: { $in: user.favorateItems } })
 
         for (var i = 0; i < items.length; i++) {
-            items[i].isFavorite = true;
+            items[i]._doc.isFavorite = true;
         }
 
         res.status(200).json({
@@ -105,11 +105,10 @@ router.get('/getFavorivestores', auth, async (req, res) => {
         const stores = await Store.find({ _id: { $in: user.favorateStors } })
 
         for (var i = 0; i < stores.length; i++) {
-            stores[i].isFavorite = true;
-            stores[i].password = '0';
-            stores[i].items = null;
+            stores[i]._doc.isFavorite = true;
+            stores[i]._doc.password = '0';
+            stores[i]._doc.items = null;
         }
-
         res.status(200).json({
             error: false,
             data: stores

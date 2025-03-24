@@ -32,6 +32,14 @@ route.post("/login", async (req, res) => {
             })
         }
 
+        if (exist.connection) {
+            return res.status(400).json({
+                error: true,
+                ishaker: true,
+                message: "الحساب مفتوح في جهاز آخر"
+            })
+        }
+
         // Verify password
         const valid = await bcrypt.compare(password, exist.password)
         if (!valid) {
@@ -80,7 +88,7 @@ route.post("/login", async (req, res) => {
     }
 })
 
-router.post("/phoneExist",async(req,res)=>{
+router.post("/phoneExist", async (req, res) => {
     try {
         const { phone } = req.body;
 
@@ -96,23 +104,24 @@ router.post("/phoneExist",async(req,res)=>{
                 isExist: false,
                 data: "رقم الهاتف غير موجود"
             });
-        }else{
+        } else {
             return res.status(200).json({
                 error: false,
                 isExist: true,
                 data: "رقم الهاتف موجود مسبقا"
             });
         }
-        
 
-        
-}catch(error){
-    console.error('phoneExist error:', error)
-    res.status(500).json({
-        error: true,
-        data: "حدث خطأ أثناء تسجيل الدخول"
-    })
-}})
+
+
+    } catch (error) {
+        console.error('phoneExist error:', error)
+        res.status(500).json({
+            error: true,
+            data: "حدث خطأ أثناء تسجيل الدخول"
+        })
+    }
+})
 route.post("/isPhoneExist", async (req, res) => {
     try {
         const { phone } = req.body;

@@ -28,18 +28,22 @@ async function connect(socket) {
             console.log("يرجى تسجيل الدخول");
           } else {
             let exist = await User.findOne({ _id: data.id });
+            if (exist && exist.connection) return
             if (!exist) {
               exist = await Store.findOne({ _id: data.id });
+              if (exist && exist.connection) return
               if (!exist) {
                 exist = await Driver.findOne({ _id: data.id });
-                await Driver.updateOne(
-                  { _id: data.id },
-                  { $set: { connection: true, connectionId: socket.id } }
-                );
-                socket.join("drivers");
-
                 if (!exist) {
                   console.log("access denied");
+                }
+                else {
+                  if (exist && exist.connection) return
+                  await Driver.updateOne(
+                    { _id: data.id },
+                    { $set: { connection: true, connectionId: socket.id } }
+                  );
+                  socket.join("drivers");
                 }
               }
               await Store.updateOne(
