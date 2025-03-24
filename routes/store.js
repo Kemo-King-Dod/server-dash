@@ -25,6 +25,7 @@ router.get('/getStore', auth, async (req, res) => {
 
 router.get('/getStores', async (req, res) => {
     try {
+        console.log(1111111111111)
         const id = req.userId
         const stores = await Store.find({}, { password: 0, items: 0 })
 
