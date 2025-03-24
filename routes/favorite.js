@@ -50,7 +50,6 @@ router.post('/addToFavoriveitems', auth, async (req, res) => {
             }
         }
 
-
         user.favorateItems.push(item._id)
         await user.save();
 
@@ -93,7 +92,6 @@ router.post('/deleteFromFavoriveitems', auth, async (req, res) => {
         });
     }
 });
-
 
 
 // shops
@@ -161,7 +159,6 @@ router.post('/addToFavorivestores', auth, async (req, res) => {
 // Remove from favorites
 router.post('/deleteFromFavorivestores', auth, async (req, res) => {
     try {
-        console.log('/deleteFromFavorivestores')
         const id = req.body.id;
         const userId = req.userId;
 
