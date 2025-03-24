@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const fireAdmin = require("./firebase/firebase_admin.js")
 const path = require("path");
-const { sendNotification } = require("./firebase/notification.js")
+const { sendNotification, sendNotificationToTopic } = require("./firebase/notification.js")
 // database
 const { createserver, connect } = require("./connention/socketio.js");
 const connecting = require("./database/database.js");
@@ -91,8 +91,9 @@ app.use(controlPanel);
 
 const getCity = require("./routes/getCities.js");
 app.use(getCity);
-
+ 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
 })
 // sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
+       sendNotificationToTopic({topic:"67ae4f246e97ff32f8a0ec2c",body:"تجربة الtopic",title:"الtopic  يعمل بنجاح"})    
