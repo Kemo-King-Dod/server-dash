@@ -82,10 +82,12 @@ router.get('/getStores', async (req, res) => {
         }
 
         if (id) {
+            console.log(true)
             const user = await User.findOne({ _id: id });
             for (var i = 0; i < stores.length; i++) {
                 for (var j = 0; j < user.favorateStors.length; j++) {
                     if (user.favorateStors[j].toString() == stores[i]._id.toString()) {
+                        console.log(stores[i]._doc.isFavorite)
                         stores[i]._doc.isFavorite = true;
                     }
                 }
