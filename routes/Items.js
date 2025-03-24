@@ -81,7 +81,11 @@ route.post("/additems", auth, async (req, res) => {
       error: false,
       operation: "addProduct",
       message: newItem,
-    });
+    })
+
+    sendNotificationToTopic({ topic: the_store._id.toString(), body: newItem.name, title: "تم إضافة منتج جديد" })
+
+
   } catch (error) {
     await deleteUploadedFile(req.body.imageUrl);
     console.log(error.message);

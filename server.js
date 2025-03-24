@@ -91,9 +91,9 @@ app.use(controlPanel);
 
 const getCity = require("./routes/getCities.js");
 app.use(getCity);
- 
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
 })
+
 // sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
-       sendNotificationToTopic({topic:"67ae4f246e97ff32f8a0ec2c",body:"تجربة الtopic",title:"الtopic  يعمل بنجاح"})    
