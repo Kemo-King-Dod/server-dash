@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../database/users');
 const Ordre = require('../database/orders');
 const Store = require('../database/store');
+const jwt = require('jsonwebtoken');
 const { auth } = require('../middleware/auth')
 const bcrypt = require('bcrypt');
 
