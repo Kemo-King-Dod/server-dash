@@ -19,7 +19,7 @@ router.get('/getFavoriveitems', auth, async (req, res) => {
 
         res.status(200).json({
             error: false,
-            data: user.favorateItems
+            data: items
         });
     } catch (error) {
         res.status(200).json({
@@ -112,7 +112,7 @@ router.get('/getFavorivestores', auth, async (req, res) => {
 
         res.status(200).json({
             error: false,
-            data: user.favorateStors
+            data: stores
         });
     } catch (error) {
         res.status(200).json({
