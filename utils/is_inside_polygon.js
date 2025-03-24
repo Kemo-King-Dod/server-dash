@@ -10,12 +10,12 @@ function isPointInsidePolygon(point, polygonPoints) {
 
     for (i = 0; i < polygonPoints.length; i++) {
         if ((polygonPoints[i].latitude < point.latitude && polygonPoints[j].latitude >= point.latitude ||
-                polygonPoints[j].latitude < point.latitude && polygonPoints[i].latitude >= point.latitude) &&
+            polygonPoints[j].latitude < point.latitude && polygonPoints[i].latitude >= point.latitude) &&
             (polygonPoints[i].longitude <= point.longitude || polygonPoints[j].longitude <= point.longitude)) {
-            
+
             if (polygonPoints[i].longitude + (point.latitude - polygonPoints[i].latitude) /
-                    (polygonPoints[j].latitude - polygonPoints[i].latitude) *
-                    (polygonPoints[j].longitude - polygonPoints[i].longitude) <
+                (polygonPoints[j].latitude - polygonPoints[i].latitude) *
+                (polygonPoints[j].longitude - polygonPoints[i].longitude) <
                 point.longitude) {
                 oddNodes = !oddNodes;
             }

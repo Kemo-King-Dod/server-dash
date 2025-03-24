@@ -30,6 +30,11 @@ router.get('/getStores', async (req, res) => {
 
         // Check if current time is between opening and closing times
         for (let i = 0; i < stores.length; i++) {
+            // Add isFavorite property to each item
+            stores[i]._doc.isFollow = false;
+            stores[i]._doc.isFavorite = false;
+
+            // check openCondition
             const now = new Date();
             let hours = now.getHours();
             const minutes = now.getMinutes();
@@ -66,6 +71,7 @@ router.get('/getStores', async (req, res) => {
             stores[i].openCondition =
                 (currentTimeInMinutes >= openAMInMinutes && currentTimeInMinutes <= closeAMInMinutes) ||
                 (currentTimeInMinutes >= openPMInMinutes && currentTimeInMinutes <= closePMInMinutes)
+            stores[i].save()
         }
 
         if (req.headers.isvisiter && req.headers.isvisiter == 'true') {
@@ -75,17 +81,11 @@ router.get('/getStores', async (req, res) => {
             })
         }
 
-        // Add isFavorite property to each item
-        for (var i = 0; i < stores.length; i++) {
-            stores[i]._doc.isFollow = false;
-            stores[i]._doc.isFavorite = false;
-        }
-
         if (id) {
             const user = await User.findOne({ _id: id });
             for (var i = 0; i < stores.length; i++) {
                 for (var j = 0; j < user.favorateStors.length; j++) {
-                    if (user.favorateStors[j]._id.toString() == stores[i]._id.toString()) {
+                    if (user.favorateStors[j].toString() == stores[i]._id.toString()) {
                         stores[i]._doc.isFavorite = true;
                     }
                 }
@@ -101,11 +101,6 @@ router.get('/getStores', async (req, res) => {
             error: false,
             data: stores
         })
-
-        for (let i = 0; i < stores.length; i++) {
-            console.log(stores[i].openCondition)
-            await stores[i].save()
-        }
     } catch (error) {
         console.log(error)
         res.status(500).json({

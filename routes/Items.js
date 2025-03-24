@@ -52,7 +52,7 @@ route.post("/additems", auth, async (req, res) => {
     }
 
     const item = {
-      city:getCityName(the_store.location).cityName,
+      city: getCityName(the_store.location).cityName,
       storeName: the_store.name,
       storeImage: the_store.picture,
       name,
@@ -147,6 +147,9 @@ route.post("/updateItem", auth, async (req, res) => {
 route.patch("/deleteitem", auth, async (req, res) => {
   try {
     await items.findByIdAndDelete(req.body.id);
+
+    // delete items from favorate
+
     res.status(200).json({
       error: false,
       operation: "deleteProduct",
@@ -171,8 +174,6 @@ route.get("/getAllItems", async (req, res) => {
       const decoded = jwt.verify(token, JWT_SECRET);
       id = decoded.id;
     }
-
-
 
     let data
     // Get all available items
@@ -236,13 +237,6 @@ route.get("/getAllItems", async (req, res) => {
       }
     )
 
-
-
-    for (let i = 0; i < data.length; i++) {
-      var itemStore = await Store.findById(data[i].storeID);
-      data[i].storeName = itemStore.name;
-      data[i].storeImage = itemStore.picture;
-    }
 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
       res.json({ error: false, items: data });
@@ -431,13 +425,6 @@ route.post("/category", async (req, res) => {
       }
     ])
 
-    // add store name and image to the items
-    for (let i = 0; i < allItems.length; i++) {
-      var itemStore = await Store.findById(allItems[i].storeID);
-      allItems[i].storeName = itemStore.name;
-      allItems[i].storeImage = itemStore.picture;
-    }
-
     // are you visitor 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
       res.json({
@@ -459,11 +446,11 @@ route.post("/category", async (req, res) => {
     }
 
     if (id) {
-      const user = await User.findOne({ _id: id });
+      const user = await User.findOne({ _id: id })
       for (var i = 0; i < allStores.length; i++) {
         for (var j = 0; j < user.favorateStors.length; j++) {
           if (user.favorateStors[j] == null) continue;
-          if (user.favorateStors[j]._id.toString() == allStores[i]._id.toString()) {
+          if (user.favorateStors[j].toString() == allStores[i]._id.toString()) {
             allStores[i].isFavorite = true;
           }
         }

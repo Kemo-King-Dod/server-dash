@@ -11,10 +11,11 @@ router.get('/getFavoriveitems', auth, async (req, res) => {
         const userId = req.userId;
         const user = await User.findById(userId);
 
-        for (var i = 0; i < user.favorateItems.length; i++) {
-            user.favorateItems[i].isFavorite = true;
-        }
+        const items = await Items.find({ _id: { $in: user.favorateItems } })
 
+        for (var i = 0; i < items.length; i++) {
+            items[i].isFavorite = true;
+        }
 
         res.status(200).json({
             error: false,
@@ -26,7 +27,7 @@ router.get('/getFavoriveitems', auth, async (req, res) => {
             data: 'حدث خطأ في جلب المفضلة'
         });
     }
-});
+})
 
 // Add to favorites
 router.post('/addToFavoriveitems', auth, async (req, res) => {
@@ -43,8 +44,14 @@ router.post('/addToFavoriveitems', auth, async (req, res) => {
             });
         }
 
+        for (let i = 0; i < user.favorateItems.length; i++) {
+            if (user.favorateItems[i].toString() == item._id.toString()) {
+                throw new Error();
+            }
+        }
 
-        user.favorateItems.push(item);
+
+        user.favorateItems.push(item._id)
         await user.save();
 
         res.status(200).json({
@@ -57,7 +64,7 @@ router.post('/addToFavoriveitems', auth, async (req, res) => {
             data: 'حدث خطأ في إضافة المنتج للمفضلة'
         });
     }
-});
+})
 
 // Remove from favorites
 router.post('/deleteFromFavoriveitems', auth, async (req, res) => {
@@ -68,7 +75,7 @@ router.post('/deleteFromFavoriveitems', auth, async (req, res) => {
         const user = await User.findById(userId);
 
         for (let i = 0; i < user.favorateItems.length; i++) {
-            if (user.favorateItems[i]._id.toString() == id) {
+            if (user.favorateItems[i].toString() == id) {
                 user.favorateItems.splice(i, 1)
                 break
             }
@@ -92,15 +99,15 @@ router.post('/deleteFromFavoriveitems', auth, async (req, res) => {
 // shops
 router.get('/getFavorivestores', auth, async (req, res) => {
     try {
-        console.log('/getFavorivestores');
-
         const userId = req.userId;
         const user = await User.findById(userId);
 
-        for (var i = 0; i < user.favorateStors.length; i++) {
-            user.favorateStors[i].isFavorite = true;
-            user.favorateStors[i].password = '0';
-            user.favorateStors[i].items = null;
+        const stores = await Store.find({ _id: { $in: user.favorateStors } })
+
+        for (var i = 0; i < stores.length; i++) {
+            stores[i].isFavorite = true;
+            stores[i].password = '0';
+            stores[i].items = null;
         }
 
         res.status(200).json({
@@ -118,7 +125,6 @@ router.get('/getFavorivestores', auth, async (req, res) => {
 // Add to favorites
 router.post('/addToFavorivestores', auth, async (req, res) => {
     try {
-        console.log('/addToFavorivestores')
         const { id } = req.body;
         const userId = req.userId;
 
@@ -132,23 +138,19 @@ router.post('/addToFavorivestores', auth, async (req, res) => {
         }
 
         for (let i = 0; i < user.favorateStors.length; i++) {
-            if (user.favorateStors[i]._id.toString() == store._id.toString()) {
-                console.log(1)
+            if (user.favorateStors[i].toString() == store._id.toString()) {
                 throw new Error();
             }
         }
 
-        user.favorateStors.push(store);
-        await user.save();
-
-        console.log(2)
+        user.favorateStors.push(store._id);
+        await user.save()
 
         res.status(200).json({
             error: false,
             data: 'تمت الإضافة إلى المفضلة'
         });
     } catch (error) {
-        console.log(3)
         console.log(error.message)
         res.status(200).json({
             error: true,
@@ -168,7 +170,7 @@ router.post('/deleteFromFavorivestores', auth, async (req, res) => {
 
         let flag = false
         for (let i = 0; i < user.favorateStors.length; i++) {
-            if (user.favorateStors[i]._id.toString() == id.toString()) {
+            if (user.favorateStors[i].toString() == id.toString()) {
                 user.favorateStors.splice(i, 1)
                 flag = true
                 break

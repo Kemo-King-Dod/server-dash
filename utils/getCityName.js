@@ -8,13 +8,12 @@ function getCityName(point) {
             cityName = city.Arabicname;
             englishName = city.Englishname;
             break;
-        }else{
-
+        } else {
             cityName = "خارج النطاق"
             englishName = "Outside the scope"
         }
     }
-    return {cityName, englishName};
+    return { cityName, englishName };
 }
 
 module.exports = getCityName;
