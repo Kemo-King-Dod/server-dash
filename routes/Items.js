@@ -294,8 +294,7 @@ route.get("/getAllItems", async (req, res) => {
 
 route.post("/getStoreItems", async (req, res) => {
   try {
-    console.log(req.body);
-    var id = req.body.id;
+    var id = req.body.shopId;
     var userid = null;
 
     const token = req.header("Authorization")?.replace("Bearer ", "");
