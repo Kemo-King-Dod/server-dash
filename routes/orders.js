@@ -11,6 +11,9 @@ const fs = require("fs").promises;
 const path = require("path");
 const { auth } = require("../middleware/auth");
 const mongoose = require("mongoose");
+const notification = require("../database/notification");
+const { sendNotification, sendNotificationToTopic } = require("../firebase/notification")
+
 
 let ordersNum;
 
@@ -137,6 +140,13 @@ router.post("/acceptOrder", auth, async (req, res) => {
             order.status = "accepted";
             order.type = "accepted";
             await order.save();
+            await notification.create({
+                id: order.customer.id,
+                userType: 'User',
+                title: 'تم قبول طلبك',
+                body: 'قام المتجر بقبول طلبك ويتم الآن تجهيز الطلبية',
+                type: 'info'
+            })
             res.status(200).json({
                 error: false,
                 data: order,
@@ -387,6 +397,14 @@ router.post("/confirmOrder", auth, async (req, res) => {
             canceledby: null
         });
         await orderRecord.save();
+
+        await notification.create({
+            id: order.customer.id,
+            userType: 'User',
+            title: 'تم تسليم طلبك',
+            body: 'نتمنى أن الخدمة قد نالت رضاكم',
+            type: 'info'
+        })
 
         // Delete original order
         await Order.findByIdAndDelete(req.body.orderId);

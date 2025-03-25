@@ -1,47 +1,26 @@
 const mongoose = require('mongoose');
 
-const notificationSchema = new mongoose.Schema({
-    recipient: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        refPath: 'recipientType'
+const notification = new mongoose.Schema({
+    id: {
+        type: String
     },
-    recipientType: {
-        type: String,
-        required: true,
-        enum: ['User', 'Driver', 'Store']
+    userType: {
+        type: String
     },
     title: {
-        type: String,
-        required: true
+        type: String
     },
     body: {
-        type: String,
-        required: true
+        type: String
     },
     type: {
         type: String,
-        required: true,
-        enum: ['ORDER', 'SYSTEM', 'PROMOTION', 'DELIVERY', 'PAYMENT']
-    },
-    data: {
-        type: mongoose.Schema.Types.Mixed,
-        default: {}
-    },
-    isRead: {
-        type: Boolean,
-        default: false
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
+        enum: ['success', 'info', 'promotion', 'warning']
     }
-});
+})
 
 // Index for better query performance
-notificationSchema.index({ recipient: 1, createdAt: -1 });
-notificationSchema.index({ isRead: 1 });
+notification.index({ id: 1 });
 
-const Notification = mongoose.model('Notification', notificationSchema);
+module.exports = mongoose.model('Notification', notification)
 
-module.exports = Notification;

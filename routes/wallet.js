@@ -6,7 +6,6 @@ const Store = require("../database/store");
 const Driver = require("../database/driver");
 const User = require("../database/users");
 const { auth } = require("../middleware/auth");
-const { error } = require("console");
 
 // user
 route.get('/userWallet', auth, async (req, res) => {

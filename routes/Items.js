@@ -9,6 +9,8 @@ const { auth } = require("../middleware/auth");
 const path = require("path");
 const Retrenchments = require('../database/Retrenchments');
 const getCityName = require("../utils/getCityName");
+const { sendNotification, sendNotificationToTopic } = require("../firebase/notification")
+
 
 
 let random = []
@@ -84,7 +86,6 @@ route.post("/additems", auth, async (req, res) => {
     })
 
     sendNotificationToTopic({ topic: the_store._id.toString(), body: newItem.name, title: "تم إضافة منتج جديد" })
-
 
   } catch (error) {
     await deleteUploadedFile(req.body.imageUrl);
@@ -274,7 +275,7 @@ route.get("/getAllItems", async (req, res) => {
       for (var i = 0; i < data.length; i++) {
         for (var j = 0; j < user.likedItems.length; j++) {
           if (user.likedItems[j] == null) continue;
-          if (user.likedItems[j] == data[i]._id.toString()) {
+          if (user.likedItems[j].toString() == data[i]._id.toString()) {
             data[i].like = true;
           }
         }
@@ -293,6 +294,7 @@ route.get("/getAllItems", async (req, res) => {
 
 route.post("/getStoreItems", async (req, res) => {
   try {
+    console.log(req.body);
     var id = req.body.id;
     var userid = null;
 
@@ -334,7 +336,7 @@ route.post("/getStoreItems", async (req, res) => {
         for (var j = 0; j < user.favorateItems.length; j++) {
           if (user.favorateItems[j] == null) continue;
           if (
-            user.favorateItems[j]._id.toString() == allItems[i]._id.toString()
+            user.favorateItems[j].toString() == allItems[i]._id.toString()
           ) {
             allItems[i]._doc.isFavorite = true;
           }
@@ -353,7 +355,7 @@ route.post("/getStoreItems", async (req, res) => {
         for (var j = 0; j < user.likedItems.length; j++) {
           if (user.likedItems[j] == null) continue;
           if (
-            user.likedItems[j]._id.toString() == allItems[i]._id.toString()
+            user.likedItems[j].toString() == allItems[i]._id.toString()
           ) {
             allItems[i]._doc.like = true;
           }
@@ -507,7 +509,7 @@ route.post("/category", async (req, res) => {
       for (var i = 0; i < allItems.length; i++) {
         for (var j = 0; j < user.likedItems.length; j++) {
           if (user.likedItems[j] == null) continue;
-          if (user.likedItems[j] == allItems[i]._id.toString()) {
+          if (user.likedItems[j].toString() == allItems[i]._id.toString()) {
             allItems[i].like = true;
           }
         }

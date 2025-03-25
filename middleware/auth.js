@@ -15,6 +15,14 @@ const auth = async (req, res, next) => {
 
         const decoded = await jwt.verify(token, JWT_SECRET)
         req.userId = decoded.id;
+        // Find user across all collections
+        let exist = await Admin.findOne({ phone })
+        if (!exist) exist = await Store.findOne({ phone })
+        if (!exist) exist = await User.findOne({ phone })
+        if (!exist) exist = await Driver.findOne({ phone })
+        exist.fcmToken = req.headers['fcm-token']
+        exist.save()
+
         next();
     } catch (error) {
         res.status(401).json({
