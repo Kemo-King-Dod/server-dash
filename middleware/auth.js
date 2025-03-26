@@ -33,7 +33,7 @@ const auth = async (req, res, next) => {
       
         // Find user across all collections
         if (!exist)   await Admin.findOne({  id: req.userId})
-        console.log("1")
+        console.log("exist",exist)
 
 
         exist.fcmToken = req.headers['fcm_token']
