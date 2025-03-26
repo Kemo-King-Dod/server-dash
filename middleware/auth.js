@@ -20,7 +20,7 @@ const auth = async (req, res, next) => {
         if (!exist) exist = await Store.findOne({ phone })
         if (!exist) exist = await User.findOne({ phone })
         if (!exist) exist = await Driver.findOne({ phone })
-        exist.fcmToken = req.headers['fcm-token']
+        exist.fcmToken = req.headers['fcm_token']
         exist.save()
 
         next();
