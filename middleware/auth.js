@@ -5,6 +5,8 @@ const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
 
 const auth = async (req, res, next) => {
     try {
+        console.log("start")
+
         const token = req.header('Authorization')?.replace('Bearer ', '');
         if (!token) {
             return res.status(401).json({
@@ -15,6 +17,8 @@ const auth = async (req, res, next) => {
 
         const decoded = await jwt.verify(token, JWT_SECRET)
         req.userId = decoded.id;
+        console.log("0")
+
         // Find user across all collections
         let exist = await Admin.findOne({ phone })
         console.log("1")
