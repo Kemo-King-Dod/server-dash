@@ -23,9 +23,7 @@ router.get("/getfromcart", auth, async (req, res) => {
     let discoundIds = []
 
     for (let i = 0; i < user.cart.length; i++) {
-      let the_item = await Item.find({
-        _id: user.cart[i].cartItem.id
-      });
+      let the_item = await Item.findById(user.cart[i].cartItem.id);
       if (the_item.retrenchment_end < Date.now()) {
         discoundIds.push(the_item._id)
         the_item.retrenchment_end = null
@@ -40,8 +38,10 @@ router.get("/getfromcart", auth, async (req, res) => {
         })
       }
       if (!the_item.is_retrenchment) {
+        console.log(1)
         user.cart[i].cartItem.price = the_item.price
       } else {
+        console.log(2)
         user.cart[i].cartItem.price = the_item.price * (1 - the_item.retrenchment_percent / 100)
       }
     }
