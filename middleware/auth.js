@@ -1,4 +1,11 @@
 const jwt = require('jsonwebtoken');
+const { User } = require('../database/users');
+const { Driver } = require('../database/driver');
+const { Store } = require('../database/store');
+const { Admin } = require('../database/admin');
+
+
+
 
 // JWT secret key
 const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
