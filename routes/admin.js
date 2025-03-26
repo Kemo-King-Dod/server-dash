@@ -119,3 +119,39 @@ router.post('/adminUserState', auth, async (req, res) => {
 })
 
 module.exports = router
+
+
+
+
+/* 
+// store
+sendNotification({ token: user.fcmToken, title: 'تم سحب الرصيد من حسابك في الشركة', body: 'تم سحب الرصيد من حسابك في الشركة' })
+            await notification.create({
+                id: store._id,
+                userType: 'store',
+                title: 'تم سحب الرصيد من حسابك في الشركة',
+                body: 'تم سحب الرصيد من حسابك في الشركة',
+                type: 'info'
+            })
+
+
+// driver
+sendNotification({ token: user.fcmToken, title: 'تم زيادة قيمة المستحقات', body: 'تم زيادة قيمة المستحقات' })
+            await notification.create({
+                id: driver._id,
+                userType: 'driver',
+                title: 'تم زيادة قيمة المستحقات',
+                body: 'تم زيادة قيمة المستحقات',
+                type: 'info'
+            })
+
+sendNotification({ token: user.fcmToken, title: 'تم دفع المستحقات للشركة', body: 'تم دفع المستحقات للشركة' })
+            await notification.create({
+                id: driver._id,
+                userType: 'driver',
+                title: 'تم دفع المستحقات للشركة',
+                body: 'تم دفع المستحقات للشركة',
+                type: 'info'
+            })
+
+*/

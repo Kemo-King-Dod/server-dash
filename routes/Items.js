@@ -293,7 +293,7 @@ route.get("/getAllItems", async (req, res) => {
 });
 
 route.post("/getStoreItems", async (req, res) => {
-  try {
+  try {3
     var id = req.body.shopId;
     var userid = null;
 

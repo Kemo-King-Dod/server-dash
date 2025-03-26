@@ -1,7 +1,5 @@
 const express = require("express");
 const route = express.Router();
-const path = require("path");
-const jwt = require("jsonwebtoken");
 const Store = require("../database/store");
 const Driver = require("../database/driver");
 const User = require("../database/users");
@@ -41,6 +39,7 @@ route.get('/storeWallet', auth, async (req, res) => {
         res.status(400).json({ error: true, message: "user not found" })
     }
 })
+
 
 //driver
 route.get('/driverWallet', auth, async (req, res) => {

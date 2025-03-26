@@ -3,6 +3,7 @@ const router = express.Router();
 const Item = require('../database/items');
 const User = require('../database/users');
 const Store = require('../database/store');
+const Retrenchments = require('../database/Retrenchments')
 const { auth } = require('../middleware/auth');
 
 // Get all favorites
@@ -168,6 +169,6 @@ router.get('/mostLiked', async (req, res) => {
         console.log(error)
         res.status(500).json({ error: true, message: error.message });
     }
-});
+})
 
 module.exports = router;

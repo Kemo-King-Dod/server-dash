@@ -117,6 +117,18 @@ router.post("/addOrder", auth, async (req, res) => {
         }
         await user.save();
 
+        sendNotificationToTopic({ topic: order.id, title: 'طلبية جديدة', body: 'هناك طلبية جديدة يمكنك قبولها' })
+
+
+        sendNotification({ token: store.fcmToken, title: 'طلبية جديدة', body: 'قام زبون ما بطلب طلبية من متجرك' })
+        await notification.create({
+            id: store._id,
+            userType: 'store',
+            title: 'طلبية جديدة',
+            body: 'قام زبون ما بطلب طلبية من متجرك',
+            type: 'info'
+        })
+
         res.status(200).json({
             error: false,
             message: "Order added successfully",
@@ -137,12 +149,14 @@ router.post("/acceptOrder", auth, async (req, res) => {
         const id = req.body.orderId;
         const order = await Order.findById(id);
         if (order) {
+            const user = await User.findById(order.customer.id);
             order.status = "accepted";
             order.type = "accepted";
             await order.save();
+            sendNotification({ token: user.fcmToken, title: 'تم قبول طلبك', body: 'قام المتجر بقبول طلبك ويتم الآن تجهيز الطلبية' })
             await notification.create({
                 id: order.customer.id,
-                userType: 'User',
+                userType: 'user',
                 title: 'تم قبول طلبك',
                 body: 'قام المتجر بقبول طلبك ويتم الآن تجهيز الطلبية',
                 type: 'info'
@@ -150,8 +164,7 @@ router.post("/acceptOrder", auth, async (req, res) => {
             res.status(200).json({
                 error: false,
                 data: order,
-            });
-            return;
+            })
         }
         res.status(500).json({
             error: true,
@@ -398,12 +411,14 @@ router.post("/confirmOrder", auth, async (req, res) => {
         });
         await orderRecord.save();
 
+        const user = await User.findById(order.customer.orderId)
+        sendNotification({ token: user.fcmToken, title: 'تم تسليم طلبك', body: 'نتمنى أن الخدمة قد نالت رضاكم' })
         await notification.create({
             id: order.customer.id,
-            userType: 'User',
+            userType: 'user',
             title: 'تم تسليم طلبك',
             body: 'نتمنى أن الخدمة قد نالت رضاكم',
-            type: 'info'
+            type: 'success'
         })
 
         // Delete original order
