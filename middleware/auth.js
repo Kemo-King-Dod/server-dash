@@ -27,12 +27,12 @@ const auth = async (req, res, next) => {
         console.log("0")
 
         let exist = 
-          await User.findOne({ id: req.userId });
-        if (!exist) exist = await Driver.findOne({  id: req.userId})
-         if (!exist) exist = await Store.findOne({  id: req.userId})
+          await User.findOne({ _id: req.userId });
+        if (!exist) exist = await Driver.findOne({  _id: req.userId})
+         if (!exist) exist = await Store.findOne({  _id: req.userId})
       
         // Find user across all collections
-        if (!exist)   await Admin.findOne({  id: req.userId})
+        if (!exist)   await Admin.findOne({  _id: req.userId})
         console.log("exist",exist)
 
 
