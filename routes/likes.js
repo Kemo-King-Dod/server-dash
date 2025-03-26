@@ -99,6 +99,14 @@ router.get('/mostLiked', async (req, res) => {
             .sort({ likes: -1 }) // Sort by likes in descending order
             .limit(10);           // Get only 4 items
 
+        var id = null;
+        const token = req.header("Authorization")?.replace("Bearer ", "");
+        if (token) {
+            const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
+            const decoded = jwt.verify(token, JWT_SECRET);
+            id = decoded.id;
+        }
+
         let discoundIds = []
 
         for (let i = 0; i < data.length; i++) {
