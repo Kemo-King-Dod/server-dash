@@ -17,9 +17,15 @@ const auth = async (req, res, next) => {
         req.userId = decoded.id;
         // Find user across all collections
         let exist = await Admin.findOne({ phone })
+        console.log("1")
         if (!exist) exist = await Store.findOne({ phone })
+        console.log("2")
+
         if (!exist) exist = await User.findOne({ phone })
+        console.log("3")
+
         if (!exist) exist = await Driver.findOne({ phone })
+            console.log("4")
         exist.fcmToken = req.headers['fcm_token']
         exist.save()
 
