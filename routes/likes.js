@@ -115,7 +115,7 @@ router.get('/mostLiked', async (req, res) => {
                 data[i].retrenchment_end = null
                 data[i].retrenchment_percent = null
                 data[i].is_retrenchment = false
-                await items.findByIdAndUpdate(data[i]._id, {
+                await Item.findByIdAndUpdate(data[i]._id, {
                     $set: {
                         retrenchment_end: null,
                         retrenchment_percent: null,
