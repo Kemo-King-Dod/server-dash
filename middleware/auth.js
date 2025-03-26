@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../database/users');
-const { Driver } = require('../database/driver');
-const { Store } = require('../database/store');
-const { Admin } = require('../database/admin');
+const  User  = require('../database/users');
+const  Driver = require('../database/driver');
+const  Store = require('../database/store');
+const  Admin = require('../database/admin');
 
 
 
