@@ -412,6 +412,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
         await orderRecord.save();
 
         const user = await User.findById(order.customer.orderId)
+        User.findByIdAndUpdate(order.customer.orderId, { orders: { $pull: order._id } })
         sendNotification({ token: user.fcmToken, title: 'تم تسليم طلبك', body: 'نتمنى أن الخدمة قد نالت رضاكم' })
         await notification.create({
             id: order.customer.id,
@@ -479,6 +480,8 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
         if (user.cancelOrderLimit >= 5) {
             user.status = "blocked";
         }
+        User.findByIdAndUpdate(order.customer.orderId, { orders: { $pull: order._id } })
+
         await user.save();
 
         res.status(200).json({
@@ -529,6 +532,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
 
         // Delete original order
         await Order.findByIdAndDelete(req.body.orderId);
+        User.findByIdAndUpdate(order.customer.orderId, { orders: { $pull: order._id } })
 
         res.status(200).json({
             error: false,
@@ -565,6 +569,8 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
                 driver.status = "blocked";
             }
             await driver.save();
+            User.findByIdAndUpdate(order.customer.orderId, { orders: { $pull: order._id } })
+
         }
         else {
             order.status = "ready"
