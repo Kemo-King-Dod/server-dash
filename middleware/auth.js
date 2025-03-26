@@ -19,22 +19,22 @@ const auth = async (req, res, next) => {
         req.userId = decoded.id;
         console.log("0")
 
+        let exist = 
+          await User.findOne({ id: req.userId });
+        if (!exist) exist = await Driver.findOne({  id: req.userId})
+         if (!exist) exist = await Store.findOne({  id: req.userId})
+      
         // Find user across all collections
-        let exist = await Admin.findOne({ phone })
+        if (!exist)   await Admin.findOne({  id: req.userId})
         console.log("1")
-        if (!exist) exist = await Store.findOne({ phone })
-        console.log("2")
 
-        if (!exist) exist = await User.findOne({ phone })
-        console.log("3")
 
-        if (!exist) exist = await Driver.findOne({ phone })
-            console.log("4")
         exist.fcmToken = req.headers['fcm_token']
         exist.save()
 
         next();
     } catch (error) {
+        console.error(error);
         res.status(401).json({
             error: true,
             message: 'يرجى الدخول'
