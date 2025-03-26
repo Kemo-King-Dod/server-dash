@@ -38,10 +38,8 @@ router.get("/getfromcart", auth, async (req, res) => {
         })
       }
       if (!the_item.is_retrenchment) {
-        console.log(1)
         user.cart[i].cartItem.price = the_item.price
       } else {
-        console.log(2)
         user.cart[i].cartItem.price = the_item.price * (1 - the_item.retrenchment_percent / 100)
       }
     }
@@ -122,7 +120,6 @@ router.get("/getfromcart", auth, async (req, res) => {
       }
     }
 
-    console.log(thedata)
     res.status(200).json({
       error: false,
       data: thedata,
