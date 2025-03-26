@@ -121,6 +121,8 @@ router.get("/getfromcart", auth, async (req, res) => {
         }
       }
     }
+
+    console.log(thedata)
     res.status(200).json({
       error: false,
       data: thedata,
@@ -137,7 +139,6 @@ router.get("/getfromcart", auth, async (req, res) => {
 // Add item to cart
 router.post("/addtocart", auth, async (req, res) => {
   try {
-    console.log('add')
     const { cartItem } = req.body;
     const userId = req.userId;
 
@@ -152,6 +153,7 @@ router.post("/addtocart", auth, async (req, res) => {
 
     // Check for blocked status based on cancelOrderLimit
     if (user.cancelOrderLimit >= 5) {
+
       return res.status(403).json({
         error: true,
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
