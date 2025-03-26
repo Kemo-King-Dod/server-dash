@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Item = require('../database/items');
 const User = require('../database/users');
-const Store = require('../database/store');
+const jwt = require('jsonwebtoken');
 const Retrenchments = require('../database/Retrenchments')
 const { auth } = require('../middleware/auth');
 
