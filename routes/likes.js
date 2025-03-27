@@ -140,7 +140,7 @@ router.get('/mostLiked', async (req, res) => {
 
         // Add isFavorite property to each item
         for (var i = 0; i < data.length; i++) {
-            data[i].isFavorite = false;
+            data[i]._doc.isFavorite = false;
         }
 
         if (id) {
@@ -149,7 +149,7 @@ router.get('/mostLiked', async (req, res) => {
                 for (var j = 0; j < user.favorateItems.length; j++) {
                     if (user.favorateItems[j] == null) continue;
                     if (user.favorateItems[j].toString() == data[i]._id.toString()) {
-                        data[i].isFavorite = true;
+                        data[i]._doc.isFavorite = true;
                     }
                 }
             }
@@ -157,7 +157,7 @@ router.get('/mostLiked', async (req, res) => {
 
         // Add like property to each item
         for (var i = 0; i < data.length; i++) {
-            data[i].like = false;
+            data[i]._doc.like = false;
         }
 
         if (id) {
@@ -166,12 +166,12 @@ router.get('/mostLiked', async (req, res) => {
                 for (var j = 0; j < user.likedItems.length; j++) {
                     if (user.likedItems[j] == null) continue;
                     if (user.likedItems[j].toString() == data[i]._id.toString()) {
-                        data[i].like = true;
+                        data[i]._doc.like = true;
                     }
                 }
             }
         }
-        console.log(data[0])
+
         res.status(200).json({ error: false, data: data });
     } catch (error) {
         console.log(error)
