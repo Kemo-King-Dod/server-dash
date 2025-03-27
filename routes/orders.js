@@ -159,7 +159,7 @@ router.post("/acceptOrder", auth, async (req, res) => {
                 body: 'قام المتجر بقبول طلبك ويتم الآن تجهيز الطلبية',
                 type: 'info'
             })
-            res.status(200).json({
+            return res.status(200).json({
                 error: false,
                 data: order,
             })
