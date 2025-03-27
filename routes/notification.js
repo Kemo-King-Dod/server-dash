@@ -6,7 +6,7 @@ const notification = require("../database/notification")
 // Mark notification as read
 router.get('/notification', auth, async (req, res) => {
     try {
-        const data = await notification.find({ id: req.userId })
+        const data = await (await notification.find({ id: req.userId })).reverse()
         res.json({
             error: false,
             data
@@ -26,6 +26,21 @@ router.post('/deleteNotification', auth, async (req, res) => {
         res.json({
             error: false,
             message: 'تم حذف الإشعار بنجاح'
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: 'فشل في حذف الإشعار'
+        });
+    }
+})
+
+router.post('/deleteAllNotifications', auth, async (req, res) => {
+    try {
+        await notification.deleteMany({ id: req.userId })
+        res.json({
+            error: false,
+            message: 'تم حذف الإشعارات بنجاح'
         });
     } catch (error) {
         res.status(500).json({
