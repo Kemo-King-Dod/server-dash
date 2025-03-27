@@ -7,6 +7,9 @@ const notification = require("../database/notification")
 router.get('/notification', auth, async (req, res) => {
     try {
         const data = await (await notification.find({ id: req.userId })).reverse()
+        for (let i = 0; i < data.length; i++) {
+            data.isread = true
+        }
         res.json({
             error: false,
             data
