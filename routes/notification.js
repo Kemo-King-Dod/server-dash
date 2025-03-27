@@ -13,7 +13,8 @@ router.get('/notification', auth, async (req, res) => {
         })
 
         for (let i = 0; i < data.length; i++) {
-            data.isread = true
+            data[i].isRead = true
+            data[i].save()
         }
     } catch (error) {
         console.log(error)
