@@ -117,10 +117,8 @@ router.post("/addOrder", auth, async (req, res) => {
         }
         await user.save();
 
-        sendNotificationToTopic({ topic: order.id, title: 'طلبية جديدة', body: 'هناك طلبية جديدة يمكنك قبولها' })
 
-
-        sendNotification({ token: store.fcmToken, title: 'طلبية جديدة', body: 'قام زبون ما بطلب طلبية من متجرك' })
+      await sendNotification({ token: store.fcmToken, title: 'طلبية جديدة', body: 'قام زبون ما بطلب طلبية من متجرك' })
         await notification.create({
             id: store._id,
             userType: 'store',
