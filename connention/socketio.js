@@ -68,10 +68,35 @@ async function connect(socket) {
     if (data.type == "chat") {
       const user = await User.findOne({ phone: data.id })
       if (user.connection)
-        socket.to(user.connectionId).emit("updateUser", data);
+        await socket.to(user.connectionId).emit("updateUser", data);
+      return
     }
 
-    // socket.to().emit("updateDriver", data)
+    try {
+      let user = await User.findById(data.userID);
+      let timesToSendRequist = 0; // to 180
+      if (user.connection == false) {
+        const times = setInterval(async () => {
+          timesToSendRequist++;
+          user = await User.findById(data.userID);
+          if (user.connection || timesToSendRequist > 180) {
+            socket.to(user.connectionId).emit("updateUser", data);
+            clearInterval(times);
+          }
+        }, 5000);
+      }
+      if (user.connection) {
+        socket.to(user.connectionId).emit("updateUser", data);
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        error: true,
+        message: error.message
+      });
+    }
+
+    socket.to().emit("updateDriver", data)
   })
 
   socket.on("updateStore", async (data) => {
@@ -95,8 +120,7 @@ async function connect(socket) {
       console.log(error);
       res.status(500).json({
         error: true,
-        message: "Error adding order",
-        error: error.message,
+        message: error.message
       });
     }
   });
