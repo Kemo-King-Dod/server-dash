@@ -354,7 +354,7 @@ router.post("/examineCode", auth, async (req, res) => {
             store.funds += order.totalPrice;
             await store.save();
 
-            const driver = await Driver.findById(req.driver.id)
+            const driver = await Driver.findById(order.driver.id)
             console.log(driver)
             if (!driver._doc.funds)
                 driver._doc.funds = order.totalPrice;
