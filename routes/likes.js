@@ -171,7 +171,7 @@ router.get('/mostLiked', async (req, res) => {
                 }
             }
         }
-        console.log(data[0])
+        
         res.status(200).json({ error: false, data: data });
     } catch (error) {
         console.log(error)
