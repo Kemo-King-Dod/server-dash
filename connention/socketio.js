@@ -28,17 +28,14 @@ async function connect(socket) {
             console.log("يرجى تسجيل الدخول");
           } else {
             let exist = await User.findOne({ _id: data.id });
-            // if (exist && exist.connection) return
             if (!exist) {
               exist = await Store.findOne({ _id: data.id });
-              // if (exist && exist.connection) return
               if (!exist) {
                 exist = await Driver.findOne({ _id: data.id });
                 if (!exist) {
                   console.log("access denied");
                 }
                 else {
-                  // if (exist && exist.connection) return
                   await Driver.updateOne(
                     { _id: data.id },
                     { $set: { connection: true, connectionId: socket.id } }
@@ -74,11 +71,6 @@ async function connect(socket) {
 
     try {
       let user = await User.findById(data.userID);
-      console.log('------------------------')
-      console.log(data)
-      console.log(socket.id)
-      console.log(user.connectionId)
-      console.log('------------------------')
       socket.to(user.connectionId).emit("updateUser", data)
       if (!user)
         throw new Error('there is no user')
@@ -110,11 +102,6 @@ async function connect(socket) {
       let store = await Store.findById(data.storeID);
       let timesToSendRequist = 0; // to 180
       if (store.connection == false) {
-        console.log('------------------------')
-        console.log(data)
-        console.log(socket.id)
-        console.log(store.connectionId)
-        console.log('------------------------')
         const times = setInterval(async () => {
           timesToSendRequist++;
           store = await Store.findById(data.storeID);
@@ -133,13 +120,17 @@ async function connect(socket) {
   });
 
   socket.on("updateDriver", async (data) => {
-    if (data.type == "chat") {
-      const driver = await Driver.findOne({ phone: data.id })
-      if (driver.connection)
-        socket.to(driver.connectionId).emit("updateDriver", data);
+    try {
+      if (data.type == "chat") {
+        const driver = await Driver.findOne({ phone: data.id })
+        if (driver.connection)
+          socket.to(driver.connectionId).emit("updateDriver", data);
+      }
+      else
+        socket.to("drivers").emit("updateDriver", data)
+    } catch (error) {
+      console.log(error)
     }
-    else
-      socket.to("drivers").emit("updateDriver", data)
   });
 
 
