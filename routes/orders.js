@@ -355,7 +355,10 @@ router.post("/examineCode", auth, async (req, res) => {
             await store.save();
 
             const driver = await Driver.findById(req.userId)
-            driver.funds += order.totalPrice;
+            if (!driver.funds)
+                driver.funds = order.totalPrice;
+            else
+                driver.funds += order.totalPrice;
             await driver.save();
 
             res.status(200).json({
