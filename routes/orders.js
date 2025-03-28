@@ -355,6 +355,7 @@ router.post("/examineCode", auth, async (req, res) => {
             await store.save();
 
             const driver = await Driver.findById(req.userId)
+            console.log(driver)
             if (!driver._doc.funds)
                 driver._doc.funds = order.totalPrice;
             else
