@@ -77,6 +77,7 @@ async function connect(socket) {
       console.log(data)
       console.log('------------------------')
       let user = await User.findById(data.userID);
+      socket.to(user.connectionId).emit("updateUser", data)
       if (!user)
         throw new Error('there is no user')
       let timesToSendRequist = 0; // to 180
