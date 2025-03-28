@@ -31,14 +31,14 @@ async function connect(socket) {
             // if (exist && exist.connection) return
             if (!exist) {
               exist = await Store.findOne({ _id: data.id });
-              if (exist && exist.connection) return
+              // if (exist && exist.connection) return
               if (!exist) {
                 exist = await Driver.findOne({ _id: data.id });
                 if (!exist) {
                   console.log("access denied");
                 }
                 else {
-                  if (exist && exist.connection) return
+                  // if (exist && exist.connection) return
                   await Driver.updateOne(
                     { _id: data.id },
                     { $set: { connection: true, connectionId: socket.id } }
