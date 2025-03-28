@@ -73,7 +73,9 @@ async function connect(socket) {
     }
 
     try {
-      console.log(data.userID)
+      console.log('------------------------')
+      console.log(data)
+      console.log('------------------------')
       let user = await User.findById(data.userID);
       if (!user)
         throw new Error('there is no user')
@@ -101,9 +103,6 @@ async function connect(socket) {
   })
 
   socket.on("updateStore", async (data) => {
-    console.log('------------------------')
-    console.log(data)
-    console.log('------------------------')
     try {
       let store = await Store.findById(data.storeID);
       let timesToSendRequist = 0; // to 180
