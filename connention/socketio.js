@@ -100,6 +100,9 @@ async function connect(socket) {
   })
 
   socket.on("updateStore", async (data) => {
+    console.log('------------------------')
+    console.log(data)
+    console.log('------------------------')
     try {
       let store = await Store.findById(data.storeID);
       let timesToSendRequist = 0; // to 180
