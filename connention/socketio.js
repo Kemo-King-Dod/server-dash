@@ -184,6 +184,7 @@ async function connect(socket) {
         { $set: { connection: false, connectionId: null } }
       );
     }
+    console.log("User disconnected:" + socket.id)
   });
 
   socket.on("stillConnect", async (token) => {
@@ -228,10 +229,6 @@ async function connect(socket) {
   socket.on("leaveRoom", (roomName) => {
     socket.leave(roomName);
     console.log("User" + socket.id + " left room:" + roomName);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected:" + socket.id);
   });
 }
 
