@@ -28,7 +28,7 @@ async function connect(socket) {
             console.log("يرجى تسجيل الدخول");
           } else {
             let exist = await User.findOne({ _id: data.id });
-            if (exist && exist.connection) return
+            // if (exist && exist.connection) return
             if (!exist) {
               exist = await Store.findOne({ _id: data.id });
               if (exist && exist.connection) return
