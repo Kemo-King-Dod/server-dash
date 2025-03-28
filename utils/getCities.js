@@ -7,7 +7,6 @@ route.get('./getCitiesAndVersion', async (req, res) => {
             error: false,
             data: { citiesAndBoundry: require('./cities.json'), version: '1.0.0' }
         });
-
     } catch (error) {
         console.log(err);
         res.status(500).json({

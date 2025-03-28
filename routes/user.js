@@ -5,6 +5,7 @@ const Addresse = require('../database/address')
 const bcrypt = require('bcrypt')
 const { auth } = require('../middleware/auth')
 const Items = require('../database/items');
+const Store = require('../database/store');
 
 router.post('/addAddress', auth, async (req, res) => {
     try {
@@ -206,6 +207,23 @@ router.post('/unlikeItem', auth, async (req, res) => {
             message: error
         });
     }
-});
+})
+
+
+router.post('/getStoreForUser', auth, async (req, res) => {
+    try {
+        const store = await Store.findById(req.body.id)
+        res.status(200).json({
+            error: false,
+            data: store
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
+        })
+    }
+})
 
 module.exports = router
