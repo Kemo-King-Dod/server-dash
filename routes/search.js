@@ -85,13 +85,52 @@ route.post('/search', async (req, res) => {
             ]);
         }
 
-        // add store name and image to the items
-        for (let i = 0; i < allItems.length; i++) {
-            if (!allItems[i]) continue;
-            var itemStore = await Store.findById(allItems[i].storeID);
-            allItems[i].storeName = itemStore.name;
-            allItems[i].storeImage = itemStore.picture;
+        // Check if current time is between opening and closing times
+        for (let i = 0; i < allStores.length; i++) {
+            // Add isFavorite property to each item
+            allStores[i]._doc.isFollow = false;
+            allStores[i]._doc.isFavorite = false;
+
+            // check openCondition
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+
+            // Parse store hours
+            const openAMHour = parseInt(allStores[i].opentimeam.split(':')[0]);
+            const openAMMinute = parseInt(allStores[i].opentimeam.split(':')[1]);
+            const closeAMHour = parseInt(allStores[i].closetimeam.split(':')[0]);
+            const closeAMMinute = parseInt(allStores[i].closetimeam.split(':')[1]);
+            const openPMHour = parseInt(allStores[i].opentimepm.split(':')[0]);
+            const openPMMinute = parseInt(allStores[i].opentimepm.split(':')[1]);
+            let closePMHour = parseInt(allStores[i].closetimepm.split(':')[0]);
+            const closePMMinute = parseInt(allStores[i].closetimepm.split(':')[1]);
+
+            // Handle after-midnight closing times (e.g., 2:00 AM becomes 26:00)
+            if (closePMHour < 7) {
+                closePMHour += 24;
+            }
+            if (hours < 7) {
+                if (closePMHour < 10) {
+                    hours += 24;
+                }
+            }
+
+            // Convert current time to minutes for easier comparison
+            // the server time is 2 hours late from libya that is way i added + 120
+            const currentTimeInMinutes = hours * 60 + 120 + minutes;
+            const openAMInMinutes = openAMHour * 60 + openAMMinute;
+            const closeAMInMinutes = closeAMHour * 60 + closeAMMinute;
+            const openPMInMinutes = openPMHour * 60 + openPMMinute;
+            const closePMInMinutes = closePMHour * 60 + closePMMinute;
+
+            // Check if current time falls within either AM or PM opening hours
+            allStores[i].openCondition =
+                (currentTimeInMinutes >= openAMInMinutes && currentTimeInMinutes <= closeAMInMinutes) ||
+                (currentTimeInMinutes >= openPMInMinutes && currentTimeInMinutes <= closePMInMinutes)
+            allStores[i].save()
         }
+
 
         // Handle visitor case
         if (req.headers.isvisiter && req.headers.isvisiter == "true") {
@@ -111,7 +150,6 @@ route.post('/search', async (req, res) => {
             if (!allStores[i]) continue;
             allStores[i].isFollow = false;
             allStores[i].isFavorite = false;
-
         }
 
         if (id) {

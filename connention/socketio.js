@@ -74,14 +74,18 @@ async function connect(socket) {
 
     try {
       let user = await User.findById(data.userID);
+      if (!user)
+        throw new Error('there is no user')
       let timesToSendRequist = 0; // to 180
       if (user.connection == false) {
         const times = setInterval(async () => {
           timesToSendRequist++;
-          user = await User.findById(data.userID);
+          user = await User.findById(data.userID)
+          if (!user)
+            throw new Error('there is no user')
           if (user.connection || timesToSendRequist > 180) {
-            socket.to(user.connectionId).emit("updateUser", data);
-            clearInterval(times);
+            socket.to(user.connectionId).emit("updateUser", data)
+            clearInterval(times)
           }
         }, 5000);
       }
@@ -89,14 +93,10 @@ async function connect(socket) {
         socket.to(user.connectionId).emit("updateUser", data);
       }
     } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        error: true,
-        message: error.message
-      });
+      console.log(error)
     }
 
-    socket.to().emit("updateDriver", data)
+    // socket.to().emit("updateUser", data)
   })
 
   socket.on("updateStore", async (data) => {
@@ -117,11 +117,7 @@ async function connect(socket) {
         socket.to(store.connectionId).emit("updateStore", data);
       }
     } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        error: true,
-        message: error.message
-      });
+      console.log(error)
     }
   });
 
