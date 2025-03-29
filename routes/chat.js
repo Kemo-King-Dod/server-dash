@@ -5,6 +5,7 @@ const User = require("../database/users");
 const Driver = require("../database/driver");
 
 const { auth } = require("../middleware/auth");
+const { sendNotification } = require("../firebase/notification");
 
 route.post('/driverChat', auth, async (req, res) => {
     try {
