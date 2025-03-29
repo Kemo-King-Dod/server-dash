@@ -18,7 +18,6 @@ route.post('/driverChat', auth, async (req, res) => {
             }
         })
 
-        order.numberOfUnreadForDriver = 0
         for (let i = 0; i < order.chat.length; i++)
             if (!order.chat[i].didUserRead)
                 order.numberOfUnreadForDriver += 1
@@ -47,7 +46,6 @@ route.post('/userChat', auth, async (req, res) => {
             }
         })
 
-        order.numberOfUnreadForUser = 0
         for (let i = 0; i < order.chat.length; i++)
             if (!order.chat[i].didUserRead)
                 order.numberOfUnreadForUser += 1

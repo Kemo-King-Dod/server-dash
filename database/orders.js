@@ -40,11 +40,20 @@ const orders = new Schema({
     type: Number
   },
   reseveCode: {
-    type: String
+    type: String,
+    default: Math.round(Math.random() * 100000)
   },
   chat: {
     type: Object,
     default: []
+  },
+  numberOfUnreadForDriver: {
+    type: Number,
+    default: 0
+  },
+  numberOfUnreadForUser: {
+    type: Number,
+    default: 0
   }
 })
 

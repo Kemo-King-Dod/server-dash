@@ -70,7 +70,6 @@ async function connect(socket) {
     }
 
     try {
-      console.log(data)
       let user = await User.findById(data.userID);
       if (!user)
         throw new Error('there is no user')
@@ -123,7 +122,6 @@ async function connect(socket) {
   socket.on("updateDriver", async (data) => {
     try {
       if (data.type == "chat") {
-        console.log(data)
         const driver = await Driver.findOne({ phone: data.id })
         if (driver.connection)
           socket.to(driver.connectionId).emit("updateDriver", data);

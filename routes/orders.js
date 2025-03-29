@@ -91,7 +91,6 @@ router.post("/addOrder", auth, async (req, res) => {
             type: "waiting",
             address: theAddress,
             distenationPrice: store.deliveryCostByKilo,
-            reserveCode: Math.round(Math.random() * 100000),
             chat: [],
         });
 
