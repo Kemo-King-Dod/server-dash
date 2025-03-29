@@ -6,6 +6,7 @@ const Driver = require("../database/driver");
 
 const { auth } = require("../middleware/auth");
 const { sendNotification } = require("../firebase/notification");
+const mongoose = require("mongoose");
 
 route.post('/driverChat', auth, async (req, res) => {
     try {
@@ -62,7 +63,7 @@ route.post('/userChat', auth, async (req, res) => {
 
 route.get('/userCheckNumberOfUnreadMessages', auth, async (req, res) => {
     try {
-        const orders = await Order.find({ 'customer.id': req.userId })
+        const orders = await Order.find({ 'customer.id': new mongoose.Types.ObjectId(req.userId) })
 
         let sum = 0
         for (let i = 0; i < orders.length; i++) {
@@ -87,7 +88,7 @@ route.get('/userCheckNumberOfUnreadMessages', auth, async (req, res) => {
 
 route.get('/driverCheckNumberOfUnreadMessages', auth, async (req, res) => {
     try {
-        const order = await Order.find({ 'driver.id': req.userId })
+        const order = await Order.find({ 'driver.id': new mongoose.Types.ObjectId(req.userId) })
         res.status(200).json({
             error: false,
             data: order.numberOfUnreadForDriver
