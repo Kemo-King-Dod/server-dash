@@ -15,21 +15,21 @@
         ]
     },
     
-        {
-            "center": {
-                "latitude": 27.038482,
-                "longitude": 14.426147
-            },
-            "Arabicname": "سبها",
-            "Englishname": "Sabha",
-            "boundary": [
-                {"latitude": 27.032251, "longitude": 14.448614},
-                {"latitude": 27.063722, "longitude": 14.421119},
-                {"latitude": 27.050511, "longitude": 14.400473},
-                {"latitude": 27.027783, "longitude": 14.405929},
-                {"latitude": 27.016148, "longitude": 14.431503}
-            ]
+    {
+        "center": {
+            "latitude": 27.038482,
+            "longitude": 14.426147
         },
+        "Arabicname": "سبها",
+        "Englishname": "Sabha",
+        "boundary": [
+            {"latitude": 27.032251, "longitude": 14.448614},
+            {"latitude": 27.063722, "longitude": 14.421119},
+            {"latitude": 27.050511, "longitude": 14.400473},
+            {"latitude": 27.027783, "longitude": 14.405929},
+            {"latitude": 27.016148, "longitude": 14.431503}
+        ]
+    },
         {
             "center": {
                 "latitude": 24.890183,

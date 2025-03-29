@@ -1,7 +1,7 @@
 const express = require("express");
 const route = express.Router();
 
-route.get('./getCitiesAndVersion', async (req, res) => {
+route.get('/getCitiesAndVersion', async (req, res) => {
     try {
         res.status(200).json({
             error: false,
