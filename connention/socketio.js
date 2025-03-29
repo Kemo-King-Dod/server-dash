@@ -63,6 +63,7 @@ async function connect(socket) {
 
   socket.on("updateUser", async (data) => {
     if (data.type == "chat") {
+      console.log(data)
       const user = await User.findOne({ phone: data.id })
       if (user.connection)
         await socket.to(user.connectionId).emit("updateUser", data);
