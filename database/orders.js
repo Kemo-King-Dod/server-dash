@@ -43,8 +43,9 @@ const orders = new Schema({
     type: String
   },
   chat: {
-    type: Object
+    type: Object,
+    default: {}
   }
-});
+})
 
-module.exports = mongoose.model("Order", orders);
+module.exports = mongoose.model("Order", orders)
