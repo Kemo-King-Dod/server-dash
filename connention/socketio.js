@@ -70,10 +70,11 @@ async function connect(socket) {
     }
 
     try {
+      console.log(data)
       let user = await User.findById(data.userID);
-      socket.to(user.connectionId).emit("updateUser", data)
       if (!user)
         throw new Error('there is no user')
+      socket.to(user.connectionId).emit("updateUser", data)
       let timesToSendRequist = 0; // to 180
       if (user.connection == false) {
         const times = setInterval(async () => {
