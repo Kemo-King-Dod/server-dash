@@ -19,6 +19,7 @@ function createserver(server) {
 
 async function connect(socket) {
   try {
+    console.log(socket.id)
     if (socket.handshake.headers.authorization) {
       await jwt.verify(
         socket.handshake.headers.authorization,
