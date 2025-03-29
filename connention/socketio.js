@@ -70,7 +70,7 @@ async function connect(socket) {
     }
 
     try {
-      console.log(data)
+      // console.log(data)
       let user = await User.findById(data.userID);
       if (!user)
         throw new Error('there is no user')
