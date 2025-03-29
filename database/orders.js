@@ -44,7 +44,7 @@ const orders = new Schema({
   },
   chat: {
     type: Object,
-    default: {}
+    default: []
   }
 })
 
