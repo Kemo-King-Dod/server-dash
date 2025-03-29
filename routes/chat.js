@@ -69,6 +69,8 @@ route.get('/userCheckNumberOfUnreadMessages', auth, async (req, res) => {
             sum += orders[i].numberOfUnreadForUser
         }
 
+        console.log(sum)
+
         res.status(200).json({
             error: false,
             data: sum
