@@ -38,7 +38,7 @@ router.get("/orderRecordForUser", auth, async (req, res) => {
 
 
 // get Order Record For Driver
-router.get("/orderRecordForUser", auth, async (req, res) => {
+router.get("/orderRecordForDriver", auth, async (req, res) => {
     try {
         const userId = req.userId;
         const records = await OrderRecord.find({ "driver.id": new mongoose.Types.ObjectId(userId) });
