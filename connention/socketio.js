@@ -154,47 +154,47 @@ async function connect(socket) {
     }
   });
 
-  socket.on("reconnect", async (token) => {
-    if (token) {
-      await jwt.verify(
-        token,
-        "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
-        async (err, data) => {
-          if (err) {
-            console.log("يرجى تسجيل الدخول");
-          } else {
-            let exist = await User.findOne({ _id: data.id });
-            if (!exist) {
-              exist = await Store.findOne({ _id: data.id });
-              if (!exist) {
-                exist = await Driver.findOne({ _id: data.id });
-                if (!exist) {
-                  console.log("access denied");
-                  return;
-                }
-                // Fixed: Added missing driver reconnection handling
-                await Driver.updateOne(
-                  { _id: data.id },
-                  { $set: { connection: true, connectionId: socket.id } }
-                );
-                socket.join("drivers");
-              } else {
-                await Store.updateOne(
-                  { _id: data.id },
-                  { $set: { connection: true, connectionId: socket.id } }
-                );
-              }
-            } else {
-              await User.updateOne(
-                { _id: data.id },
-                { $set: { connection: true, connectionId: socket.id } }
-              );
-            }
-          }
-        }
-      );
-    }
-  });
+  // socket.on("reconnect", async (token) => {
+  //   if (token) {
+  //     await jwt.verify(
+  //       token,
+  //       "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
+  //       async (err, data) => {
+  //         if (err) {
+  //           console.log("يرجى تسجيل الدخول");
+  //         } else {
+  //           let exist = await User.findOne({ _id: data.id });
+  //           if (!exist) {
+  //             exist = await Store.findOne({ _id: data.id });
+  //             if (!exist) {
+  //               exist = await Driver.findOne({ _id: data.id });
+  //               if (!exist) {
+  //                 console.log("access denied");
+  //                 return;
+  //               }
+  //               // Fixed: Added missing driver reconnection handling
+  //               await Driver.updateOne(
+  //                 { _id: data.id },
+  //                 { $set: { connection: true, connectionId: socket.id } }
+  //               );
+  //               socket.join("drivers");
+  //             } else {
+  //               await Store.updateOne(
+  //                 { _id: data.id },
+  //                 { $set: { connection: true, connectionId: socket.id } }
+  //               );
+  //             }
+  //           } else {
+  //             await User.updateOne(
+  //               { _id: data.id },
+  //               { $set: { connection: true, connectionId: socket.id } }
+  //             );
+  //           }
+  //         }
+  //       }
+  //     );
+  //   }
+  // });
 
   socket.on("disconnect", async () => {
     try {
@@ -229,49 +229,50 @@ async function connect(socket) {
     }
   });
 
-  socket.on("stillConnect", async (token) => {
-    userisstillconnected(socket);
-    if (token) {
-      await jwt.verify(
-        token,
-        "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
-        async (err, data) => {
-          if (err) {
-            return;
-          } else {
-            let exist = await User.findOne({ _id: data.id });
-            if (!exist) {
-              exist = await Store.findOne({ _id: data.id });
-              if (!exist) {
-                exist = await Driver.findOne({ _id: data.id });
-                if (!exist) {
-                  return;
-                }
-                // Fixed: Added missing driver stillConnect handling
-                await Driver.updateOne(
-                  { _id: data.id },
-                  { $set: { connection: true, connectionId: socket.id } }
-                );
-                socket.join("drivers");
-              } else {
-                await Store.updateOne(
-                  { _id: data.id },
-                  { $set: { connection: true, connectionId: socket.id } }
-                );
-              }
-            } else {
-              await User.updateOne(
-                { _id: data.id },
-                { $set: { connection: true, connectionId: socket.id } }
-              );
-            }
-          }
-        }
-      );
-    }
-  });
+  // socket.on("stillConnect", async (token) => {
+  //   userisstillconnected(socket);
+  //   if (token) {
+  //     await jwt.verify(
+  //       token,
+  //       "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
+  //       async (err, data) => {
+  //         if (err) {
+  //           return;
+  //         } else {
+  //           let exist = await User.findOne({ _id: data.id });
+  //           if (!exist) {
+  //             exist = await Store.findOne({ _id: data.id });
+  //             if (!exist) {
+  //               exist = await Driver.findOne({ _id: data.id });
+  //               if (!exist) {
+  //                 return;
+  //               }
+  //               // Fixed: Added missing driver stillConnect handling
+  //               await Driver.updateOne(
+  //                 { _id: data.id },
+  //                 { $set: { connection: true, connectionId: socket.id } }
+  //               );
+  //               socket.join("drivers");
+  //             } else {
+  //               await Store.updateOne(
+  //                 { _id: data.id },
+  //                 { $set: { connection: true, connectionId: socket.id } }
+  //               );
+  //             }
+  //           } else {
+  //             await User.updateOne(
+  //               { _id: data.id },
+  //               { $set: { connection: true, connectionId: socket.id } }
+  //             );
+  //           }
+  //         }
+  //       }
+  //     );
+  //   }
+  // });
 
   // انضمام المستخدم إلى غرفة خاصة
+  
   socket.on("joinRoom", (roomName) => {
     socket.join(roomName);
     console.log("User " + socket.id + " joined room: " + roomName);
@@ -284,47 +285,47 @@ async function connect(socket) {
   });
 
   // Initialize connection timeout check
-  isuserconnected(socket);
+  // isuserconnected(socket);
 }
 
-function isuserconnected(socket) {
-  isconnected = setTimeout(async () => {
-    try {
-      let exist = await Store.findOne({ connectionId: socket.id });
-      if (!exist) {
-        exist = await User.findOne({ connectionId: socket.id });
-        if (!exist) {
-          exist = await Driver.findOne({ connectionId: socket.id });
-          if (!exist) {
-            return;
-          }
-          // Fixed: Added missing driver timeout handling
-          await Driver.updateOne(
-            { connectionId: socket.id },
-            { $set: { connection: false, connectionId: null } }
-          );
-        } else {
-          await User.updateOne(
-            { connectionId: socket.id },
-            { $set: { connection: false, connectionId: null } }
-          );
-        }
-      } else {
-        await Store.updateOne(
-          { connectionId: socket.id },
-          { $set: { connection: false, connectionId: null } }
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, 1000 * 20);
-}
+// function isuserconnected(socket) {
+//   isconnected = setTimeout(async () => {
+//     try {
+//       let exist = await Store.findOne({ connectionId: socket.id });
+//       if (!exist) {
+//         exist = await User.findOne({ connectionId: socket.id });
+//         if (!exist) {
+//           exist = await Driver.findOne({ connectionId: socket.id });
+//           if (!exist) {
+//             return;
+//           }
+//           // Fixed: Added missing driver timeout handling
+//           await Driver.updateOne(
+//             { connectionId: socket.id },
+//             { $set: { connection: false, connectionId: null } }
+//           );
+//         } else {
+//           await User.updateOne(
+//             { connectionId: socket.id },
+//             { $set: { connection: false, connectionId: null } }
+//           );
+//         }
+//       } else {
+//         await Store.updateOne(
+//           { connectionId: socket.id },
+//           { $set: { connection: false, connectionId: null } }
+//         );
+//       }
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   }, 1000 * 20);
+// }
 
-function userisstillconnected(socket) {
-  clearTimeout(isconnected);
-  isconnected = false;
-  isuserconnected(socket);
-}
+// function userisstillconnected(socket) {
+//   clearTimeout(isconnected);
+//   isconnected = false;
+//   isuserconnected(socket);
+// }
 
 module.exports = { createserver, connect };
