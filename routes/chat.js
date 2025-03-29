@@ -46,12 +46,10 @@ route.post('/userChat', auth, async (req, res) => {
             }
         })
 
-        for (let i = 0; i < order.chat.length; i++)
-            if (!order.chat[i].didUserRead)
-                order.numberOfUnreadForUser += 1
-
-        for (let i = 0; i < order.chat.length; i++)
+        for (let i = 0; i < order.chat.length; i++) {
             order.chat[i].didUserRead = true
+            order.chat[i].save()
+        }
 
     } catch (error) {
         console.log(error)
@@ -70,6 +68,7 @@ route.get('/userCheckNumberOfUnreadMessages', auth, async (req, res) => {
         for (let i = 0; i < orders.length; i++) {
             sum += orders[i].numberOfUnreadForUser
         }
+
         res.status(200).json({
             error: false,
             data: sum
@@ -139,8 +138,9 @@ route.post('/driverSendMessage', auth, async (req, res) => {
             sendNotification({ token: driver.fcmToken, title: 'رسالة جديدة', body: 'قام الزبون بارسال رسالة لك' })
         }
 
-        order.chat.push(newMessage);
-        await Order.findOneAndUpdate({ _id: id }, { $set: { chat: order.chat } });
+        order.chat.push(newMessage)
+        order.numberOfUnreadForUser += 1
+        order.save()
 
         res.status(200).json({
             error: false,
@@ -198,7 +198,8 @@ route.post('/userSendMessage', auth, async (req, res) => {
 
 
         order.chat.push(newMessage)
-        await Order.findOneAndUpdate({ _id: id }, { $set: { chat: order.chat } });
+        order.numberOfUnreadForDriver += 1
+        order.save()
 
         res.status(200).json({
             error: false,
