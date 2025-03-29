@@ -415,7 +415,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
 
         const user = await User.findById(order.customer.orderId)
         User.findByIdAndUpdate(order.customer.orderId, { orders: { $pull: order._id } })
-        sendNotification({ token: user.fcmToken, title: 'تم تسليم طلبك', body: 'نتمنى أن الخدمة قد نالت رضاكم' })
+        // sendNotification({ token: user.fcmToken, title: 'تم تسليم طلبك', body: 'نتمنى أن الخدمة قد نالت رضاكم' })
         await notification.create({
             id: order.customer.id,
             userType: 'user',
