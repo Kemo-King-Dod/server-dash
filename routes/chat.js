@@ -49,8 +49,8 @@ route.post('/userChat', auth, async (req, res) => {
 
         for (let i = 0; i < order.chat.length; i++) {
             order.chat[i].didUserRead = true
-            order.chat[i].save()
         }
+        order.save()
 
     } catch (error) {
         console.log(error)
