@@ -212,7 +212,7 @@ router.post('/unlikeItem', auth, async (req, res) => {
 
 router.post('/getStoreForUser', auth, async (req, res) => {
     try {
-        const store = await Store.findById(req.body.id)
+        const store = await Store.findById(req.body.id, { items: 0, password: 0 })
         res.status(200).json({
             error: false,
             data: store
