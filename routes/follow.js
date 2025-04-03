@@ -103,24 +103,14 @@ router.get("/MostFollowedStores", async (req, res) => {
           if (
             user.favorateStors[j]._id.toString() === stores[i]._id.toString()
           ) {
-            console.log(
-              user.favorateStors[j].toString() == stores[i]._id.toString()
-            );
-            console.log(user.favorateStors[j].toString());
-            console.log(stores[i]._id.toString());
-            stores[i].isFavorite = true;
+            stores[i]._doc.isFavorite = true;
           }
         }
         // Add isFollow property to stores
         stores[i].isFollow = false;
         for (var j = 0; j < user.followedStores.length; j++) {
           if (user.followedStores[j].toString() == stores[i]._id.toString()) {
-            console.log(
-              user.followedStores[j].toString() == stores[i]._id.toString()
-            );
-            console.log(user.followedStores[j].toString());
-            console.log(stores[i]._id.toString());
-            stores[i].isFollow = true;
+            stores[i]._doc.isFollow = true;
           }
         }
       }
