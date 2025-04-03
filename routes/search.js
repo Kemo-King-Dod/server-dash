@@ -88,8 +88,8 @@ route.post("/search", async (req, res) => {
     // Check if current time is between opening and closing times
     for (let i = 0; i < allStores.length; i++) {
       // Add isFavorite property to each item
-      allStores[i]._doc.isFollow = false;
-      allStores[i]._doc.isFavorite = false;
+      allStores[i].isFollow = false;
+      allStores[i].isFavorite = false;
 
       // check openCondition
       const now = new Date();
