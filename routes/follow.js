@@ -77,6 +77,9 @@ router.post("/unFollow", auth, async (req, res) => {
 
 router.get("/MostFollowedStores", async (req, res) => {
   try {
+    console.log(777);
+    console.log(new Date());
+
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
@@ -120,6 +123,8 @@ router.get("/MostFollowedStores", async (req, res) => {
       data: stores,
     });
     console.log(111);
+    console.log(new Date());
+
   } catch (error) {
     res.status(500).json({
       error: true,
