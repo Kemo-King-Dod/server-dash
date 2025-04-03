@@ -130,7 +130,6 @@ route.post("/search", async (req, res) => {
           currentTimeInMinutes <= closeAMInMinutes) ||
         (currentTimeInMinutes >= openPMInMinutes &&
           currentTimeInMinutes <= closePMInMinutes);
-      //   await allStores[i].save();
     }
 
     // Handle visitor case
@@ -216,13 +215,14 @@ route.post("/search", async (req, res) => {
       }
     }
 
-    res.json({
+    await res.json({
       error: false,
       data: {
         products: allItems,
         stores: allStores,
       },
     });
+    console.log(111)
   } catch (error) {
     console.log(error);
     res.status(401).json({
