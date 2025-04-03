@@ -119,6 +119,7 @@ router.get("/MostFollowedStores", async (req, res) => {
       error: false,
       data: stores,
     });
+    console.log(111);
   } catch (error) {
     res.status(500).json({
       error: true,
