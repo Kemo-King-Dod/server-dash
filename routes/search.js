@@ -130,7 +130,7 @@ route.post("/search", async (req, res) => {
           currentTimeInMinutes <= closeAMInMinutes) ||
         (currentTimeInMinutes >= openPMInMinutes &&
           currentTimeInMinutes <= closePMInMinutes);
-      allStores[i].save();
+      await allStores[i].save();
     }
 
     // Handle visitor case
