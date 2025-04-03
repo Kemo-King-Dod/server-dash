@@ -125,11 +125,11 @@ router.get('/MostFollowedStores', async (req, res) => {
                     }
                 }
             }
-            res.status(200).json({
-                error: false,
-                data: stores
-            });
         }
+        res.status(200).json({
+            error: false,
+            data: stores
+        });
     } catch (error) {
         res.status(500).json({
             error: true,
