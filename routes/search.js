@@ -181,7 +181,14 @@ route.post("/search", async (req, res) => {
         if (!allStores[i]) continue;
         allStores[i].isFollow = false;
         for (var j = 0; j < user.followedStores.length; j++) {
-          if (user.followedStores[j].toString() == allStores[i]._id.toString()) {
+          console.log(
+            user.followedStores[j].toString() == allStores[i]._id.toString()
+          );
+          console.log(user.followedStores[j].toString());
+          console.log(allStores[i]._id.toString());
+          if (
+            user.followedStores[j].toString() == allStores[i]._id.toString()
+          ) {
             allStores[i].isFollow = true;
           }
         }
