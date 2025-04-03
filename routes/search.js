@@ -18,21 +18,21 @@ route.post('/search', async (req, res) => {
         const searchTerm = req.body.keyWord;
 
         // Try text search first for stores
-        let allStores = await Store.aggregate([
-            {
-                $match: {
-                    $text: { $search: searchTerm }
-                }
-            },
-            {
-                $sort: {
-                    score: { $meta: "textScore" }
-                }
-            },
-            {
-                $limit: 2
-            }
-        ]);
+        // let allStores = await Store.aggregate([
+        //     {
+        //         $match: {
+        //             $text: { $search: searchTerm }
+        //         }
+        //     },
+        //     {
+        //         $sort: {
+        //             score: { $meta: "textScore" }
+        //         }
+        //     },
+        //     {
+        //         $limit: 2
+        //     }
+        // ]);
 
         // If no results, fall back to regex search for stores
         if (allStores.length === 0) {
@@ -52,21 +52,21 @@ route.post('/search', async (req, res) => {
         }
 
         // Try text search first for items
-        let allItems = await items.aggregate([
-            {
-                $match: {
-                    $text: { $search: searchTerm }
-                }
-            },
-            {
-                $sort: {
-                    score: { $meta: "textScore" }
-                }
-            },
-            {
-                $limit: 4
-            }
-        ]);
+        // let allItems = await items.aggregate([
+        //     {
+        //         $match: {
+        //             $text: { $search: searchTerm }
+        //         }
+        //     },
+        //     {
+        //         $sort: {
+        //             score: { $meta: "textScore" }
+        //         }
+        //     },
+        //     {
+        //         $limit: 4
+        //     }
+        // ]);
 
         // If no results, fall back to regex search for items
         if (allItems.length === 0) {
