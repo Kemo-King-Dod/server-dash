@@ -1,146 +1,153 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const stores = new Schema({
+const stores = new Schema(
+  {
     name: {
-        type: String,
-        require: [true, 'الإسم مطلوب']
+      type: String,
+      require: [true, "الإسم مطلوب"],
     },
     phone: {
-        type: String,
-        length: 10,
-        require: [true, 'رقم الهاتف مطلوب']
+      type: String,
+      length: 10,
+      require: [true, "رقم الهاتف مطلوب"],
     },
     password: {
-        type: String,
-        require: [true, 'كلمة السر مطلوبة']
+      type: String,
+      require: [true, "كلمة السر مطلوبة"],
     },
     storeType: {
-        type: String,
-        require: [true, 'النوع مطلوب']
+      type: String,
+      require: [true, "النوع مطلوب"],
     },
     deliveryCostByKilo: {
-        type: Number,
-        require: [true, 'السعر مطلوب'],
-        default: 5.0,
-        length: 2
+      type: Number,
+      require: [true, "السعر مطلوب"],
+      default: 5.0,
+      length: 2,
     },
     idNumber: {
-        type: String,
-        require: [true, 'رقم الهوية مطلوب']
+      type: String,
+      require: [true, "رقم الهوية مطلوب"],
     },
     licenseNumber: {
-        type: String,
-        require: [true, 'رقم الرخصة مطلوب']
+      type: String,
+      require: [true, "رقم الرخصة مطلوب"],
     },
     location: {
-        type: {
-            latitude: {
-                type: Number,
-                required: true
-            },
-            longitude: {
-                type: Number,
-                required: true
-            }
+      type: {
+        latitude: {
+          type: Number,
+          required: true,
         },
-        required: [true, 'الموقع مطلوب']
+        longitude: {
+          type: Number,
+          required: true,
+        },
+      },
+      required: [true, "الموقع مطلوب"],
     },
     address: {
-        type: String,
-        require: [true, 'العنوان مطلوب']
+      type: String,
+      require: [true, "العنوان مطلوب"],
     },
     ownerName: {
-        type: String
+      type: String,
     },
     city: {
-        type: String
+      type: String,
     },
     picture: {
-        type: String,
-        require: [true, 'صورة المتجر مطلوبة']
+      type: String,
+      require: [true, "صورة المتجر مطلوبة"],
     },
     registerCondition: {
-        type: String,
-        default: "waiting"
+      type: String,
+      default: "waiting",
     },
     items: {
-        type: Array
+      type: Array,
     },
     connection: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
     connectionId: {
-        type: String,
-        default: false
+      type: String,
+      default: false,
     },
     orders: {
-        type: Array
+      type: Array,
     },
     RetrenchmentsNumbers: {
-        type: Array
+      type: Array,
+    },
+    hasDiscount: {
+      type: Boolean,
+      default: false,
     },
     totalCommission: {
-        type: Number
+      type: Number,
     },
     moneyRecord: {
-        type: Array
+      type: Array,
     },
     discription: {
-        type: String
+      type: String,
     },
     notificationsCondition: {
-        type: Boolean,
-        default: true
+      type: Boolean,
+      default: true,
     },
     openCondition: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
     registerHistory: {
-        type: Date
+      type: Date,
     },
     opentimeam: {
-        type: String,
-        default: null
+      type: String,
+      default: null,
     },
     closetimeam: {
-        type: String,
-        default: null
+      type: String,
+      default: null,
     },
     opentimepm: {
-        type: String,
-        default: null
+      type: String,
+      default: null,
     },
     closetimepm: {
-        type: String,
-        default: null
+      type: String,
+      default: null,
     },
     // اللي المحل يبيه منا
     funds: {
-        type: Number,
-        default: null
+      type: Number,
+      default: null,
     },
     lastWidrawal: {
-        type: Number,
-        default: null
+      type: Number,
+      default: null,
     },
     userType: {
-        type: String
+      type: String,
     },
     fcmToken: {
-        type: String
+      type: String,
     },
     followersNumber: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
     otp: {
-        type: String
-    }
-}, {
-    timestamps: true
-})
+      type: String,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = mongoose.model('Store', stores)
+module.exports = mongoose.model("Store", stores);
