@@ -98,6 +98,10 @@ app.use(getCities);
 const notification = require("./routes/notification.js");
 app.use(notification);
 
+const version = require("./routes/version.js");
+app.use(version);
+
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'try.html'))
 })
