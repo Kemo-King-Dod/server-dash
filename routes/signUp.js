@@ -30,7 +30,7 @@ router.post('/user', async (req, res) => {
         const { name, password, gender, phone, locations, fcmToken } = req.body;
 
         if (!name || !password || !phone  || !gender ) {
-            res.status(400).json({
+          return res.status(400).json({
                 error: true,
                 data: 'جميع الحقول مطلوبة'
             });
