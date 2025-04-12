@@ -38,11 +38,12 @@ router.post('/user', async (req, res) => {
 
         const existingUser = await User.findOne({ phone });
         if (existingUser) {
-            res.status(400).json({
+         return res.status(400).json({
                 error: true,
                 data: 'رقم الهاتف مسجل مسبقاً'
             });
-        }
+        }else{
+
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -82,6 +83,7 @@ router.post('/user', async (req, res) => {
                 }
             }
         });
+    }
     } catch (error) {
         console.log(error)
         res.status(500).json({
