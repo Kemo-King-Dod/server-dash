@@ -5,5 +5,6 @@
     "time": "12:00:00",
     "author": "John Doe",
     "description": "This is a description of the version",
-    "url": "https://play.google.com/store/apps/details?id=com.fasto.ly"
+    "url": "https://play.google.com/store/apps/details?id=com.fasto.ly",
+    "image":"newUpdateNoBg.png"
 }

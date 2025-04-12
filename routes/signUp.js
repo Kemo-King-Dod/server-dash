@@ -83,6 +83,7 @@ router.post('/user', async (req, res) => {
             }
         });
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             error: true,
             data: 'حدث خطأ أثناء التسجيل'
