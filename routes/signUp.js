@@ -28,7 +28,7 @@ const deleteUploadedFile = async (filePath) => {
 router.post('/user', async (req, res) => {
     try {
         const { name, password, gender, phone, locations, fcmToken } = req.body;
-
+        console.log(req.body)
         if (!name || !password || !phone  || !gender ) {
           return res.status(400).json({
                 error: true,
