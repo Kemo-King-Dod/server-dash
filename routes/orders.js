@@ -257,32 +257,34 @@ router.get("/getOrdersForStore", auth, async (req, res) => {
 router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     try {
         const id = req.userId
-        const acceptedorder = await Order.findOne({ "driver.id": id, status: "driverAccepted" })
-        if (acceptedorder) {
+        const acceptedorders = await Order.find({ "driver.id": id, status: { $in: ["driverAccepted", "onWay", "delivered"] } })
+        if (!req.user.userType === "admin" && acceptedorders.length > 3) {
             return res.status(200).json({
                 error: false,
-                data: acceptedorder,
+                data: acceptedorders,
             });
         }
         const order = await Order.aggregate([
             {
-                $match: { status: { $in: ["ready", "driverAccepted", "onWay", "confirmed"] } }
+                $match: { status: { $in: ["ready"] } }
             },
             {
-                $sample: { size: 1 }
+                $sample: { size: 10 }
             }
         ]);
 
-        if (order.length == 0) {
+        if (order.length == 0 && acceptedorders.length == 0) {
             return res.status(300).json({
                 error: true,
                 message: 'ليس هناك طلبات جاهزة حتى الآن'
             });
         }
-
+        if (acceptedorders.length > 0) {
+            order.push(...acceptedorders)
+        }
         res.status(200).json({
             error: false,
-            data: order[0],
+            data:order,
         });
     } catch (err) {
         console.log(err);
@@ -292,6 +294,23 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
         });
     }
 });
+router.get("/getAcceptedOrdersForDriver", auth, async (req, res) => {
+    try {
+        const id = req.userId
+        const orders = await Order.find({ "driver.id": id, status: "driverAccepted" })
+        res.status(200).json({
+            error: false,
+            data: orders,
+        });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: true,
+            message: err
+        });
+    }
+})
 
 router.post("/driverAcceptOrder", auth, async (req, res) => {
     try {
@@ -306,6 +325,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
         }
 
         const order = await Order.findById(id);
+        if (order.status == "waiting") {
         if (order) {
             order.status = "driverAccepted";
             order.type = "driverAccepted";
@@ -328,6 +348,12 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
             res.status(500).json({
                 error: true,
                 message: "الطلب غير موجود",
+            });
+        }
+    }else{
+           return res.status(500).json({
+                error: true,
+                message: "لا يمكن قبول طلب جاري",
             });
         }
     } catch (err) {
