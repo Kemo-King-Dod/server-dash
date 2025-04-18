@@ -63,14 +63,13 @@ router.post("/addOrder", auth, async (req, res) => {
             });
             return;
         }
-
         // Create new order
         console.log("theAddress",theAddress);
         const order = new Order({
             orderId: await read(),
             city:{
-                englishName: getCityName(theAddress.location).englishName,
-                arabicName: getCityName(theAddress.location).arabicName
+                englishName: getCityName(theAddress).englishName,
+                arabicName: getCityName(theAddress).arabicName
             },
             customer: {
                 id: user._id,
