@@ -65,6 +65,7 @@ router.post("/addOrder", auth, async (req, res) => {
         }
 
         // Create new order
+        console.log("theAddress",theAddress);
         const order = new Order({
             orderId: await read(),
             city:{
