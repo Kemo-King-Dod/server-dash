@@ -3,6 +3,7 @@ const { isPointInsidePolygon } = require("./is_inside_polygon");
 
 function getCityName(point) {
     let cityName = "";
+    let englishName = "";
     for (const city of cities) {
         if (isPointInsidePolygon(point, city.boundary)) {
             cityName = city.Arabicname;

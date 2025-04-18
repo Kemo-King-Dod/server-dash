@@ -93,6 +93,9 @@ const drivers = new Schema({
     },
     otp: {
         type: String
+    },
+    city: {
+        type: String
     }
 })
 

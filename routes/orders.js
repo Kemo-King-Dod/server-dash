@@ -12,7 +12,8 @@ const path = require("path");
 const { auth } = require("../middleware/auth");
 const mongoose = require("mongoose");
 const notification = require("../database/notification");
-const { sendNotification, sendNotificationToTopic } = require("../firebase/notification")
+const { sendNotification, sendNotificationToTopic } = require("../firebase/notification");
+const getCityName = require("../utils/getCityName");
 
 
 let ordersNum;
@@ -66,6 +67,10 @@ router.post("/addOrder", auth, async (req, res) => {
         // Create new order
         const order = new Order({
             orderId: await read(),
+            city:{
+                englishName: getCityName(theAddress.location).englishName,
+                arabicName: getCityName(theAddress.location).arabicName
+            },
             customer: {
                 id: user._id,
                 name: user.name,
@@ -259,19 +264,21 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
         const id = req.userId
         const acceptedorders = await Order.find({ "driver.id": id, status: { $in: ["driverAccepted", "onWay", "delivered"] } })
         if (!req.user.userType === "admin" && acceptedorders.length > 3) {
-            return res.status(200).json({
+            return res.status(200).json({ 
                 error: false,
-                data: acceptedorders,
+                data: acceptedorders, 
             });
         }
         const order = await Order.aggregate([
             {
-                $match: { status: { $in: ["ready"] } }
+                $match: { status: { $in: ["ready"] }, city: { englishName: req.headers.cityEn } }
             },
             {
                 $sample: { size: 10 }
             }
         ]);
+       
+
 
         if (order.length == 0 && acceptedorders.length == 0) {
             return res.status(300).json({

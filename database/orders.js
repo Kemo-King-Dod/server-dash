@@ -54,6 +54,9 @@ const orders = new Schema({
   numberOfUnreadForUser: {
     type: Number,
     default: 0
+  },
+  city: {
+    type: Object
   }
 })
 

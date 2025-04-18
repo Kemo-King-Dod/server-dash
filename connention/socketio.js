@@ -207,6 +207,7 @@ async function connect(socket) {
             return;
           }
           // Fixed: Added missing driver disconnect handling
+          console.log("driver disconnected ", socket.id);
           await Driver.updateOne(
             { connectionId: socket.id },
             { $set: { connection: false, connectionId: null } }

@@ -49,7 +49,7 @@ router.post("/like", auth, async (req, res) => {
     }
 
     // Add item to user's liked items
-    user.likedItems.push(itemId);
+    user.likedItems.push(itemId);  
     await user.save();
 
     // Increment item's like count
