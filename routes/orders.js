@@ -281,8 +281,8 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
 
 
         if (order.length == 0 && acceptedorders.length == 0) {
-            return res.status(300).json({
-                error: true,
+            return res.status(200).json({
+                error: false,
                 message: 'ليس هناك طلبات جاهزة حتى الآن'
             });
         }
@@ -517,7 +517,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
         User.findByIdAndUpdate(order.customer.id, { orders: { $pull: order._id } })
 
         await user.save();
-        
+
 
         res.status(200).json({
             error: false,
