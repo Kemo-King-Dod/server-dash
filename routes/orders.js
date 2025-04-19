@@ -439,14 +439,14 @@ router.post("/confirmOrder", auth, async (req, res) => {
             type: "confirmed",
             address: order.address,
             distenationPrice: order.distenationPrice,
-            reseveCode: order.reserveCode,
+            reseveCode: order.reseveCode,
             chat: order.chat,
             canceledby: null
         });
         await orderRecord.save();
 
-        const user = await User.findById(order.customer.orderId)
-        User.findByIdAndUpdate(order.customer.orderId, { orders: { $pull: order._id } })
+        const user = await User.findById(order.customer.id)
+        User.findByIdAndUpdate(order.customer.id, { orders: { $pull: order._id } })
         sendNotification({ token: user.fcmToken, title: 'تم تسليم طلبك', body: 'نتمنى أن الخدمة قد نالت رضاكم' })
         await notification.create({
             id: order.customer.id,
@@ -500,7 +500,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
             type: "canceled",
             address: order.address,
             distenationPrice: order.distenationPrice,
-            reseveCode: order.reserveCode,
+            reseveCode: order.reseveCode,
             chat: order.chat,
             canceledby: "user"
         });
@@ -514,9 +514,10 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
         if (user.cancelOrderLimit >= 5) {
             user.status = "blocked";
         }
-        User.findByIdAndUpdate(order.customer.orderId, { orders: { $pull: order._id } })
+        User.findByIdAndUpdate(order.customer.id, { orders: { $pull: order._id } })
 
         await user.save();
+        
 
         res.status(200).json({
             error: false,
