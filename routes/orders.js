@@ -264,7 +264,6 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
         const id = req.userId
         console.log("req.headers",req.headers);
         console.log("req.headers.cityen",req.headers.cityen);
-        console.log("req.headers.cityEn",req.headers.cityEn);
         const acceptedorders = await Order.find({ "driver.id": id, status: { $in: ["driverAccepted", "onWay", "delivered"] } })
         if (!req.user.userType === "admin" && acceptedorders.length > 3) {
             return res.status(200).json({ 
@@ -274,7 +273,7 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
         }
         const order = await Order.aggregate([
             {
-                $match: { status: { $in: ["ready"] }, city: { englishName: req.headers.cityEn } }
+                $match: { status: { $in: ["ready"] }, city: { englishName: req.headers.cityen } }
             },
             {
                 $sample: { size: 10 }
