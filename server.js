@@ -19,13 +19,6 @@ const expressserver = app.listen(4000, () => {
 const io = createserver(expressserver);
 io.on("connection", connect);
 
-
-// const errorHandler = require('./middleware/ErrorHandler');
-// app.use(errorHandler.AppError);
-// app.use(errorHandler.catchAsync);
-// app.use(errorHandler.errorHandler);
-
-
 const loadphoto = require("./routes/loadPhoto.js");
 app.use(loadphoto);
 
@@ -100,10 +93,5 @@ app.use(notification);
 
 const version = require("./routes/version.js");
 app.use(version);
-
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'try.html'))
-})
 
 // sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
