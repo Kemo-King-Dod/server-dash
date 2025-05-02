@@ -480,7 +480,11 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
     try {
         const userId = req.userId;
         const user = await User.findById(userId);
-
+        
+        console.log(req.body.orderId)
+        await setTimeout(() => {
+            console.log('hi')
+        }, 5000);
         const order = await Order.findById(req.body.orderId);
         if (!order) {
             return res.status(404).json({
