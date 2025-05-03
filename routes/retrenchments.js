@@ -3,6 +3,7 @@ const router = express.Router();
 const { auth } = require('../middleware/auth');
 const Item = require('../database/items');
 const Retrenchments = require('../database/Retrenchments');
+const { sendNotificationToTopic } = require('../firebase/notification');
 
 router.post('/discount', auth, async (req, res) => {
     try {

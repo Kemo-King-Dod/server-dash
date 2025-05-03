@@ -273,12 +273,13 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
         }
         const order = await Order.aggregate([
             {
-                $match: { status: { $in: ["ready"] }, city: { englishName: req.headers.cityen } }
+                $match: { status: { $in: ["ready"] }, "city.englishName": req.headers.cityen }
             },
             {
                 $sample: { size: 10 }
             }
         ]);
+        console.log("order",order);
        
 
 
