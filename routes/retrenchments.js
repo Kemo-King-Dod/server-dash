@@ -39,7 +39,7 @@ router.post('/discount', auth, async (req, res) => {
             message: 'تم إضافة التخفيض بنجاح',
         })
 
-        sendNotificationToTopic({ topic: the_store._id.toString(), body: discount.name, title: "تم إضافة تخفيض جديد" })
+        sendNotificationToTopic({ topic: userId.toString(), body: discount.name, title: "تم إضافة تخفيض جديد" })
 
 
     } catch (error) {
