@@ -1,9 +1,8 @@
 {
-    "version": "1.0.3",
+    "version": "1.0.5",
     "build": "1",
-    "date": "2021-01-01",
-    "time": "12:00:00",
-    "author": "John Doe",
+    "date": "2025-05-04",
+    "author": "Kemo king",
     "description": "This is a description of the version",
     "url": "https://play.google.com/store/apps/details?id=com.fasto.ly",
     "image":"newUpdateNoBg.png"
