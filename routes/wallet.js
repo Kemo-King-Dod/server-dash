@@ -68,5 +68,33 @@ route.get('/driverWallet', auth, async (req, res) => {
     }
 })
 
-
+route.post("/addWithdrawal", auth, async (req, res) => {
+    try {
+        const userId = req.userId
+        const { balance } = req.body
+        const store = await Store.findById(userId)
+        if (!store) {
+            return res.status(400).json({ error: true, message: "store not found" })
+        }
+        if (balance > store.funds) {
+            return res.status(400).json({ error: true, message: "balance is greater than funds" })
+        }
+        if (balance < 500) {
+            return res.status(400).json({ error: true, message: "balance is less than 500" })
+        }
+        const withdrawal = new Withdrawal({
+            storeId: userId,
+            balance: balance,
+            status: "waiting"
+        })
+        await withdrawal.save()
+        res.status(200).json({
+            error: false,
+            message: "withdrawal added successfully"
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ error: true, message: "withdrawal not added" })
+    }
+})
 module.exports = route
