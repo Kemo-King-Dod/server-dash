@@ -43,6 +43,8 @@ route.get('/storeWallet', auth, async (req, res) => {
 
             }
         })
+        console.log(                lastWidrawal.filter(withdrawal => withdrawal.status === 'onWay' || withdrawal.status === 'waiting'),
+    );
     } catch (error) {
         console.log(error);
         res.status(400).json({ error: true, message: "user not found" })
