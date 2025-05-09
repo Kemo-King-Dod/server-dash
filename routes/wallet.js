@@ -105,4 +105,38 @@ route.post("/addWithdrawal", auth, async (req, res) => {
     res.status(400).json({ error: true, message: "withdrawal not added" });
   }
 });
+
+route.post("/confirmWithdrawal", auth, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { id } = req.body;
+    const withdrawal = await Withdrawal.findById(id);
+    if (!withdrawal) {
+      return res.status(400).json({ error: true, message: "withdrawal not found" });
+    }
+    const store = await Store.findById(withdrawal.storeId);
+    if (!store) {
+      return res.status(400).json({ error: true, message: "store not found" });
+    }
+    store.funds -= withdrawal.balance;
+    await store.save();
+    withdrawal.status = "finished";
+    await withdrawal.save();
+    const transaction = new Transaction({
+      sender: store._id,
+      receiver: userId,
+      amount: withdrawal.balance,
+      type: "debit",
+    });
+    await transaction.save();
+    res.status(200).json({
+      error: false,
+      message: "withdrawal confirmed successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: true, message: "withdrawal not confirmed" });
+  }
+});
+
 module.exports = route;
