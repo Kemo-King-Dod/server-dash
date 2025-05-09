@@ -34,7 +34,7 @@ route.get("/storeWallet", auth, async (req, res) => {
       $or: [{ sender: store._id }, { receiver: store._id }],
     })
       .sort({ date: -1 })
-      .limit(1);
+      ;
     res.status(200).json({
       error: false,
       data: {
