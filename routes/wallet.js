@@ -125,7 +125,7 @@ route.post("/confirmWithdrawal", auth, async (req, res) => {
     const transaction = new Transaction({
       sender: store._id,
       receiver: userId,
-      amount: withdrawal.balance,
+      balance: withdrawal.balance,
       type: "debit",
     });
     await transaction.save();
