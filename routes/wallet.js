@@ -77,24 +77,24 @@ route.post("/addWithdrawal", auth, async (req, res) => {
     const { balance } = req.body;
     const store = await Store.findById(userId);
     if (!store) {
-      return res.status(400).json({ error: true, message: "store not found" });
+      return res.status(400).json({ error: true, message: "المتجر غير موجود" });
     }
     if (balance > store.funds) {
       return res
         .status(400)
-        .json({ error: true, message: "balance is greater than funds" });
+        .json({ error: true, message: "لا يمكن سحب اكثر من المبلغ المتاح" });
     }
     if (balance < 500) {
       return res
         .status(400)
-        .json({ error: true, message: "balance is less than 500" });
+        .json({ error: true, message: "لا يمكن سحب اقل من 500 د.ل" });
     }
     const lastWithdrawal = await Withdrawal.find({
       storeId: userId,
       status: { $in: ["waiting", "onWay"] },
     }).sort({ date: -1 });
     if (lastWithdrawal.length > 0) {
-      return res.status(400).json({ error: true, message: "withdrawal already exists" });
+      return res.status(400).json({ error: true, message: "لقد تم طلب السحب مسبقا" });
     }
     const withdrawal = new Withdrawal({
       name: store.name,
@@ -105,11 +105,11 @@ route.post("/addWithdrawal", auth, async (req, res) => {
     await withdrawal.save();
     res.status(200).json({
       error: false,
-      message: "withdrawal added successfully",
+      message: "تم اضافة السحب",    
     });
   } catch (error) {
     console.log(error);
-    res.status(400).json({ error: true, message: "withdrawal not added" });
+    res.status(400).json({ error: true, message: "لم يتم اضافة السحب" });
   }
 });
 
@@ -119,11 +119,11 @@ route.post("/confirmWithdrawal", auth, async (req, res) => {
     const { id } = req.body;
     const withdrawal = await Withdrawal.findById(id);
     if (!withdrawal) {
-      return res.status(400).json({ error: true, message: "withdrawal not found" });
+      return res.status(400).json({ error: true, message: "لم يتم ايجاد السحب" });
     }
     const store = await Store.findById(withdrawal.storeId);
     if (!store) {
-      return res.status(400).json({ error: true, message: "store not found" });
+      return res.status(400).json({ error: true, message: "المتجر غير موجود" });
     }
     store.funds -= withdrawal.balance;
     await store.save();
@@ -138,11 +138,24 @@ route.post("/confirmWithdrawal", auth, async (req, res) => {
     await transaction.save();
     res.status(200).json({
       error: false,
-      message: "withdrawal confirmed successfully",
+      message: "تم تأكيد السحب",
     });
   } catch (error) {
     console.log(error);
     res.status(400).json({ error: true, message: "withdrawal not confirmed" });
+  }
+});
+route.get("/withdrawals", auth, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const withdrawals = await Withdrawal.find({ storeId: userId });
+    res.status(200).json({
+      error: false,
+      data: withdrawals,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: true, message: "withdrawals not found" });
   }
 });
 
