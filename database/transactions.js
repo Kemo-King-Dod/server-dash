@@ -14,10 +14,7 @@ const transaction = new Schema({
         type: Number,
         required: true
     },
-    balance: {
-        type: Number,
-        required: true
-    },
+   
     type: {
         type: String,
         enum: ['credit', 'debit'],
