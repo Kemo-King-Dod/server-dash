@@ -83,6 +83,7 @@ route.post("/addWithdrawal", auth, async (req, res) => {
             return res.status(400).json({ error: true, message: "balance is less than 500" })
         }
         const withdrawal = new Withdrawal({
+            name: store.name,
             storeId: userId,
             balance: balance,
             status: "waiting"
