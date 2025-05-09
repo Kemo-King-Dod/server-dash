@@ -27,7 +27,7 @@ route.get('/storeWallet', auth, async (req, res) => {
     try {
         const userId = req.userId
         const store = await Store.findById(userId);
-        const lastWidrawal = await Withdrawal.find({ storeId: store._id }).sort({ date: -1 }).limit(1);
+        const lastWidrawal = await Withdrawal.find({ storeId: store._id.toString() }).sort({ date: -1 }).limit(1);
         const transactionList = await Transaction.find({ $or: [{ sender: store._id }, { receiver: store._id }] }).sort({ date: -1 }).limit(1);
         res.status(200).json({
             error: false,
