@@ -1,28 +1,29 @@
-/* const mongoose = require('mongoose')
+const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const withdrawal = new Schema({
-    : {
-        type: 
+    name: {
+        type: String,
+        required: true
     },
-    : {
-        type: 
+    status: {
+        type: String,
+        enum: ['waiting', 'finished', 'onWay'],
+        default: 'waiting'
     },
-    : {
-        type: 
+    balance: {
+        type: Number,
+        required: true
     },
-    : {
-        type: 
+    date: {
+        type: Date,
+        default: Date.now
     },
-    : {
-        type: 
-    },
-    : {
-        type: 
-    },
-    : {
-        type: 
+    storeId: {
+        type: String,
+        required: true
     }
 })
 
-module.exports = mongoose.model('Withdrawal', withdrawal) */
+const Withdrawal = mongoose.model('Withdrawal', withdrawal);
+module.exports = Withdrawal;

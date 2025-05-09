@@ -1,28 +1,35 @@
-/* const mongoose = require('mongoose')
+const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const transaction = new Schema({
-    : {
-        type: 
+    sender: {
+        type: String,
+        required: true
     },
-    : {
-        type: 
+    receiver: {
+        type: String,
+        required: true
     },
-    : {
-        type: 
+    amount: {
+        type: Number,
+        required: true
     },
-    : {
-        type: 
+    balance: {
+        type: Number,
+        required: true
     },
-    : {
-        type: 
+    type: {
+        type: String,
+        enum: ['credit', 'debit'],
+        required: true
     },
-    : {
-        type: 
+    date: {
+        type: Date,
+        default: Date.now
     },
-    : {
-        type: 
+    description: {
+        type: String
     }
 })
-
-module.exports = mongoose.model('Transaction', transaction) */
+const Transaction = mongoose.model('Transaction', transaction)
+module.exports = Transaction

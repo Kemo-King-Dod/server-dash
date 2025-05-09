@@ -14,6 +14,7 @@ const mongoose = require("mongoose");
 const notification = require("../database/notification");
 const { sendNotification, sendNotificationToTopic } = require("../firebase/notification");
 const getCityName = require("../utils/getCityName");
+const Transaction = require("../database/transactions");
 
 
 let ordersNum;
@@ -389,6 +390,14 @@ router.post("/examineCode", auth, async (req, res) => {
             store.funds += order.totalPrice;
             await store.save();
 
+            const transaction = new Transaction({
+                receiver: store._id,
+                sender: order.driver.id,
+                amount: order.totalPrice,
+                type: "credit",
+                description: "طلبية رقم " + order.orderId
+            });
+            await transaction.save();
             const driver = await Driver.findById(order.driver.id)
             console.log(driver)
             if (!driver._doc.funds)
