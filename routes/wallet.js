@@ -36,7 +36,7 @@ route.get('/storeWallet', auth, async (req, res) => {
                 // totalCommission: store.totalCommission, // what he wants from us
                 funds: store.funds,
                 lastWidrawal: lastWidrawal.length > 0 && lastWidrawal[0].balance,
-                withdrawalList: lastWidrawal.filter(withdrawal => withdrawal.status === 'onWay'),
+                withdrawalList: lastWidrawal.filter(withdrawal => withdrawal.status === 'onWay' || withdrawal.status === 'waiting'),
                 transactionList: transactionList,
 
 
