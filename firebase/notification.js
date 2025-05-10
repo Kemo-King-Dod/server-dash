@@ -35,8 +35,7 @@ async function sendNotification({ token, title, body }) {
       console.log("تم إرسال الإشعار بنجاح:", response);
       return ;
     } catch (error) {
-      console.error("حدث خطأ أثناء إرسال الإشعار:", error);
-    
+      console.error("حدث خطأ أثناء إرسال الإشعاار:", error);
     }
   }
 
