@@ -77,7 +77,6 @@ async function sendNotification({ token, title, body }) {
         return;
       } catch (error) {
         console.error("حدث خطأ أثناء إرسال الإشعار إلى التوبيك:", error);
-        throw error;
       }
   }
   module.exports = { sendNotification, sendNotificationToTopic };
