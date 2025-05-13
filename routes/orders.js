@@ -47,6 +47,7 @@ router.post("/addOrder", auth, async (req, res) => {
             if (user.cart[i].cartItem.storeID == StoreId) {
                 const item = await Item.findById(user.cart[i].cartItem.id);
                 itemsdata.push({
+                    id: item._id,
                     name: item.name,
                     options: user.cart[i].cartItem.options,
                     addOns: user.cart[i].cartItem.addOns,
