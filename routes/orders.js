@@ -600,6 +600,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       { orders: { $pull: order._id } },
       { new: true }
     );
+    console.log("updatedUser", updatedUser);
     if (req.body.reason != "") {
       if (req.body.unavailableProducts.length > 0) {
         const unavailableProducts = req.body.unavailableProducts
