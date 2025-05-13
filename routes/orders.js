@@ -551,6 +551,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
 
 router.post("/cancelOrderStore", auth, async (req, res) => {
     try {
+        console.log("req.body",req.body);
         const order = await Order.findById(req.body.orderId);
         if (!order) {
             return res.status(404).json({
