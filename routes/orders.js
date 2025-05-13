@@ -596,7 +596,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
     await Order.findByIdAndDelete(req.body.orderId);
 
     const updatedUser = await User.findByIdAndUpdate(
-      order.customer.orderId,
+      order.customer.id,
       { orders: { $pull: order._id } },
       { new: true }
     );
