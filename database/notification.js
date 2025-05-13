@@ -17,6 +17,10 @@ const notification = new mongoose.Schema({
         type: String,
         enum: ['success', 'info', 'promotion', 'warning']
     },
+    date: {
+        type: Date,
+        default: Date.now
+    },
     isRead: {
         type: Boolean,
         require: true,
