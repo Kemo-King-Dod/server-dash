@@ -151,6 +151,13 @@ route.post("/updateItem", auth, async (req, res) => {
 });
 route.patch("/deleteitem", auth, async (req, res) => {
   try {
+    const item = await items.findById(req.body.id);
+    
+    // حذف الصورة من الخادم إذا كانت موجودة
+    if (item && item.imageUrl) {
+      await deleteUploadedFile(item.imageUrl);
+    }
+    
     await items.findByIdAndDelete(req.body.id);
 
     // delete items from favorate
