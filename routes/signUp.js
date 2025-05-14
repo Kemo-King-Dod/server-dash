@@ -316,11 +316,11 @@ router.delete('/driver', async (req, res) => {
             status: { $nin: ['confiremd', 'cancelled'] }
         });
 
-        // Update each order to remove driver assignment
-        for (const order of activeOrders) {
-            order.driver = {};
-            order.status = 'ready';
-            await order.save();
+        if (activeOrders.length > 0) {
+            return res.status(401).json({
+                error: true,
+                data: 'لا يمكن حذف حساب السائق لوجود طلبات نشطة'
+            });
         }
 
         // Delete driver's uploaded files
