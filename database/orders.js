@@ -57,6 +57,10 @@ const orders = new Schema({
   },
   city: {
     type: Object
+  },
+  ByCode:{
+    type:Boolean,
+    default:false,
   }
 })
 

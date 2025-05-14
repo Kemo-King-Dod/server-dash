@@ -161,7 +161,7 @@ route.post("/isPhoneExist", async (req, res) => {
 
         // إرسال OTP
         const otpResponse = await axios.post(
-            "https://otp.sadeem-factory.com/api/v1/pins?service_name=fasto&test=true",
+            "https://otp.sadeem-factory.com/api/v1/pins?service_name=فاستو",
             { phone },
             {
                 headers: {
