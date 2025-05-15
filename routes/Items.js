@@ -152,12 +152,12 @@ route.post("/updateItem", auth, async (req, res) => {
 route.patch("/deleteitem", auth, async (req, res) => {
   try {
     const item = await items.findById(req.body.id);
-    
+
     // حذف الصورة من الخادم إذا كانت موجودة
     if (item && item.imageUrl) {
       await deleteUploadedFile(item.imageUrl);
     }
-    
+
     await items.findByIdAndDelete(req.body.id);
 
     // delete items from favorate
@@ -195,7 +195,7 @@ route.get("/getAllItems", async (req, res) => {
         if (user.gender == 'male') {
           data = await items.aggregate([
             {
-              $match: { gender: { $in: ['all', 'male'] } }
+              $match: { gender: { $in: ['all', 'male'] }, city: { $in: [req.headers.cityen] } }
             },
             {
               $sample: { size: 4 }
@@ -205,7 +205,7 @@ route.get("/getAllItems", async (req, res) => {
         else {
           data = await items.aggregate([
             {
-              $match: { gender: { $in: ['all', 'female'] } }
+              $match: { gender: { $in: ['all', 'female'] }, city: { $in: [req.headers.cityen] } }
             },
             {
               $sample: { size: 4 }
@@ -216,7 +216,7 @@ route.get("/getAllItems", async (req, res) => {
     else {
       data = await items.aggregate([
         {
-          $match: { gender: { $in: ['all'] } }
+          $match: { gender: { $in: ['all'] }, city: { $in: [req.headers.cityen] } }
         },
         {
           $sample: { size: 4 }
@@ -300,7 +300,8 @@ route.get("/getAllItems", async (req, res) => {
 });
 
 route.post("/getStoreItems", async (req, res) => {
-  try {3
+  try {
+    3
     var id = req.body.shopId;
     var userid = null;
 

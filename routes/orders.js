@@ -18,6 +18,7 @@ const {
 } = require("../firebase/notification");
 const getCityName = require("../utils/getCityName");
 const Transaction = require("../database/transactions");
+const { error } = require("console");
 
 let ordersNum;
 
@@ -103,6 +104,13 @@ router.post("/addOrder", auth, async (req, res) => {
       chat: [],
       ByCode: store.ByCode,
     });
+
+    if (order.city.englishName != req.headers.cityen) {
+      return res.status(401).json({
+        error: true,
+        message: "لا يمكن الطلب من خارج مدينتك"
+      })
+    }
 
     // Save order
     await order.save();
@@ -356,8 +364,8 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
     const order = await Order.findById(id);
     if (order.status == "ready") {
       if (order) {
-        order.status = order.ByCode ?   "driverAccepted":"onWay";
-        order.type = order.ByCode ?   "driverAccepted":"onWay";
+        order.status = order.ByCode ? "driverAccepted" : "onWay";
+        order.type = order.ByCode ? "driverAccepted" : "onWay";
         order.driver = {
           id: req.userId,
           name: driver.name,

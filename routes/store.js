@@ -33,7 +33,7 @@ router.get('/getStores', async (req, res) => {
             const decoded = jwt.verify(token, JWT_SECRET);
             id = decoded.id;
         }
-        const stores = await Store.find({}, { password: 0, items: 0 })
+        const stores = await Store.find({ city: req.headers.cityen }, { password: 0, items: 0 })
 
         // Check if current time is between opening and closing times
         for (let i = 0; i < stores.length; i++) {
