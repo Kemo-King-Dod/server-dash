@@ -96,11 +96,12 @@ router.post("/addOrder", auth, async (req, res) => {
       date: new Date(),
       items: itemsdata,
       totalPrice: totalprice,
-      status: "waiting",
-      type: "waiting",
+      status: store.ByCode ? "waiting" : "ready",
+      type: store.ByCode ? "waiting" : "ready",
       address: theAddress,
       distenationPrice: store.deliveryCostByKilo,
       chat: [],
+      ByCode: store.ByCode,
     });
 
     // Save order

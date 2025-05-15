@@ -144,6 +144,10 @@ const stores = new Schema(
     otp: {
       type: String,
     },
+    ByCode: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
