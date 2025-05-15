@@ -1,0 +1,23 @@
+{
+    "categories": [
+        
+        {
+            "name":"قرطاسية",
+            "image":"uploads/pictures/qertas.avif"
+        },{
+            "name":"مواد غذائية",
+            "image":"uploads/pictures/food.avif"
+        },
+        {
+            "name":"مخبوزات",
+            "image":"uploads/pictures/makhboza.avif"
+        },
+        {"name":"خضروات وفواكه",
+            "image":"uploads/pictures/khazroat.avif"
+        },
+       {
+        "name":"مواد تنظيف",
+        "image":"uploads/pictures/tasnif.avif"
+       }
+    ]
+}
