@@ -356,8 +356,8 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
     const order = await Order.findById(id);
     if (order.status == "ready") {
       if (order) {
-        order.status = "driverAccepted";
-        order.type = "driverAccepted";
+        order.status = order.ByCode ? "onWay" : "driverAccepted";
+        order.type = order.ByCode ? "onWay" : "driverAccepted";
         order.driver = {
           id: req.userId,
           name: driver.name,
