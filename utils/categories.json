@@ -3,21 +3,28 @@
         
         {
             "name":"قرطاسية",
-            "image":"uploads/pictures/qertas.avif"
+            "image":"uploads/pictures/qurtasya.png"
         },{
             "name":"مواد غذائية",
-            "image":"uploads/pictures/food.avif"
-        },
-        {
-            "name":"مخبوزات",
-            "image":"uploads/pictures/makhboza.avif"
+            "image":"uploads/pictures/material.png"
         },
         {"name":"خضروات وفواكه",
             "image":"uploads/pictures/khazroat.avif"
         },
        {
         "name":"مواد تنظيف",
-        "image":"uploads/pictures/tasnif.avif"
+        "image":"uploads/pictures/clean.png"
+       },
+       {
+        "name":"مطاعم",
+        "image":"uploads/pictures/burger.png"
+       },
+       {
+        "name":"مواد تنظيف",
+        "image":"uploads/pictures/clean.png"
+       },{
+        "name":"حقائب وأحذية",
+        "image":"uploads/pictures/bagsAndSoeses.png"
        }
     ]
 }
