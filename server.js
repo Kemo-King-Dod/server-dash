@@ -94,4 +94,7 @@ app.use(notification);
 const version = require("./routes/version.js");
 app.use(version);
 
+const reports = require('./routes/reports.js')
+app.use(reports)
+
 // sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
