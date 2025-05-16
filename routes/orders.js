@@ -41,10 +41,16 @@ router.post("/addOrder", auth, async (req, res) => {
     const userId = req.userId;
     const StoreId = req.body.storeId;
     const theAddress = await Address.findById(req.body.addressId);
-
     const store = await Store.findById(StoreId);
     const user = await User.findById(userId);
     let totalprice = 0;
+
+    if (store.city != req.headers.cityen) {
+      return res.status(500).json({
+        error: true,
+        message: "المحل غير موجود في هذه المدينة",
+      })
+    }
 
     for (var i = 0; i < user.cart.length; i++) {
       if (user.cart[i].cartItem.storeID == StoreId) {

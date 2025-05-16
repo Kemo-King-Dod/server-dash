@@ -49,7 +49,7 @@ router.post("/like", auth, async (req, res) => {
     }
 
     // Add item to user's liked items
-    user.likedItems.push(itemId);  
+    user.likedItems.push(itemId);
     await user.save();
 
     // Increment item's like count
@@ -101,7 +101,7 @@ router.post("/unlike", auth, async (req, res) => {
 // Get top 4 most liked items
 router.get("/mostLiked", async (req, res) => {
   try {
-    const data = await Item.find()
+    const data = await Item.find({ city: req.headers.cityen })
       .sort({ likes: -1 }) // Sort by likes in descending order
       .limit(10); // Get only 4 items
 

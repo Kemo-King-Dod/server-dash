@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { report } = require('../routes/Items');
 
 const reportSchema = new mongoose.Schema({
     description: {

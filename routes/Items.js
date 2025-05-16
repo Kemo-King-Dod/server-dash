@@ -187,6 +187,9 @@ route.get("/getAllItems", async (req, res) => {
       id = decoded.id;
     }
 
+    console.log(111)
+    console.log(req.headers.cityen)
+
     let data
     // Get all available items
     if (id) {
@@ -222,6 +225,9 @@ route.get("/getAllItems", async (req, res) => {
           $sample: { size: 4 }
         }
       ])
+    }
+    for (let i = 0; i < data.length; i++) {
+      console.log(data[i].city)
     }
 
     let discoundIds = []
@@ -423,7 +429,7 @@ route.post("/category", async (req, res) => {
     // Get all available items
     const allStores = await Store.aggregate([
       {
-        $match: { storeType: req.body.category }
+        $match: { storeType: req.body.category, city: req.body.city }
       },
       {
         $sample: { size: 2 }
@@ -431,7 +437,7 @@ route.post("/category", async (req, res) => {
     ])
     const allItems = await items.aggregate([
       {
-        $match: { category: req.body.category }
+        $match: { category: req.body.category, city: req.body.city }
       },
       {
         $sample: { size: 2 }

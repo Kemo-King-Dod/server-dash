@@ -77,9 +77,6 @@ router.post("/unFollow", auth, async (req, res) => {
 
 router.get("/MostFollowedStores", async (req, res) => {
   try {
-    console.log(777);
-    console.log(new Date());
-
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
@@ -87,7 +84,7 @@ router.get("/MostFollowedStores", async (req, res) => {
       const decoded = jwt.verify(token, JWT_SECRET);
       id = decoded.id;
     }
-    const stores = await Store.find({}).sort({ followersNumber: -1 }).limit(4);
+    const stores = await Store.find({ city: req.headers.cityen }).sort({ followersNumber: -1 }).limit(4);
     // Handle authenticated user case
     // Add isFollow property to each store
     for (var i = 0; i < stores.length; i++) {
