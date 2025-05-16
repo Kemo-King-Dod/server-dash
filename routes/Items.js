@@ -187,8 +187,13 @@ route.get("/getAllItems", async (req, res) => {
       id = decoded.id;
     }
 
-    console.log(111)
     console.log(req.headers)
+    if (!req.headers.cityen) {
+      return res.status(400).json({
+        error: true,
+        message: "يرجى التحقق من تفعيل الموقع وإعطاء الإذن"
+      });
+    }
 
     let data
     // Get all available items

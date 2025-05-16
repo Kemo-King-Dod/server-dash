@@ -101,6 +101,12 @@ router.post("/unlike", auth, async (req, res) => {
 // Get top 4 most liked items
 router.get("/mostLiked", async (req, res) => {
   try {
+    if (!req.headers.cityen) {
+      return res.status(400).json({
+        error: true,
+        message: "يرجى التحقق من تفعيل الموقع وإعطاء الإذن"
+      });
+    }
     const data = await Item.find({ city: req.headers.cityen })
       .sort({ likes: -1 }) // Sort by likes in descending order
       .limit(10); // Get only 4 items

@@ -84,6 +84,12 @@ router.get("/MostFollowedStores", async (req, res) => {
       const decoded = jwt.verify(token, JWT_SECRET);
       id = decoded.id;
     }
+    if (!req.headers.cityen) {
+      return res.status(400).json({
+        error: true,
+        message: "يرجى التحقق من تفعيل الموقع وإعطاء الإذن"
+      });
+    }
     const stores = await Store.find({ city: req.headers.cityen }).sort({ followersNumber: -1 }).limit(4);
     // Handle authenticated user case
     // Add isFollow property to each store
