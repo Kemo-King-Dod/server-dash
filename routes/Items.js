@@ -188,7 +188,7 @@ route.get("/getAllItems", async (req, res) => {
     }
 
     console.log(111)
-    console.log(req.headers.cityen)
+    console.log(req.headers)
 
     let data
     // Get all available items
