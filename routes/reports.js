@@ -30,7 +30,7 @@ router.post('/addReport', auth, async (req, res) => {
         await newReport.save();
         const Notification = new notification({
             title: 'تم إضافة البلاغ',
-            message: 'تم إضافة البلاغ بنجاح',
+            body: `تم اضافة البلاغ عن ${description}`,
             type: 'warning',
             id: req.userId
         });
@@ -38,12 +38,6 @@ router.post('/addReport', auth, async (req, res) => {
         const fcmToken =req.user.fcmToken;
         if(fcmToken){
 
-            const payload = {
-                notification: {
-                    title: 'تم إضافة البلاغ',
-                    message: 'تم إضافة البلاغ بنجاح',
-                }
-            }
             sendNotification({
                 token: fcmToken,
                 title: 'تم إضافة البلاغ',
