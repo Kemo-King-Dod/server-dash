@@ -2,16 +2,18 @@ const express = require('express');
 const router = express.Router();
 const Report = require('../database/report');
 const { auth } = require('../middleware/auth'); // افتراض وجود middleware للمصادقة
+const notification = require('../database/notification');
+const { sendNotification } = require('../firebase/notification');
 
 // طلب إضافة بلاغ جديد
 router.post('/addReport', auth, async (req, res) => {
     try {
-        const { description, reportedabout, reportedBy } = req.body;
+        const { description, type, id } = req.body;
 
         // التحقق من وجود الوصف
-        if (!description || !reportedabout || !reportedBy) {
+        if (!description || !type || !id ) {
             return res.status(400).json({
-                success: false,
+                error: true,
                 message: 'الوصف مطلوب لإنشاء البلاغ'
             });
         }
@@ -19,22 +21,45 @@ router.post('/addReport', auth, async (req, res) => {
         // إنشاء بلاغ جديد
         const newReport = new Report({
             description,
-            reportedabout,
-            reportedat: req.userId
+            type,
+            id,
+            by: req.userId
         });
 
         // حفظ البلاغ في قاعدة البيانات
         await newReport.save();
+        const Notification = new notification({
+            title: 'تم إضافة البلاغ',
+            message: 'تم إضافة البلاغ بنجاح',
+            type: 'warning',
+            id: req.userId
+        });
+        await Notification.save();
+        const fcmToken =req.user.fcmToken;
+        if(fcmToken){
 
+            const payload = {
+                notification: {
+                    title: 'تم إضافة البلاغ',
+                    message: 'تم إضافة البلاغ بنجاح',
+                }
+            }
+            sendNotification({
+                token: fcmToken,
+                title: 'تم إضافة البلاغ',
+                body: 'تم إضافة البلاغ بنجاح',
+            });
+        }
         res.status(201).json({
-            success: true,
+            error: false,
             message: 'تم إضافة البلاغ بنجاح',
             data: newReport
         });
+        
     } catch (error) {
         console.error('خطأ في إضافة البلاغ:', error);
         res.status(500).json({
-            success: false,
+            error: true,
             message: 'حدث خطأ أثناء إضافة البلاغ',
             error: error.message
         });

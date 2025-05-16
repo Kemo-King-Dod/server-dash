@@ -5,12 +5,16 @@ const reportSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    reportedBy: {
+    by: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
     },
-    reportedabout: {
+    id: {
         type: mongoose.Schema.Types.ObjectId,
+        required: true,
+    },
+    type: {
+        type: String,
         required: true,
     },
     status: {
