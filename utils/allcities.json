@@ -1,0 +1,101 @@
+[
+    {
+        "center": {
+            "latitude": 32.8872,
+            "longitude": 13.1913
+        },
+        "Arabicname": "طرابلس",
+        "Englishname": "Tripoli",
+        "boundary": [
+            {"latitude": 33.431503, "longitude": 12.848614},  
+            {"latitude": 33.2431503, "longitude": 13.421119},  
+            {"latitude": 32.5431503, "longitude": 14.400473},    
+            {"latitude": 32.3431503, "longitude": 13.405929},  
+            {"latitude": 32.7431503, "longitude": 12.431503}   
+        ]
+    },
+    
+    {
+        "center": {
+            "latitude": 27.038482,
+            "longitude": 14.426147
+        },
+        "Arabicname": "سبها",
+        "Englishname": "Sabha",
+        "boundary": [
+            {"latitude": 27.032251, "longitude": 14.448614},
+            {"latitude": 27.063722, "longitude": 14.421119},
+            {"latitude": 27.050511, "longitude": 14.400473},
+            {"latitude": 27.027783, "longitude": 14.405929},
+            {"latitude": 27.016148, "longitude": 14.431503}
+        ]
+    },
+        {
+            "center": {
+                "latitude": 24.890183,
+                "longitude": 14.528641
+            },
+            "Arabicname": "القطرون",
+            "Englishname": "Qatron",
+            "boundary": [
+                {"latitude": 24.869796, "longitude": 14.521328},
+                {"latitude": 24.870854, "longitude": 14.539094},
+                {"latitude": 24.888568, "longitude": 14.54828},
+                {"latitude": 24.901128, "longitude": 14.54731},
+                {"latitude": 24.910371, "longitude": 14.538384},
+                {"latitude": 24.911687, "longitude": 14.518994},
+                {"latitude": 24.897949, "longitude": 14.507956},
+                {"latitude": 24.878104, "longitude": 14.509998}
+            ]
+        },
+        {
+            "center": {
+                "latitude": 24.831422,
+                "longitude": 14.495116
+            },
+            "Arabicname": "البخي",
+            "Englishname": "Bakhi",
+            "boundary": [
+                {"latitude": 24.814569, "longitude": 14.501847},
+                {"latitude": 24.819447, "longitude": 14.511186},
+                {"latitude": 24.826868, "longitude": 14.513224},
+                {"latitude": 24.840509, "longitude": 14.511173},
+                {"latitude": 24.848276, "longitude": 14.489148},
+                {"latitude": 24.833512, "longitude": 14.477007},
+                {"latitude": 24.820515, "longitude": 14.480751}
+            ]
+        },
+        {
+            "center": {
+                "latitude": 24.928214,
+                "longitude": 14.574622
+            },
+            "Arabicname": "قصر مسعود",
+            "Englishname": "Qasir Masaood",
+            "boundary": [
+                {"latitude": 24.935956, "longitude": 14.581266},
+                {"latitude": 24.935113, "longitude": 14.572078},
+                {"latitude": 24.930469, "longitude": 14.570992},
+                {"latitude": 24.92331, "longitude": 14.568774},
+                {"latitude": 24.920676, "longitude": 14.568079},
+                {"latitude": 24.912472, "longitude": 14.57019},
+                {"latitude": 24.919552, "longitude": 14.579613},
+                {"latitude": 24.925665, "longitude": 14.58037}
+            ]
+        },
+        {
+            "center": {
+                "latitude": 24.918153,
+                "longitude": 14.610554
+            },
+            "Arabicname": "الجنسية",
+            "Englishname": "Aljensia",
+            "boundary": [
+                {"latitude": 24.922526, "longitude": 14.609541},
+                {"latitude": 24.920154, "longitude": 14.614981},
+                {"latitude": 24.916166, "longitude": 14.614126},
+                {"latitude": 24.913767, "longitude": 14.603566}
+            ]
+        }
+      
+    ]
