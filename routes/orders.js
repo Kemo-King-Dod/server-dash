@@ -19,6 +19,7 @@ const {
 const getCityName = require("../utils/getCityName");
 const Transaction = require("../database/transactions");
 const { error } = require("console");
+const driver = require("../database/driver");
 
 let ordersNum;
 
@@ -497,6 +498,20 @@ router.post("/confirmOrder", auth, async (req, res) => {
       body: "نتمنى أن الخدمة قد نالت رضاكم",
       type: "success",
     });
+    try {
+      const driver = await Driver.findById(order.driver.id);
+      driver.funds += order.companyFee;
+      driver.balance += order.deliveryCostByKilo;
+      await driver.save();
+    } catch (err) {
+      await notification.create({
+        id: order.driver.id,
+        userType: "driver",
+        title: "حصل خطأ في تعديل مستحقات الشركة في رقم الطلبية ذات الرقم " + order.orderId + " id =" + order._id,
+        body: "يرجى التوجه إلى المكتب الرئيسي للتعديل",
+        type: "warning",
+      });
+    }
 
     // Delete original order
     await Order.findByIdAndDelete(req.body.orderId);
