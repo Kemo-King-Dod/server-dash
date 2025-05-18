@@ -37,7 +37,6 @@ router.post('/addReport', auth, async (req, res) => {
         await Notification.save();
         const fcmToken =req.user.fcmToken;
         if(fcmToken){
-
             sendNotification({
                 token: fcmToken,
                 title: 'تم إضافة البلاغ',
