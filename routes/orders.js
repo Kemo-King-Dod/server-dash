@@ -362,7 +362,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
     const driver = await Driver.findById(req.userId);
     console.log("req.headers", req.headers);
     console.log("req.headers.cityen", req.headers.cityen);
-    const acceptedorders = await Order.find({
+    const acceptedordersCount = await Order.countDocuments({
       "driver.id": id,
       status: { $in: ["driverAccepted", "onWay", "delivered"] },
     });
@@ -372,14 +372,21 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
         error: true,
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
       });
+    }else{
+      console.log("driver.cancelOrderLimit" , driver.cancelOrderLimit);
+
     }
 
-    if (!req.user.userType === "admin" && acceptedorders.length >= 3) {
+    if (!req.user.userType === "admin" && acceptedordersCount >= 3) {
       return res.status(200).json({
         error: true,
         message :"لقد وصلت الى الحد الاقصى للطلبات"
       });
+    }else{
+      console.log("accept order for driver", acceptedordersCount);
+      
     }
+
 
     const order = await Order.findById(id);
     if (order.status == "ready") {
