@@ -481,7 +481,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
     }
     try {
       driver.funds += order.companyFee;
-      driver.balance += order.deliveryCostByKilo;
+      driver.balance += order.distenationPrice;
       await driver.save();
     } catch (err) {
         console.log(err);
