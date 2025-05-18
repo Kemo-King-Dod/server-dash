@@ -296,9 +296,9 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
       "driver.id": id,
       status: { $in: ["driverAccepted", "onWay", "delivered"] },
     });
-    if (!req.user.userType === "admin" && acceptedorders.length > 3) {
+    if (!req.user.userType === "admin" && acceptedorders.length >= 3) {
       return res.status(200).json({
-        error: false,
+        error: true,
         data: acceptedorders,
       });
     }
@@ -360,11 +360,24 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
   try {
     const id = req.body.orderId;
     const driver = await Driver.findById(req.userId);
+    console.log("req.headers", req.headers);
+    console.log("req.headers.cityen", req.headers.cityen);
+    const acceptedorders = await Order.find({
+      "driver.id": id,
+      status: { $in: ["driverAccepted", "onWay", "delivered"] },
+    });
 
     if (driver.cancelOrderLimit >= 5) {
       return res.status(403).json({
         error: true,
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
+      });
+    }
+
+    if (!req.user.userType === "admin" && acceptedorders.length >= 3) {
+      return res.status(200).json({
+        error: true,
+        message :"لقد وصلت الى الحد الاقصى للطلبات"
       });
     }
 
