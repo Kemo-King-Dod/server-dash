@@ -361,7 +361,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
     console.log("req.headers", req.headers);
     console.log("req.headers.cityen", req.headers.cityen);
     const acceptedordersCount = await Order.countDocuments({
-      "driver.id": new mongoose.Types.ObjectId(id),
+      "driver.id": id.toString(),
       status: { $in: ["driverAccepted", "onWay", "delivered"] },
     });
 
