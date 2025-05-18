@@ -499,10 +499,12 @@ router.post("/confirmOrder", auth, async (req, res) => {
       type: "success",
     });
     try {
-      const driver = await Driver.findById(order.driver.id);
-      driver.funds += order.companyFee;
-      driver.balance += order.deliveryCostByKilo;
-      await driver.save();
+  await Driver.findByIdAndUpdate(order.driver.id, {
+        $inc: {
+          funds: order.companyFee,
+          balance: order.deliveryCostByKilo,
+        },
+      });
     } catch (err) {
       console.log(err);
       await notification.create({
