@@ -375,14 +375,13 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
 
     }
 
-    if (!req.user.userType === "admin" && acceptedordersCount >= 3) {
+    if (req.user.userType !== "admin" && acceptedordersCount >= 3) {
       return res.status(200).json({
         error: true,
-        message :"لقد وصلت الى الحد الاقصى للطلبات"
+        message: "لقد وصلت الى الحد الاقصى للطلبات"
       });
-    }else{
+    } else {
       console.log("accept order for driver", acceptedordersCount);
-      
     }
 
 
