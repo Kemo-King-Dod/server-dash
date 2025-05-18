@@ -12,5 +12,15 @@ router.get('/getVersion', async (req, res) => {
     });
 });
 
+router.get('/getVersionForDriver', async (req, res) => {
+    var version = require('../utils/versionDriver.json');
+    version.image = path.join('uploads','pictures',version.image);
+    res.status(200).json({
+        error: false,
+        message: "Version fetched successfully",
+        data:version
+    });
+});
+
 module.exports = router;
 
