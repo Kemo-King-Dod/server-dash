@@ -290,7 +290,6 @@ router.get("/getOrdersForStore", auth, async (req, res) => {
 router.get("/getReadyOrderForDriver", auth, async (req, res) => {
   try {
     const id = req.userId;
-    console.log("req.headers", req.headers);
     console.log("req.headers.cityen", req.headers.cityen);
     const acceptedorders = await Order.find({
       "driver.id": id,
@@ -313,7 +312,6 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
         $sample: { size: 10 },
       },
     ]);
-    console.log("order", order);
 
     if (order.length == 0 && acceptedorders.length == 0) {
       return res.status(200).json({
