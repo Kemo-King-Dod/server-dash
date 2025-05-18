@@ -504,6 +504,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
       driver.balance += order.deliveryCostByKilo;
       await driver.save();
     } catch (err) {
+      console.log(err);
       await notification.create({
         id: order.driver.id,
         userType: "driver",
