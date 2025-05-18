@@ -458,11 +458,44 @@ router.post("/examineCode", auth, async (req, res) => {
 router.post("/confirmOrder", auth, async (req, res) => {
   try {
     const order = await Order.findById(req.body.orderId);
+    const driver = await Driver.findById(new mongoose.Types.ObjectId(order.driver.id));
+    const user = await User.findById(new mongoose.Types.ObjectId(order.customer.id));
+
     if (!order) {
       return res.status(404).json({
         error: true,
         message: "الطلب غير موجود",
       });
+    }
+    if (!driver) {
+      return res.status(404).json({
+        error: true,
+        message: "السائق غير موجود",
+      });
+    }
+    if (!user) {
+      return res.status(404).json({
+        error: true,
+        message: "المستخدم غير موجود",
+      });
+    }
+    try {
+      driver.funds += order.companyFee;
+      driver.balance += order.deliveryCostByKilo;
+      await driver.save();
+    } catch (err) {
+        console.log(err);
+        await notification.create({
+          id: order.driver.id,
+          userType: "driver",
+          title: "حصل خطأ في تعديل مستحقات الشركة في رقم الطلبية ذات الرقم " + order.orderId + " id =" + order._id,
+          body: "يرجى التوجه إلى المكتب الرئيسي للتعديل",
+          type: "warning",
+        });
+        return res.status(500).json({
+          error: true,
+          message: "حصل خطأ في تعديل مستحقات ",
+        });
     }
 
     // Create record in OrderRecord collection
@@ -484,7 +517,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
     });
     await orderRecord.save();
 
-    const user = await User.findById(order.customer.id);
+   
     User.findByIdAndUpdate(order.customer.id, { orders: { $pull: order._id } });
     sendNotification({
       token: user.fcmToken,
@@ -498,23 +531,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
       body: "نتمنى أن الخدمة قد نالت رضاكم",
       type: "success",
     });
-    try {
-  await Driver.findByIdAndUpdate(order.driver.id, {
-        $inc: {
-          funds: order.companyFee,
-          balance: order.deliveryCostByKilo,
-        },
-      });
-    } catch (err) {
-      console.log(err);
-      await notification.create({
-        id: order.driver.id,
-        userType: "driver",
-        title: "حصل خطأ في تعديل مستحقات الشركة في رقم الطلبية ذات الرقم " + order.orderId + " id =" + order._id,
-        body: "يرجى التوجه إلى المكتب الرئيسي للتعديل",
-        type: "warning",
-      });
-    }
+   
 
     // Delete original order
     await Order.findByIdAndDelete(req.body.orderId);
