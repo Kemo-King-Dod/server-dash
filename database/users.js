@@ -72,6 +72,13 @@ const users = new Schema({
     },
     otp: {
         type: String
+    },
+    blockUntil:{
+        type : Date ,
+    },
+    timesForgetPassword:{
+        type: Number,
+        default:0,
     }
 })
 

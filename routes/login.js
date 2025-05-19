@@ -127,7 +127,7 @@ route.post("/isPhoneExist", async (req, res) => {
         const { phone } = req.body;
 
         // Find user across all collections
-        let user = await Admin.findOne({ phone });
+        let user ;
         if (!user) user = await Store.findOne({ phone });
         if (!user) user = await User.findOne({ phone });
         if (!user) user = await Driver.findOne({ phone });
@@ -137,6 +137,26 @@ route.post("/isPhoneExist", async (req, res) => {
                 error: false,
                 isExist: false,
                 data: "رقم الهاتف غير موجود"
+            });
+        }
+
+        // تحقق إذا كان المستخدم محظور حالياً
+        if (user.blockUntil && user.blockUntil > new Date()) {
+            return res.status(403).json({
+                error: false,
+                isExist: false,
+                data: `أنت محظور من المحاولات حتى ${user.blockUntil.toLocaleString('ar-EG')}`, 
+            });
+        }
+
+        if(user.timesForgetPassword % 3 == 0 && user.timesForgetPassword !== 0){
+            // حظر المستخدم لمدة أسبوع من الآن
+            user.blockUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+            await user.save();
+            return res.status(404).json({
+                error: false,
+                isExist: false,
+                data: "انت محظور من المحاولات لمدة أسبوع"
             });
         }
 
@@ -170,8 +190,9 @@ route.post("/isPhoneExist", async (req, res) => {
                 }
             })
         user.otp = otpResponse.data.pin
+        user.timesForgetPassword +=1;
         await user.save()
-
+        
         res.status(200).json({
             error: false,
             isExist: true,

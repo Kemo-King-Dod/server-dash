@@ -96,6 +96,13 @@ const drivers = new Schema({
     },
     city: {
         type: String
+    },
+    blockUntil:{
+        type : Date ,
+    },
+    timesForgetPassword:{
+        type: Number,
+        default:0,
     }
 })
 

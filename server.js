@@ -94,7 +94,26 @@ app.use(notification);
 const version = require("./routes/version.js");
 app.use(version);
 
-const reports = require('./routes/reports.js')
+const reports = require('./routes/reports.js');
 app.use(reports)
 
 // sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
+// دالة لتحديث جميع المستخدمين
+// async function addFieldsToAllUsers() {
+//     try {
+//         // تحديث جميع المستخدمين بإضافة الحقول إذا لم تكن موجودة
+//         const result = await drivers.updateMany(
+//             {}, // بدون شرط: يشمل كل المستخدمين
+//             {
+//                 $set: {
+//                     timesForgetPassword: 0,
+//                     blockUntil: null // يمكنك استخدام new Date(0) إذا أردت قيمة وقت صفرية
+//                 }
+//             }
+//         );
+
+//         console.log(`تم تحديث ${result.modifiedCount} مستخدمًا.`);
+//     } catch (err) {
+//         console.error("خطأ أثناء التحديث:", err);
+//     }
+// }

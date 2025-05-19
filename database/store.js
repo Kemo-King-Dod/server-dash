@@ -148,6 +148,13 @@ const stores = new Schema(
       type: Boolean,
       default: false,
     },
+    blockUntil:{
+      type : Date ,
+  },
+  timesForgetPassword:{
+      type: Number,
+      default:0,
+  }
   },
   {
     timestamps: true,
