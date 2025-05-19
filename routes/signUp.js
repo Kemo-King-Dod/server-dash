@@ -253,7 +253,17 @@ router.post('/store', async (req, res) => {
                     phone: newStore.phone,
                     userType: "Store",
                     registerCondition: newStore.registerCondition,
-                    picture: newStore.picture
+                    picture: newStore.picture,
+                    createdAt:newStore.createdAt,
+                    address:address,
+                    storeType:storeType,
+                    opentimeam:newStore.opentimeam,
+                    opentimepm:newStore.opentimepm,
+                    closetimeam:newStore.closetimeam,
+                    closetimepm:newStore.closetimepm,
+
+
+
                 }
             }
         });
