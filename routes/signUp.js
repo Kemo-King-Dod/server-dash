@@ -185,7 +185,7 @@ router.post('/driver', async (req, res) => {
 // Store Signup
 router.post('/store', async (req, res) => {
     try {
-        const { name, password, phone, storeType, idNumber, licenseNumber, ownerName, location, address, picture, fcmToken } = req.body;
+        const { name, password, phone, storeType, idNumber, licenseNumber, ownerName, location, address, picture, fcmToken,closetimeam,closetimepm,opentimeam,opentimepm } = req.body;
         const city = getCityName(location).englishName;
         console.log("req.body",req.body,"city",city);
         if (!name || !password || !phone || !storeType || !idNumber || !ownerName || !city || !licenseNumber || !location || !address || !picture || picture == null) {
@@ -237,7 +237,12 @@ router.post('/store', async (req, res) => {
             notifications: [],
             funds: 0,
             userType: "Store",
-            fcmToken
+            fcmToken,
+            opentimeam,
+            opentimepm,
+            closetimeam,
+            closetimepm,
+
         });
 
         await newStore.save();
@@ -257,10 +262,10 @@ router.post('/store', async (req, res) => {
                     createdAt:newStore.createdAt,
                     address:address,
                     storeType:storeType,
-                    opentimeam:newStore.opentimeam,
-                    opentimepm:newStore.opentimepm,
-                    closetimeam:newStore.closetimeam,
-                    closetimepm:newStore.closetimepm,
+                    opentimeam:opentimeam,
+                    opentimepm:opentimepm,
+                    closetimeam:closetimeam,
+                    closetimepm:closetimepm,
 
 
 
