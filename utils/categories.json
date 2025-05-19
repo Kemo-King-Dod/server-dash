@@ -2,7 +2,7 @@
   "categories": [
     {
       "name": "قرطاسية",
-      "image": "uploads/pictures/qurtasya.png"
+      "image": "uploads/pictures/stationery.png"
     },
     {
       "name": "مواد غذائية",
@@ -38,7 +38,7 @@
     },
     {
       "name": "مواد تجميل",
-      "": "uploads/pictures/zina.png"
+      "image": "uploads/pictures/zina.png"
     },
     { "name": "بقوليات", "image": "uploads/pictures/bakoliat.png" }
   ]
