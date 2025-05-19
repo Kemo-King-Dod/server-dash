@@ -185,7 +185,7 @@ router.post('/driver', async (req, res) => {
 router.post('/store', async (req, res) => {
     try {
         const { name, password, phone, storeType, idNumber, licenseNumber, ownerName, city, location, address, picture, fcmToken } = req.body;
-
+        console.log("req.body",req.body);
         if (!name || !password || !phone || !storeType || !idNumber || !ownerName || !city || !licenseNumber || !location || !address || !picture || picture == null) {
             await deleteUploadedFile(picture);
             res.status(400).json({
