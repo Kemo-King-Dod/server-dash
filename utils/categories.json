@@ -1,30 +1,45 @@
 {
-    "categories": [
-        
-        {
-            "name":"قرطاسية",
-            "image":"uploads/pictures/qurtasya.png"
-        },{
-            "name":"مواد غذائية",
-            "image":"uploads/pictures/material.png"
-        },
-        {"name":"خضروات وفواكه",
-            "image":"uploads/pictures/khazroat.avif"
-        },
-       {
-        "name":"مواد تنظيف",
-        "image":"uploads/pictures/clean.png"
-       },
-       {
-        "name":"مطاعم",
-        "image":"uploads/pictures/burger.png"
-       },
-       {
-        "name":"مواد تنظيف",
-        "image":"uploads/pictures/clean.png"
-       },{
-        "name":"حقائب وأحذية",
-        "image":"uploads/pictures/bagsAndSoeses.png"
-       }
-    ]
+  "categories": [
+    {
+      "name": "قرطاسية",
+      "image": "uploads/pictures/qurtasya.png"
+    },
+    {
+      "name": "مواد غذائية",
+      "image": "uploads/pictures/material.png"
+    },
+    { "name": "خضروات وفواكه", "image": "uploads/pictures/khazroat.avif" },
+    {
+      "name": "مطاعم",
+      "image": "uploads/pictures/burger.png"
+    },
+    {
+      "name": "مواد تنظيف",
+      "image": "uploads/pictures/clean.png"
+    },
+    {
+      "name": "حقائب وأحذية",
+      "image": "uploads/pictures/bagsAndSoeses.png"
+    }
+  ],
+  "avilableCat": [
+    {
+      "name": "مطاعم",
+      "image": "uploads/pictures/burger.png"
+    },
+    {
+      "name": "حقائب وأحذية",
+      "image": "uploads/pictures/bagsAndSoeses.png"
+    },
+    { "name": "مقهى", "image": "uploads/pictures/coffee.png" },
+    {
+      "name": "اكسسوارات الهواتف",
+      "image": "uploads/pictures/accwarat.png"
+    },
+    {
+      "name": "مواد تجميل",
+      "": "uploads/pictures/zina.png"
+    },
+    { "name": "بقوليات", "image": "uploads/pictures/bakoliat.png" }
+  ]
 }
