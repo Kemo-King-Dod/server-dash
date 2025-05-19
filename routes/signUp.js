@@ -9,6 +9,7 @@ const Order = require('../database/orders')
 const fs = require('fs');
 const path = require('path');
 const { auth } = require('../middleware/auth');
+const getCityName = require("../utils/getCityName")
 
 const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
 
@@ -184,8 +185,9 @@ router.post('/driver', async (req, res) => {
 // Store Signup
 router.post('/store', async (req, res) => {
     try {
-        const { name, password, phone, storeType, idNumber, licenseNumber, ownerName, city, location, address, picture, fcmToken } = req.body;
-        console.log("req.body",req.body);
+        const { name, password, phone, storeType, idNumber, licenseNumber, ownerName, location, address, picture, fcmToken } = req.body;
+        const city = getCityName(location);
+        console.log("req.body",req.body,"city",city);
         if (!name || !password || !phone || !storeType || !idNumber || !ownerName || !city || !licenseNumber || !location || !address || !picture || picture == null) {
             await deleteUploadedFile(picture);
             res.status(400).json({
