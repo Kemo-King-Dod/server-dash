@@ -292,7 +292,7 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     const id = req.userId;
     console.log("req.headers.cityen", req.headers.cityen);
     const acceptedorders = await Order.find({
-      "driver.id":  new mongoose.Types.ObjectId(id),
+      "driver.id":  id,
       status: { $in: ["driverAccepted", "onWay", "delivered"] },
     });
     if (!req.user.userType === "admin" && acceptedorders.length >= 3) {
