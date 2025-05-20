@@ -322,6 +322,7 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     if (acceptedorders.length > 0) {
       order.push(...acceptedorders);
     }
+    console.log("req.body order",req.body)
     res.status(200).json({
       error: false,
       data: order,
