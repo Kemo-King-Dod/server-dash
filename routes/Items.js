@@ -54,7 +54,7 @@ route.post("/additems", auth, async (req, res) => {
     }
 
     const item = {
-      city: getCityName(the_store.location).cityName,
+      city: getCityName(the_store.location).englishName,
       storeName: the_store.name,
       storeImage: the_store.picture,
       name,
