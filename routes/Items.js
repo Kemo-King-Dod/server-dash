@@ -438,7 +438,7 @@ route.post("/category", async (req, res) => {
         $match: { storeType: req.body.category, city: req.headers.cityen }
       },
       {
-        $sample: { size: 2 }
+        $sample: { size: 10 }
       }
     ])
     const allItems = await items.aggregate([
@@ -446,7 +446,7 @@ route.post("/category", async (req, res) => {
         $match: { category: req.body.category, city: req.headers.cityen }
       },
       {
-        $sample: { size: 2 }
+        $sample: { size: 10 }
       }
     ])
 
