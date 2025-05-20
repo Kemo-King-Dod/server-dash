@@ -95,6 +95,7 @@ const version = require("./routes/version.js");
 app.use(version);
 
 const reports = require('./routes/reports.js');
+const product = require('./database/items.js');
 app.use(reports)
 
 // sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
@@ -102,12 +103,12 @@ app.use(reports)
 // async function addFieldsToAllUsers() {
 //     try {
 //         // تحديث جميع المستخدمين بإضافة الحقول إذا لم تكن موجودة
-//         const result = await drivers.updateMany(
+//         const result = await product.updateMany(
 //             {}, // بدون شرط: يشمل كل المستخدمين
 //             {
 //                 $set: {
-//                     timesForgetPassword: 0,
-//                     blockUntil: null // يمكنك استخدام new Date(0) إذا أردت قيمة وقت صفرية
+//                   city : 
+//                     // يمكنك استخدام new Date(0) إذا أردت قيمة وقت صفرية
 //                 }
 //             }
 //         );

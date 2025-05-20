@@ -20,7 +20,16 @@
     {
       "name": "حقائب وأحذية",
       "image": "uploads/pictures/bagsAndSoeses.png"
-    }
+    }, { "name": "مقهى", "image": "uploads/pictures/coffee.png" },
+    {
+      "name": "اكسسوارات الهواتف",
+      "image": "uploads/pictures/accwarat.png"
+    },
+    {
+      "name": "مواد تجميل",
+      "image": "uploads/pictures/zina.png"
+    },
+    { "name": "بقوليات", "image": "uploads/pictures/bakoliat.png" }
   ],
   "avilableCat": [
     {
