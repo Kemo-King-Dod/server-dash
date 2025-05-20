@@ -421,6 +421,7 @@ route.get("/storeItems", auth, async (req, res) => {
 
 route.post("/category", async (req, res) => {
   try {
+    console.log("req.body category",req.body)
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
