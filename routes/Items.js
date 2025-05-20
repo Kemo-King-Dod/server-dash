@@ -431,19 +431,26 @@ route.post("/category", async (req, res) => {
     }
 
 
-
-    // Get all available items
+    const storeMatch = {
+      city: req.headers.cityen,
+    };
+    const itemsMatch = {
+      city: req.headers.cityen,
+    };
+    
+    if (req.body.category !== "all") {
+      storeMatch.storeType = req.body.category;
+      itemsMatch.category=req.body.category;
+    }
+    
+    // الحصول على المتاجر
     const allStores = await Store.aggregate([
-      {
-        $match: { storeType: req.body.category, city: req.headers.cityen }
-      },
-      {
-        $sample: { size: 10 }
-      }
-    ])
+      { $match: storeMatch },
+      { $sample: { size: 10 } }
+    ]);
     const allItems = await items.aggregate([
       {
-        $match: { category: req.body.category, city: req.headers.cityen }
+        $match: itemsMatch,
       },
       {
         $sample: { size: 10 }
