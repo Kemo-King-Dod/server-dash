@@ -203,7 +203,7 @@ route.get("/getAllItems", async (req, res) => {
         if (user.gender == 'male') {
           data = await items.aggregate([
             {
-              $match: { gender: { $in: ['all', 'male'] }, city: { $in: [req.headers.cityen] } }
+              $match: { gender: { $in: ['all', 'male'] }, city: req.headers.cityen  }
             },
             {
               $sample: { size: 4 }

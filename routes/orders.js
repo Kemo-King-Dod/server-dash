@@ -412,7 +412,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
     } else {
       return res.status(500).json({
         error: true,
-        message: "لا يمكن قبول طلب جاري",
+        message: "لقد تم قبول الطلب من سائق اخر",
       });
     }
   } catch (err) {
