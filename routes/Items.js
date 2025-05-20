@@ -443,7 +443,7 @@ route.post("/category", async (req, res) => {
     ])
     const allItems = await items.aggregate([
       {
-        $match: { category: req.body.category, city: req.body.cityen }
+        $match: { category: req.body.category, city: req.headers.cityen }
       },
       {
         $sample: { size: 2 }
