@@ -292,7 +292,7 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     const id = req.userId;
     console.log("req.headers.cityen", req.headers.cityen);
     const acceptedorders = await Order.find({
-      "driver.id":  new mongoose.ObjectId(id),
+      "driver.id":  new mongoose.Types.ObjectId(id),
       status: { $in: ["driverAccepted", "onWay", "delivered"] },
     });
     if (!req.user.userType === "admin" && acceptedorders.length >= 3) {
@@ -322,7 +322,7 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     if (acceptedorders.length > 0) {
       order.push(...acceptedorders);
     }
-    console.log("req.body order",req.body)
+    console.log(" orders",order)
     res.status(200).json({
       error: false,
       data: order,
