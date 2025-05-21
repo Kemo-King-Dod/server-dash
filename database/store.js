@@ -146,7 +146,7 @@ const stores = new Schema(
     },
     ByCode: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     blockUntil:{
       type : Date ,
