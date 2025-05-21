@@ -63,7 +63,7 @@ const stores = new Schema(
     },
     registerCondition: {
       type: String,
-      default: "waiting",
+      default: "accepted",
     },
     items: {
       type: Array,

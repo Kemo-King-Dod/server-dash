@@ -49,6 +49,7 @@
       "name": "مواد تجميل",
       "image": "uploads/pictures/zina.png"
     },
-    { "name": "بقوليات", "image": "uploads/pictures/bakoliat.png" }
+    { "name": "بقوليات", "image": "uploads/pictures/bakoliat.png" },
+    { "name": "إلكترونيات", "image": "uploads/pictures/elctron.png" }
   ]
 }
