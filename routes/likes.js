@@ -109,7 +109,7 @@ router.get("/mostLiked", async (req, res) => {
     }
     const data = await Item.find({ city: req.headers.cityen })
       .sort({ likes: -1 }) // Sort by likes in descending order
-      .limit(10); // Get only 4 items
+      .limit(4); // Get only 4 items
 
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
