@@ -38,6 +38,12 @@ async function read() {
 // orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
   try {
+
+    return res.status(500).json({
+      error: true,
+      message: "سيتم الإطلاق قريباً",
+    })
+
     const itemsdata = [];
     const userId = req.userId;
     const StoreId = req.body.storeId;
@@ -292,7 +298,7 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     const id = req.userId;
     console.log("req.headers.cityen", req.headers.cityen);
     const acceptedorders = await Order.find({
-      "driver.id":  id,
+      "driver.id": id,
       status: { $in: ["driverAccepted", "onWay", "delivered"] },
     });
     if (!req.user.userType === "admin" && acceptedorders.length >= 3) {
@@ -323,8 +329,8 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
       order.push(...acceptedorders);
 
     }
-    console.log(" orders",order)
-    console.log(" accept orders",acceptedorders)
+    console.log(" orders", order)
+    console.log(" accept orders", acceptedorders)
 
 
     res.status(200).json({
@@ -375,8 +381,8 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
         error: true,
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
       });
-    }else{
-      console.log("driver.cancelOrderLimit" , driver.cancelOrderLimit);
+    } else {
+      console.log("driver.cancelOrderLimit", driver.cancelOrderLimit);
 
     }
 
@@ -506,18 +512,18 @@ router.post("/confirmOrder", auth, async (req, res) => {
       driver.balance += order.distenationPrice;
       await driver.save();
     } catch (err) {
-        console.log(err);
-        await notification.create({
-          id: order.driver.id,
-          userType: "driver",
-          title: "حصل خطأ في تعديل مستحقات الشركة في رقم الطلبية ذات الرقم " + order.orderId + " id =" + order._id,
-          body: "يرجى التوجه إلى المكتب الرئيسي للتعديل",
-          type: "warning",
-        });
-        return res.status(500).json({
-          error: true,
-          message: "حصل خطأ في تعديل مستحقات ",
-        });
+      console.log(err);
+      await notification.create({
+        id: order.driver.id,
+        userType: "driver",
+        title: "حصل خطأ في تعديل مستحقات الشركة في رقم الطلبية ذات الرقم " + order.orderId + " id =" + order._id,
+        body: "يرجى التوجه إلى المكتب الرئيسي للتعديل",
+        type: "warning",
+      });
+      return res.status(500).json({
+        error: true,
+        message: "حصل خطأ في تعديل مستحقات ",
+      });
     }
 
     // Create record in OrderRecord collection
@@ -539,7 +545,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
     });
     await orderRecord.save();
 
-   
+
     User.findByIdAndUpdate(order.customer.id, { orders: { $pull: order._id } });
     sendNotification({
       token: user.fcmToken,
@@ -553,7 +559,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
       body: "نتمنى أن الخدمة قد نالت رضاكم",
       type: "success",
     });
-   
+
 
     // Delete original order
     await Order.findByIdAndDelete(req.body.orderId);
