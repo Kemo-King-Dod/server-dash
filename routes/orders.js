@@ -20,6 +20,7 @@ const getCityName = require("../utils/getCityName");
 const Transaction = require("../database/transactions");
 const { error } = require("console");
 const driver = require("../database/driver");
+const orders = require("../database/orders");
 
 let ordersNum;
 
@@ -34,6 +35,13 @@ async function read() {
   );
   return ordersNum;
 }
+router.get("/getAllOrders",auth,async(req,res)=>{
+  var Orders = await orders.find({});
+  return res.status(200).json({
+    error:false,
+    data : Orders
+  })
+})
 
 // orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
