@@ -39,7 +39,9 @@ router.get("/getAllOrders",auth,async(req,res)=>{
   var Orders = await orders.find({});
   return res.status(200).json({
     error:false,
-    data : Orders
+    data : {
+      orders:Orders,
+    }
   })
 })
 
