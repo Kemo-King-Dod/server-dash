@@ -40,7 +40,7 @@ router.get('/getStores', async (req, res) => {
                 message: "يرجى التحقق من تفعيل الموقع وإعطاء الإذن"
             });
         }
-        const stores = await Store.find({ city: req.headers.cityen }, { password: 0, items: 0 })
+        const stores = await Store.find({ city: req.headers.cityen , registerCondition:"accepted"}, { password: 0, items: 0 })
 
         // Check if current time is between opening and closing times
         for (let i = 0; i < stores.length; i++) {
