@@ -190,7 +190,7 @@ route.get("/getAllItems", async (req, res) => {
     console.log(req.headers)
     if (!req.headers.cityen) {
       return res.status(400).json({
-        error: true,
+        error: false,
         message: "يرجى التحقق من تفعيل الموقع وإعطاء الإذن"
       });
     }
@@ -203,7 +203,7 @@ route.get("/getAllItems", async (req, res) => {
         if (user.gender == 'male') {
           data = await items.aggregate([
             {
-              $match: { gender: { $in: ['all', 'male'] }, city: { $in: [req.headers.cityen] , category:{$in:['مقهى','مطاعم','مواد غذائية']} } }
+              $match: { gender: { $in: ['all', 'male'] }, city: { $in: [req.headers.cityen] },category:{$in:['مقهى','مطاعم','مواد غذائية']} }
             },
             {
               $sample: { size: 10 }
@@ -213,10 +213,10 @@ route.get("/getAllItems", async (req, res) => {
         else {
           data = await items.aggregate([
             {
-              $match: { gender: { $in: ['all', 'female'] }, city: { $in: [req.headers.cityen] } }
+              $match: { gender: { $in: ['all', 'female'] }, city: { $in: [req.headers.cityen] },category:{$in:['مقهى','مطاعم','مواد غذائية']}  }
             },
             {
-              $sample: { size: 4 }
+              $sample: { size: 10 }
             }
           ])
         }
@@ -224,10 +224,10 @@ route.get("/getAllItems", async (req, res) => {
     else {
       data = await items.aggregate([
         {
-          $match: { gender: { $in: ['all'] }, city: { $in: [req.headers.cityen] } }
+          $match: { gender: { $in: ['all'] }, city: { $in: [req.headers.cityen] } ,category:{$in:['مقهى','مطاعم','مواد غذائية']}  }
         },
         {
-          $sample: { size: 4 }
+          $sample: { size: 10 }
         }
       ])
     }
