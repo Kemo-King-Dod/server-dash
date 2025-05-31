@@ -65,7 +65,8 @@ router.get("/getfromcart", auth, async (req, res) => {
           shopId: item.storeID,
           shopName: store.name,
           shopImage: store.picture,
-          deliveryFee: store.deliveryCostByKilo + store.companyFee,
+          deliveryFee: store.deliveryCostByKilo ,
+          companyFee:store.companyFee,
           location: store.location,
           items: [
             {
@@ -103,7 +104,8 @@ router.get("/getfromcart", auth, async (req, res) => {
             shopId: item.storeID,
             shopName: store.name,
             shopImage: store.picture,
-            deliveryFee: store.deliveryCostByKilo + store.companyFee,
+            deliveryFee: store.deliveryCostByKilo ,
+            companyFee:store.companyFee,
           location: store.location,
 
             items: [
