@@ -24,7 +24,10 @@ const stores = new Schema(
       type: Number,
       require: [true, "السعر مطلوب"],
       default: 5.0,
-      length: 2,
+    },
+    companyFee: {
+      type: Number,
+      default: 2.0,
     },
     idNumber: {
       type: String,

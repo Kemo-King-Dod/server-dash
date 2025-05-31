@@ -189,10 +189,12 @@ router.post("/acceptOrder", auth, async (req, res) => {
   try {
     const id = req.body.orderId;
     const order = await Order.findById(id);
+    const store = await Store.findById(order.store.id);
+
     if (order) {
       const user = await User.findById(order.customer.id);
-      order.status = "accepted";
-      order.type = "accepted";
+      order.status = store.ByCode?"ready":"accepted";
+      order.type = store.ByCode?"ready":"accepted";
       await order.save();
       sendNotification({
         token: user.fcmToken,
