@@ -60,6 +60,7 @@ router.post("/addOrder", auth, async (req, res) => {
     const theAddress = await Address.findById(req.body.addressId);
     const store = await Store.findById(StoreId);
     const user = await User.findById(userId);
+    const deliveryPrice = req.body.deliveryPrice
     let totalprice = 0;
 
     if (store.city != req.headers.cityen) {
@@ -91,8 +92,14 @@ router.post("/addOrder", auth, async (req, res) => {
       });
       return;
     }
+    if(getCityName(theAddress).englishName!==getCityName(store.location).englishName){
+      res.status(500).json({
+        error: true,
+        message: "لا يمكن الطلب من مدن مختلفة",
+      });
+      return;
+    }
     // Create new order
-    console.log("theAddress", theAddress);
     const order = new Order({
       orderId: await read(),
       city: {
@@ -116,14 +123,14 @@ router.post("/addOrder", auth, async (req, res) => {
         address: store.address,
       },
       driver: null,
-      companyFee: (store.deliveryCostByKilo * 20) / 100,
+      companyFee: 2,
       date: new Date(),
       items: itemsdata,
       totalPrice: totalprice,
       status: store.ByCode ? "waiting" : "ready",
       type: store.ByCode ? "waiting" : "ready",
       address: theAddress,
-      distenationPrice: store.deliveryCostByKilo,
+      distenationPrice: deliveryPrice,
       chat: [],
       ByCode: store.ByCode,
     });

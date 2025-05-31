@@ -112,7 +112,19 @@ route.post("/updateItem", auth, async (req, res) => {
       imageUrl,
     } = req.body;
     console.log(req.body)
+    res.status(200).json({
+      error: false,
+      operation: "editProduct",
+      message: "تم التعديل بنجاح",
+    });
     const item = await items.findById(req.body.id);
+    if(!item){
+      return  res.status(200).json({
+        error: true,
+        operation: "editProduct",
+        message: "حصل خطأ ما",
+      });
+    }
 
     // Only delete the old image if a new one is provided
     if (imageUrl && imageUrl !== item.imageUrl) {
