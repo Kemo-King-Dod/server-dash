@@ -5,6 +5,7 @@ const Driver = require("../database/driver");
 const Order = require("../database/orders");
 const jwt = require("jsonwebtoken");
 const { auth } = require("../middleware/auth");
+const Admin = require("../database/admin");
 
 let isconnected;
 
@@ -63,6 +64,50 @@ async function connect(socket) {
   } catch (error) {
     console.log(error);
   }
+
+  socket.on("updateAdmin", async (data) => {
+    if (data.type == "chat") {
+      try {
+        const admin = await Admin.findOne({ phone: data.id });
+        if (admin && admin.connection) {
+          await socket.to(admin.connectionId).emit("updateUser", data);
+        }
+        return;
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    }
+
+    try {
+      console.log(data);
+      let admin = await Admin.findById(data.userID);
+      if (!admin)
+        throw new Error('there is no user');
+
+      if (admin.connection) {
+        socket.to(admin.connectionId).emit("updateAdmin", data);
+      } else {
+        let timesToSendRequist = 0; // to 180
+        const times = setInterval(async () => {
+          timesToSendRequist++;
+          admin = await Admin.findById(data.userID);
+          if (!admin) {
+            clearInterval(times);
+            throw new Error('there is no user');
+          }
+          if (admin.connection || timesToSendRequist > 180) {
+            if (admin.connection) {
+              socket.to(admin.connectionId).emit("updateAdmin", data);
+            }
+            clearInterval(times);
+          }
+        }, 5000);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
   socket.on("updateUser", async (data) => {
     if (data.type == "chat") {

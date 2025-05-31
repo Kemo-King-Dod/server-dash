@@ -23,7 +23,15 @@ const admin = new Schema({
     },
     otp: {
         type: String
-    }
+    },
+    connection: {
+        type: Boolean,
+        require: [true, 'الإتصال مطلوب'],
+        default: false
+    },
+    connectionId: {
+        type: String
+    },
 })
 
 module.exports = mongoose.model('Admin', admin)
