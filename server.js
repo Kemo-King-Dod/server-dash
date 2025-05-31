@@ -98,6 +98,9 @@ const reports = require('./routes/reports.js');
 const product = require('./database/items.js');
 app.use(reports)
 
+const ads= require('./routes/ads.js');
+app.use(ads)
+
 // sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
 // دالة لتحديث جميع المستخدمين
 // async function addFieldsToAllUsers() {
