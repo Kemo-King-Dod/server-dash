@@ -3,7 +3,7 @@ const route = express.Router();
 const Ads = require("../database/ads");
 const deleteUploadedFile = require("../utils/deleteImage");
 
-route.get("/getAdeses", async (req, res) => {
+route.get("/getAdses", async (req, res) => {
   const allAds = await Ads.find({});
 
   return res.status(200).json({
