@@ -35,7 +35,7 @@ router.get('/getInfo', /* auth, */ async (req, res) => {
 // stores
 router.get('/adminGetStores', /* auth, */ async (req, res) => {
     try {
-        const stores = await Store.find({}, { password: false })
+        const stores = await Store.find({}, { password: false,items:false })
         res.status(200).json({
             error: false,
             data: stores

@@ -49,6 +49,7 @@ router.get('/getStores', async (req, res) => {
             stores[i]._doc.isFavorite = false;
 
             // check openCondition
+            
             const now = new Date();
             let hours = now.getHours();
             const minutes = now.getMinutes();
