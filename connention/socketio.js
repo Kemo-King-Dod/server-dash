@@ -29,11 +29,10 @@ async function connect(socket) {
             console.log(err);
             console.log("يرجى تسجيل الدخول");
           } else {
-
             let exist = await User.findOne({ _id: data.id });
-            if(!exist){
-             exist= await Admin.findOne({_id:data.id})
-              if(exist){
+            if (!exist) {
+              exist = await Admin.findOne({ _id: data.id });
+              if (exist) {
                 await Admin.updateOne(
                   { _id: data.id },
                   { $set: { connection: true, connectionId: socket.id } }
@@ -41,16 +40,13 @@ async function connect(socket) {
                 socket.join("admins");
                 console.log("isAdmin.......");
               }
-
-            }else
-            if (!exist) {
+            } else if (!exist) {
               exist = await Store.findOne({ _id: data.id });
               if (!exist) {
                 exist = await Driver.findOne({ _id: data.id });
                 if (!exist) {
                   console.log("access denied");
-                }
-                else {
+                } else {
                   await Driver.updateOne(
                     { _id: data.id },
                     { $set: { connection: true, connectionId: socket.id } }
@@ -70,7 +66,6 @@ async function connect(socket) {
                 { $set: { connection: true, connectionId: socket.id } }
               );
             }
-
           }
         }
       );
@@ -96,8 +91,7 @@ async function connect(socket) {
     try {
       console.log(data);
       let admin = await Admin.findById(data.userID);
-      if (!admin)
-        throw new Error('there is no user');
+      if (!admin) throw new Error("there is no user");
 
       if (admin.connection) {
         socket.to(admin.connectionId).emit("updateAdmin", data);
@@ -108,7 +102,7 @@ async function connect(socket) {
           admin = await Admin.findById(data.userID);
           if (!admin) {
             clearInterval(times);
-            throw new Error('there is no user');
+            throw new Error("there is no user");
           }
           if (admin.connection || timesToSendRequist > 180) {
             if (admin.connection) {
@@ -140,8 +134,7 @@ async function connect(socket) {
     try {
       console.log(data);
       let user = await User.findById(data.userID);
-      if (!user)
-        throw new Error('there is no user');
+      if (!user) throw new Error("there is no user");
 
       if (user.connection) {
         socket.to(user.connectionId).emit("updateUser", data);
@@ -152,7 +145,7 @@ async function connect(socket) {
           user = await User.findById(data.userID);
           if (!user) {
             clearInterval(times);
-            throw new Error('there is no user');
+            throw new Error("there is no user");
           }
           if (user.connection || timesToSendRequist > 180) {
             if (user.connection) {
@@ -171,14 +164,12 @@ async function connect(socket) {
     try {
       let store = await Store.findById(data.storeID);
       if (!store) {
-        throw new Error('Store not found');
+        throw new Error("Store not found");
       }
-     let admin = await Admin.findOne({phone:"0910808060"});
-
+      let admin = await Admin.findOne({ phone: "0910808060" });
 
       if (store.connection) {
         socket.to(store.connectionId).emit("updateStore", data);
-        
       } else {
         let timesToSendRequist = 0; // to 180
         const times = setInterval(async () => {
@@ -186,7 +177,7 @@ async function connect(socket) {
           store = await Store.findById(data.storeID);
           if (!store) {
             clearInterval(times);
-            throw new Error('Store not found');
+            throw new Error("Store not found");
           }
           if (store.connection || timesToSendRequist > 180) {
             if (store.connection) {
@@ -196,20 +187,25 @@ async function connect(socket) {
           }
         }, 5000);
       }
+      console.log("admin and ", data);
       if (admin.connection) {
         socket.to(admin.connectionId).emit("updateAdmin", data);
-        
+        console.log("admin and ", data);
       } else {
         let timesToSendRequist = 0; // to 180
         const times = setInterval(async () => {
           timesToSendRequist++;
           admin = await Admin.findById(data.storeID);
+          console.log("admin and ", data);
+
           if (!admin) {
             clearInterval(times);
-            throw new Error('Store not found');
+            throw new Error("Store not found");
           }
           if (admin.connection || timesToSendRequist > 180) {
             if (admin.connection) {
+              console.log("admin and ", data);
+
               socket.to(admin.connectionId).emit("updateAdmin", data);
             }
             clearInterval(times);
@@ -355,7 +351,7 @@ async function connect(socket) {
   // });
 
   // انضمام المستخدم إلى غرفة خاصة
-  
+
   socket.on("joinRoom", (roomName) => {
     socket.join(roomName);
     console.log("User " + socket.id + " joined room: " + roomName);

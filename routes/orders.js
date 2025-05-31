@@ -21,6 +21,7 @@ const Transaction = require("../database/transactions");
 const { error } = require("console");
 const driver = require("../database/driver");
 const orders = require("../database/orders");
+const Admin = require("../database/admin");
 
 let ordersNum;
 
@@ -60,7 +61,7 @@ router.post("/addOrder", auth, async (req, res) => {
     const StoreId = req.body.storeId;
     const theAddress = await Address.findById(req.body.addressId);
     const store = await Store.findById(StoreId);
-    const admin = await Store.findOne({phone:"0910808060"});
+    const admin = await Admin.findOne({phone:"0910808060"});
     const user = await User.findById(userId);
     const deliveryPrice = req.body.deliveryPrice
     let totalprice = 0;
