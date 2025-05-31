@@ -48,17 +48,18 @@ router.get("/getAllOrders",auth,async(req,res)=>{
 // orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
   try {
-
+    if( req.userId !=="67ae3afe99b17930459942e3"){
     return res.status(500).json({
       error: true,
       message: "سيتم الإطلاق قريباً",
-    })
+    })}else{
 
     const itemsdata = [];
     const userId = req.userId;
     const StoreId = req.body.storeId;
     const theAddress = await Address.findById(req.body.addressId);
     const store = await Store.findById(StoreId);
+    const admin = await Store.findOne({phone:"0910808060"});
     const user = await User.findById(userId);
     const deliveryPrice = req.body.deliveryPrice
     let totalprice = 0;
@@ -169,6 +170,11 @@ router.post("/addOrder", auth, async (req, res) => {
       title: "طلبية جديدة",
       body: "قام زبون ما بطلب طلبية من متجرك",
     });
+    await sendNotification({
+      token: admin.fcmToken,
+      title: "طلبية جديدة",
+      body:` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+    });
     await notification.create({
       id: store._id,
       userType: "store",
@@ -181,7 +187,7 @@ router.post("/addOrder", auth, async (req, res) => {
       error: false,
       message: "Order added successfully",
       data: theorderId,
-    });
+    });}
   } catch (error) {
     console.log(error);
     res.status(500).json({

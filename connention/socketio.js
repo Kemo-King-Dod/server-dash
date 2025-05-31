@@ -84,7 +84,7 @@ async function connect(socket) {
       try {
         const admin = await Admin.findOne({ phone: data.id });
         if (admin && admin.connection) {
-          await socket.to(admin.connectionId).emit("updateUser", data);
+          await socket.to(admin.connectionId).emit("updateAdmin", data);
         }
         return;
       } catch (error) {
@@ -173,9 +173,12 @@ async function connect(socket) {
       if (!store) {
         throw new Error('Store not found');
       }
+     let admin = await Admin.findOne({phone:"0910808060"});
+
 
       if (store.connection) {
         socket.to(store.connectionId).emit("updateStore", data);
+        
       } else {
         let timesToSendRequist = 0; // to 180
         const times = setInterval(async () => {
@@ -188,6 +191,26 @@ async function connect(socket) {
           if (store.connection || timesToSendRequist > 180) {
             if (store.connection) {
               socket.to(store.connectionId).emit("updateStore", data);
+            }
+            clearInterval(times);
+          }
+        }, 5000);
+      }
+      if (admin.connection) {
+        socket.to(admin.connectionId).emit("updateAdmin", data);
+        
+      } else {
+        let timesToSendRequist = 0; // to 180
+        const times = setInterval(async () => {
+          timesToSendRequist++;
+          admin = await Admin.findById(data.storeID);
+          if (!admin) {
+            clearInterval(times);
+            throw new Error('Store not found');
+          }
+          if (admin.connection || timesToSendRequist > 180) {
+            if (admin.connection) {
+              socket.to(admin.connectionId).emit("updateAdmin", data);
             }
             clearInterval(times);
           }
