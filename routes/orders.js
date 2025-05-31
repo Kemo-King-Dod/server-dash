@@ -48,7 +48,9 @@ router.get("/getAllOrders",auth,async(req,res)=>{
 // orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
   try {
-    if( req.userId !=="67ae3afe99b17930459942e3"){
+    console.log(req.userId)
+    console.log("67ae3afe99b17930459942e3")
+    if( req.user._id.toString() !=="67ae3afe99b17930459942e3"){
     return res.status(500).json({
       error: true,
       message: "سيتم الإطلاق قريباً",
