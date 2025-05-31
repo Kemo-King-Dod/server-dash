@@ -29,7 +29,20 @@ async function connect(socket) {
             console.log(err);
             console.log("يرجى تسجيل الدخول");
           } else {
+
             let exist = await User.findOne({ _id: data.id });
+            if(!exist){
+             exist= await Admin.findOne({_id:data.id})
+              if(exist){
+                await Admin.updateOne(
+                  { _id: data.id },
+                  { $set: { connection: true, connectionId: socket.id } }
+                );
+                socket.join("admins");
+                console.log("isAdmin.......");
+              }
+
+            }else
             if (!exist) {
               exist = await Store.findOne({ _id: data.id });
               if (!exist) {
@@ -57,6 +70,7 @@ async function connect(socket) {
                 { $set: { connection: true, connectionId: socket.id } }
               );
             }
+
           }
         }
       );
