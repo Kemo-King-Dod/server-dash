@@ -812,6 +812,20 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         message: "الطلب غير موجود",
       });
     }
+    const user = await User.findById(order.customer.id);
+    if(!user){
+      return res.status(404).json({
+        error: true,
+        message: "المستخدم غير موجود",
+      });
+    }
+    const store = await User.findById(order.store.id);
+    if(!store){
+      return res.status(404).json({
+        error: true,
+        message: "المتجر غير موجود",
+      });
+    }
 
     if (order.status == "onWay") {
       order.status = "canceled";
@@ -831,6 +845,12 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
       order.driver = null;
     }
     await order.save();
+    sendNotification({
+      token:driver.fcmToken,
+      title:"تم الغاء الطلبية",
+      body:"لقد الغيت الطلبية رقم "+order.orderId
+    })
+    
 
     res.status(200).json({
       error: false,
