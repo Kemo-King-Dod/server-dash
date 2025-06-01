@@ -15,7 +15,7 @@ route.get("/getAdses", async (req, res) => {
 });
 route.post("/addAdeses", async (req, res) => {
   try {
-    const { ads } = req.body.ads;
+    const { ads } = req.body;
     const newAds = await Ads.create(ads);
     return res.status(200).json({
       error: false,
