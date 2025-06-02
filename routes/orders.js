@@ -819,7 +819,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         message: "المستخدم غير موجود",
       });
     }
-    const store = await User.findById(order.store.id);
+    const store = await Store.findById(order.store.id);
     if(!store){
       return res.status(404).json({
         error: true,
