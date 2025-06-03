@@ -663,6 +663,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
       type: "canceled",
       address: order.address,
       distenationPrice: order.distenationPrice,
+      companyFee: order.companyFee,
       reseveCode: order.reseveCode,
       chat: order.chat,
       canceledby: "user",

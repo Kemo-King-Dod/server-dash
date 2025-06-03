@@ -17,6 +17,15 @@ route.post("/search", async (req, res) => {
 
     const searchTerm = req.body.keyWord;
 
+    if (!req.headers.cityen) {
+      return res.status(400).json({
+        error: false,
+        message: "يرجى التحقق من تفعيل الموقع وإعطاء الإذن"
+      });
+    }
+    const city = req.headers.cityen
+    
+
     // Try text search first for stores
     // let allStores = await Store.aggregate([
     //     {
@@ -43,6 +52,7 @@ route.post("/search", async (req, res) => {
             $regex: searchTerm,
             $options: "i",
           },
+          city: city,
         },
       },
       {
@@ -77,6 +87,7 @@ route.post("/search", async (req, res) => {
             $regex: searchTerm,
             $options: "i",
           },
+          city: city,
         },
       },
       {
