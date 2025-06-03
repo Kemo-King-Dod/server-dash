@@ -61,7 +61,11 @@ const orders = new Schema({
   ByCode:{
     type:Boolean,
     default:false,
-  }
+  },
+  handcheck: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 module.exports = mongoose.model("Order", orders)

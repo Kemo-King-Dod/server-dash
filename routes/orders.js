@@ -136,6 +136,7 @@ router.post("/addOrder", auth, async (req, res) => {
       distenationPrice: deliveryPrice,
       chat: [],
       ByCode: store.ByCode,
+      handcheck:store.handcheck,
     });
 
     if (order.city.englishName != req.headers.cityen) {
@@ -453,6 +454,11 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
           gender: driver.gender,
           phone: driver.phone,
         };
+        if(order.handcheck!==true){
+          driver.funds -=order.totalPrice
+          await driver.save()
+
+        }
         console.log(order.driver);
         await order.save();
 
@@ -556,6 +562,10 @@ router.post("/confirmOrder", auth, async (req, res) => {
     try {
       driver.funds += order.companyFee;
       driver.balance += order.distenationPrice;
+      if(order.handcheck!==true){
+        driver.funds+=order.totalPrice
+        await driver.save()
+      }
       await driver.save();
     } catch (err) {
       console.log(err);
@@ -592,7 +602,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
     await orderRecord.save();
 
 
-    User.findByIdAndUpdate(order.customer.id, { orders: { $pull: order._id } });
+   await User.findByIdAndUpdate(order.customer.id, { orders: { $pull: order._id } });
     sendNotification({
       token: user.fcmToken,
       title: "تم تسليم طلبك",

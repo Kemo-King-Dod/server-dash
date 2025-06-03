@@ -157,7 +157,11 @@ const stores = new Schema(
   timesForgetPassword:{
       type: Number,
       default:0,
-  }
+    },
+    handcheck: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
