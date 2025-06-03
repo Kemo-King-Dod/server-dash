@@ -559,7 +559,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
     }
     try {
       driver.funds += order.companyFee;
-      driver.balance += order.distenationPrice;
+      driver.balance += order.distenationPrice - order.companyFee;
       if (order.handcheck) {
         driver.funds += order.totalPrice;
       }
