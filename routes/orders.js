@@ -36,163 +36,169 @@ async function read() {
   );
   return ordersNum;
 }
-router.get("/getAllOrders",auth,async(req,res)=>{
+router.get("/getAllOrders", auth, async (req, res) => {
   var Orders = await orders.find({});
   return res.status(200).json({
-    error:false,
-    data : {
-      orders:Orders,
-    }
-  })
-})
+    error: false,
+    data: {
+      orders: Orders,
+    },
+  });
+});
 
 // orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
   try {
-    console.log(req.userId)
-    if( req.userId !=="682e92122f76a6aadd90d682"){
-    return res.status(500).json({
-      error: true,
-      message: "سيتم الإطلاق قريباً",
-    })}else{
-
-    const itemsdata = [];
-    const userId = req.userId;
-    const StoreId = req.body.storeId;
-    const theAddress = await Address.findById(req.body.addressId);
-    const store = await Store.findById(StoreId);
-    const admin = await Admin.findOne({phone:"0910808060"});
-    const user = await User.findById(userId);
-    const deliveryPrice = req.body.deliveryPrice
-    let totalprice = 0;
-
-    if (store.city != req.headers.cityen) {
+    console.log(req.userId);
+    if (req.userId !== "682e92122f76a6aadd90d682") {
       return res.status(500).json({
         error: true,
-        message: "المحل غير موجود في هذه المدينة",
-      })
-    }
+        message: "سيتم الإطلاق قريباً",
+      });
+    } 
+    else {
+      const itemsdata = [];
+      const userId = req.userId;
+      const StoreId = req.body.storeId;
+      const theAddress = await Address.findById(req.body.addressId);
+      const store = await Store.findById(StoreId);
+      const admin = await Admin.findOne({ phone: "0910808060" });
+      const user = await User.findById(userId);
+      const deliveryPrice = req.body.deliveryPrice;
+      let totalprice = 0;
 
-    for (var i = 0; i < user.cart.length; i++) {
-      if (user.cart[i].cartItem.storeID == StoreId) {
-        const item = await Item.findById(user.cart[i].cartItem.id);
-        itemsdata.push({
-          id: item._id,
-          name: item.name,
-          options: user.cart[i].cartItem.options,
-          addOns: user.cart[i].cartItem.addOns,
-          quantity: 1, // update later
-          price: user.cart[i].cartItem.price,
+      if (store.city != req.headers.cityen) {
+        return res.status(500).json({
+          error: true,
+          message: "المحل غير موجود في هذه المدينة",
         });
-        totalprice += user.cart[i].cartItem.price;
       }
-    }
 
-    if (itemsdata.length == 0) {
-      res.status(500).json({
-        error: true,
-        message: "ليس هناك عناصر",
+      for (var i = 0; i < user.cart.length; i++) {
+        if (user.cart[i].cartItem.storeID == StoreId) {
+          const item = await Item.findById(user.cart[i].cartItem.id);
+          itemsdata.push({
+            id: item._id,
+            name: item.name,
+            options: user.cart[i].cartItem.options,
+            addOns: user.cart[i].cartItem.addOns,
+            quantity: 1, // update later
+            price: user.cart[i].cartItem.price,
+          });
+          totalprice += user.cart[i].cartItem.price;
+        }
+      }
+
+      if (itemsdata.length == 0) {
+        res.status(500).json({
+          error: true,
+          message: "ليس هناك عناصر",
+        });
+        return;
+      }
+      if (
+        getCityName(theAddress).englishName !==
+        getCityName(store.location).englishName
+      ) {
+        res.status(500).json({
+          error: true,
+          message: "لا يمكن الطلب من مدن مختلفة",
+        });
+        return;
+      }
+      // Create new order
+      const order = new Order({
+        orderId: await read(),
+        city: {
+          englishName: getCityName(theAddress).englishName,
+          arabicName: getCityName(theAddress).arabicName,
+        },
+        customer: {
+          id: user._id,
+          name: user.name,
+          phone: user.phone,
+          gender: user.gender,
+        },
+        store: {
+          id: store._id,
+          phone: store.phone,
+          name: store.name,
+          picture: store.picture,
+          deliveryCostByKilo: store.deliveryCostByKilo,
+          storeType: store.storeType,
+          location: store.location,
+          address: store.address,
+        },
+        driver: null,
+        companyFee: store.companyFee,
+        date: new Date(),
+        items: itemsdata,
+        totalPrice: totalprice,
+        status: "waiting",
+        type: "waiting",
+        address: theAddress,
+        distenationPrice: deliveryPrice,
+        chat: [],
+        ByCode: store.ByCode,
+        handcheck: store.handcheck,
       });
-      return;
-    }
-    if(getCityName(theAddress).englishName!==getCityName(store.location).englishName){
-      res.status(500).json({
-        error: true,
-        message: "لا يمكن الطلب من مدن مختلفة",
+
+      if (order.city.englishName != req.headers.cityen) {
+        return res.status(401).json({
+          error: true,
+          message: "لا يمكن الطلب من خارج مدينتك",
+        });
+      }
+
+      // Save order
+      await order.save();
+
+      const theorderId = await Order.findOne({ orderId: ordersNum });
+
+      // Update store's orders array
+      await Store.findByIdAndUpdate(StoreId, {
+        $push: { orders: theorderId._id },
       });
-      return;
-    }
-    // Create new order
-    const order = new Order({
-      orderId: await read(),
-      city: {
-        englishName: getCityName(theAddress).englishName,
-        arabicName: getCityName(theAddress).arabicName,
-      },
-      customer: {
-        id: user._id,
-        name: user.name,
-        phone: user.phone,
-        gender: user.gender,
-      },
-      store: {
+
+      // Update user's orders array
+      await User.findByIdAndUpdate(userId, {
+        $push: { orders: theorderId._id },
+      });
+
+      // delete from cart
+      for (var i = 0; i < user.cart.length; i++) {
+        if (user.cart[i].cartItem.storeID == StoreId) {
+          user.cart.splice(i, 1);
+          i--;
+        }
+      }
+      await user.save();
+
+      await sendNotification({
+        token: store.fcmToken,
+        title: "طلبية جديدة",
+        body: "قام زبون ما بطلب طلبية من متجرك",
+      });
+      await sendNotification({
+        token: admin.fcmToken,
+        title: "طلبية جديدة",
+        body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+      });
+
+      await notification.create({
         id: store._id,
-        phone: store.phone,
-        name: store.name,
-        picture: store.picture,
-        deliveryCostByKilo: store.deliveryCostByKilo,
-        storeType: store.storeType,
-        location: store.location,
-        address: store.address,
-      },
-      driver: null,
-      companyFee: store.companyFee,
-      date: new Date(),
-      items: itemsdata,
-      totalPrice: totalprice,
-      status:  "waiting" ,
-      type:  "waiting",
-      address: theAddress,
-      distenationPrice: deliveryPrice,
-      chat: [],
-      ByCode: store.ByCode,
-      handcheck:store.handcheck,
-    });
+        userType: "store",
+        title: "طلبية جديدة",
+        body: "قام زبون ما بطلب طلبية من متجرك",
+        type: "info",
+      });
 
-    if (order.city.englishName != req.headers.cityen) {
-      return res.status(401).json({
-        error: true,
-        message: "لا يمكن الطلب من خارج مدينتك"
-      })
+      res.status(200).json({
+        error: false,
+        message: "Order added successfully",
+        data: theorderId,
+      });
     }
-
-    // Save order
-    await order.save();
-
-    const theorderId = await Order.findOne({ orderId: ordersNum });
-
-    // Update store's orders array
-    await Store.findByIdAndUpdate(StoreId, {
-      $push: { orders: theorderId._id },
-    });
-
-    // Update user's orders array
-    await User.findByIdAndUpdate(userId, { $push: { orders: theorderId._id } });
-
-    // delete from cart
-    for (var i = 0; i < user.cart.length; i++) {
-      if (user.cart[i].cartItem.storeID == StoreId) {
-        user.cart.splice(i, 1);
-        i--;
-      }
-    }
-    await user.save();
-
-    await sendNotification({
-      token: store.fcmToken,
-      title: "طلبية جديدة",
-      body: "قام زبون ما بطلب طلبية من متجرك",
-    });
-    await sendNotification({
-      token: admin.fcmToken,
-      title: "طلبية جديدة",
-      body:` قام زبون ما بطلب طلبية من متجر ${store.name}`,
-    });
-
-   
-    await notification.create({
-      id: store._id,
-      userType: "store",
-      title: "طلبية جديدة",
-      body: "قام زبون ما بطلب طلبية من متجرك",
-      type: "info",
-    });
-
-    res.status(200).json({
-      error: false,
-      message: "Order added successfully",
-      data: theorderId,
-    });}
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -211,8 +217,8 @@ router.post("/acceptOrder", auth, async (req, res) => {
 
     if (order) {
       const user = await User.findById(order.customer.id);
-      order.status = store.ByCode?"accepted"  : "ready";
-      order.type = store.ByCode?"accepted"  : "ready";
+      order.status = store.ByCode ? "accepted" : "ready";
+      order.type = store.ByCode ? "accepted" : "ready";
       await order.save();
       sendNotification({
         token: user.fcmToken,
@@ -231,17 +237,15 @@ router.post("/acceptOrder", auth, async (req, res) => {
         data: order,
       });
     }
-    
- if(store.ByCode ==false){
-  sendNotificationToTopic({
-    topic:`${order.city.englishName}Drivers`,
-    title:'طلبية جديدة',
-    body:"هناك طلبية جديدة سارع بقبولها"
 
-  })
+    if (store.ByCode == false) {
+      sendNotificationToTopic({
+        topic: `${order.city.englishName}Drivers`,
+        title: "طلبية جديدة",
+        body: "هناك طلبية جديدة سارع بقبولها",
+      });
+    }
 
- }
-   
     res.status(500).json({
       error: true,
       message: "الطلب غير موجود",
@@ -265,11 +269,10 @@ router.post("/readyOrder", auth, async (req, res) => {
       order.type = "ready";
       await order.save();
       sendNotificationToTopic({
-        topic:`${order.city.englishName}Drivers`,
-        title:'طلبية جديدة',
-        body:"هناك طلبية جديدة سارع بقبولها"
-  
-      })
+        topic: `${order.city.englishName}Drivers`,
+        title: "طلبية جديدة",
+        body: "هناك طلبية جديدة سارع بقبولها",
+      });
     } else {
       res.status(500).json({
         error: true,
@@ -374,11 +377,9 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     }
     if (acceptedorders.length > 0) {
       order.push(...acceptedorders);
-
     }
-    console.log(" orders", order)
-    console.log(" accept orders", acceptedorders)
-
+    console.log(" orders", order);
+    console.log(" accept orders", acceptedorders);
 
     res.status(200).json({
       error: false,
@@ -430,18 +431,16 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
       });
     } else {
       console.log("driver.cancelOrderLimit", driver.cancelOrderLimit);
-
     }
 
     if (req.user.userType !== "admin" && acceptedordersCount >= 3) {
       return res.status(200).json({
         error: true,
-        message: "لقد وصلت الى الحد الاقصى للطلبات"
+        message: "لقد وصلت الى الحد الاقصى للطلبات",
       });
     } else {
       console.log("accept order for driver", acceptedordersCount);
     }
-
 
     const order = await Order.findById(id);
     if (order.status == "ready") {
@@ -454,12 +453,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
           gender: driver.gender,
           phone: driver.phone,
         };
-        if(order.handcheck!==true){
-          driver.funds -=order.totalPrice
-          await driver.save()
-
-        }
-        console.log(order.driver);
+       
         await order.save();
 
         res.status(200).json({
@@ -538,8 +532,12 @@ router.post("/examineCode", auth, async (req, res) => {
 router.post("/confirmOrder", auth, async (req, res) => {
   try {
     const order = await Order.findById(req.body.orderId);
-    const driver = await Driver.findById(new mongoose.Types.ObjectId(order.driver.id));
-    const user = await User.findById(new mongoose.Types.ObjectId(order.customer.id));
+    const driver = await Driver.findById(
+      new mongoose.Types.ObjectId(order.driver.id)
+    );
+    const user = await User.findById(
+      new mongoose.Types.ObjectId(order.customer.id)
+    );
 
     if (!order) {
       return res.status(404).json({
@@ -562,17 +560,21 @@ router.post("/confirmOrder", auth, async (req, res) => {
     try {
       driver.funds += order.companyFee;
       driver.balance += order.distenationPrice;
-      if(order.handcheck!==true){
-        driver.funds+=order.totalPrice
-        await driver.save()
+      if (order.handcheck) {
+        driver.funds += order.totalPrice;
       }
+
       await driver.save();
     } catch (err) {
       console.log(err);
       await notification.create({
         id: order.driver.id,
         userType: "driver",
-        title: "حصل خطأ في تعديل مستحقات الشركة في رقم الطلبية ذات الرقم " + order.orderId + " id =" + order._id,
+        title:
+          "حصل خطأ في تعديل مستحقات الشركة في رقم الطلبية ذات الرقم " +
+          order.orderId +
+          " id =" +
+          order._id,
         body: "يرجى التوجه إلى المكتب الرئيسي للتعديل",
         type: "warning",
       });
@@ -601,8 +603,9 @@ router.post("/confirmOrder", auth, async (req, res) => {
     });
     await orderRecord.save();
 
-
-   await User.findByIdAndUpdate(order.customer.id, { orders: { $pull: order._id } });
+    await User.findByIdAndUpdate(order.customer.id, {
+      orders: { $pull: order._id },
+    });
     sendNotification({
       token: user.fcmToken,
       title: "تم تسليم طلبك",
@@ -615,7 +618,6 @@ router.post("/confirmOrder", auth, async (req, res) => {
       body: "نتمنى أن الخدمة قد نالت رضاكم",
       type: "success",
     });
-
 
     // Delete original order
     await Order.findByIdAndDelete(req.body.orderId);
@@ -734,10 +736,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       { orders: { $pull: order._id } },
       { new: true }
     );
-    const driver = await Driver.findById(
-      order.driver.id,
-     
-    );
+    const driver = await Driver.findById(order.driver.id);
     console.log("updatedUser", updatedUser);
     if (req.body.reason != "") {
       if (req.body.unavailableProducts.length > 0) {
@@ -753,11 +752,10 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
             " ولم يتم توفير بعض المنتجات مثل " +
             unavailableProducts,
         });
-         sendNotification({
+        sendNotification({
           token: driver.fcmToken,
           title: "تم إلغاء طلب",
-          body:"تم الغاء الطلب رقم "+order.orderId
-           
+          body: "تم الغاء الطلب رقم " + order.orderId,
         });
         await notification.create({
           id: updatedUser._id,
@@ -779,8 +777,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
         sendNotification({
           token: driver.fcmToken,
           title: "تم إلغاء طلب",
-          body:"تم الغاء الطلب رقم "+order.orderId
-           
+          body: "تم الغاء الطلب رقم " + order.orderId,
         });
         await notification.create({
           id: updatedUser._id,
@@ -789,7 +786,6 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
           body: "تم إلغاء طلبك بسبب" + req.body.reason,
           type: "success",
           date: new Date(),
-
         });
       }
     } else {
@@ -825,8 +821,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
         sendNotification({
           token: driver.fcmToken,
           title: "تم إلغاء طلب",
-          body:"تم الغاء الطلب رقم "+order.orderId
-           
+          body: "تم الغاء الطلب رقم " + order.orderId,
         });
         await notification.create({
           id: updatedUser._id,
@@ -864,14 +859,14 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
       });
     }
     const user = await User.findById(order.customer.id);
-    if(!user){
+    if (!user) {
       return res.status(404).json({
         error: true,
         message: "المستخدم غير موجود",
       });
     }
     const store = await Store.findById(order.store.id);
-    if(!store){
+    if (!store) {
       return res.status(404).json({
         error: true,
         message: "المتجر غير موجود",
@@ -897,11 +892,10 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
     }
     await order.save();
     sendNotification({
-      token:driver.fcmToken,
-      title:"تم الغاء الطلبية",
-      body:"لقد الغيت الطلبية رقم "+order.orderId
-    })
-    
+      token: driver.fcmToken,
+      title: "تم الغاء الطلبية",
+      body: "لقد الغيت الطلبية رقم " + order.orderId,
+    });
 
     res.status(200).json({
       error: false,
