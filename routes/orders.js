@@ -126,12 +126,12 @@ router.post("/addOrder", auth, async (req, res) => {
         address: store.address,
       },
       driver: null,
-      companyFee: 2,
+      companyFee: store.companyFee,
       date: new Date(),
       items: itemsdata,
       totalPrice: totalprice,
-      status: store.ByCode ? "waiting" : "ready",
-      type: store.ByCode ? "waiting" : "ready",
+      status:  "waiting" ,
+      type:  "waiting",
       address: theAddress,
       distenationPrice: deliveryPrice,
       chat: [],
@@ -177,6 +177,8 @@ router.post("/addOrder", auth, async (req, res) => {
       title: "طلبية جديدة",
       body:` قام زبون ما بطلب طلبية من متجر ${store.name}`,
     });
+
+   
     await notification.create({
       id: store._id,
       userType: "store",
@@ -208,8 +210,8 @@ router.post("/acceptOrder", auth, async (req, res) => {
 
     if (order) {
       const user = await User.findById(order.customer.id);
-      order.status = store.ByCode?"ready":"accepted";
-      order.type = store.ByCode?"ready":"accepted";
+      order.status = store.ByCode?"accepted"  : "ready";
+      order.type = store.ByCode?"accepted"  : "ready";
       await order.save();
       sendNotification({
         token: user.fcmToken,
@@ -228,6 +230,17 @@ router.post("/acceptOrder", auth, async (req, res) => {
         data: order,
       });
     }
+    
+ if(store.ByCode ==false){
+  sendNotificationToTopic({
+    topic:`${order.city.englishName}Drivers`,
+    title:'طلبية جديدة',
+    body:"هناك طلبية جديدة سارع بقبولها"
+
+  })
+
+ }
+   
     res.status(500).json({
       error: true,
       message: "الطلب غير موجود",
@@ -250,6 +263,12 @@ router.post("/readyOrder", auth, async (req, res) => {
       order.status = "ready";
       order.type = "ready";
       await order.save();
+      sendNotificationToTopic({
+        topic:`${order.city.englishName}Drivers`,
+        title:'طلبية جديدة',
+        body:"هناك طلبية جديدة سارع بقبولها"
+  
+      })
     } else {
       res.status(500).json({
         error: true,
@@ -705,6 +724,10 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       { orders: { $pull: order._id } },
       { new: true }
     );
+    const driver = await Driver.findById(
+      order.driver.id,
+     
+    );
     console.log("updatedUser", updatedUser);
     if (req.body.reason != "") {
       if (req.body.unavailableProducts.length > 0) {
@@ -719,6 +742,12 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
             req.body.reason +
             " ولم يتم توفير بعض المنتجات مثل " +
             unavailableProducts,
+        });
+         sendNotification({
+          token: driver.fcmToken,
+          title: "تم إلغاء طلب",
+          body:"تم الغاء الطلب رقم "+order.orderId
+           
         });
         await notification.create({
           id: updatedUser._id,
@@ -736,6 +765,12 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
           token: updatedUser.fcmToken,
           title: "تم إلغاء طلبك",
           body: "تم إلغاء طلبك بسبب" + req.body.reason,
+        });
+        sendNotification({
+          token: driver.fcmToken,
+          title: "تم إلغاء طلب",
+          body:"تم الغاء الطلب رقم "+order.orderId
+           
         });
         await notification.create({
           id: updatedUser._id,
@@ -776,6 +811,12 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
           token: updatedUser.fcmToken,
           title: "تم إلغاء طلبك",
           body: "تم إلغاء طلبك ",
+        });
+        sendNotification({
+          token: driver.fcmToken,
+          title: "تم إلغاء طلب",
+          body:"تم الغاء الطلب رقم "+order.orderId
+           
         });
         await notification.create({
           id: updatedUser._id,
