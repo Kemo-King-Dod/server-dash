@@ -269,7 +269,7 @@ router.post("/readyOrder", auth, async (req, res) => {
       order.type = "ready";
       await order.save();
       sendNotificationToTopic({
-        topic: `${order.city.englishName}Drivers`,
+        topic: `${order.city.englishName.toLowerCase()}_drivers`,
         title: "طلبية جديدة",
         body: "هناك طلبية جديدة سارع بقبولها",
       });
