@@ -220,6 +220,13 @@ router.post("/acceptOrder", auth, async (req, res) => {
       order.status = store.ByCode ? "accepted" : "ready";
       order.type = store.ByCode ? "accepted" : "ready";
       await order.save();
+      if (!store.ByCode) {
+        sendNotificationToTopic({
+          topic: `${order.city.englishName.toLowerCase()}_drivers`,
+          title: "طلبية جديدة",
+          body: "هناك طلبية جديدة سارع بقبولها",
+        });
+      }
       sendNotification({
         token: user.fcmToken,
         title: "تم قبول طلبك",
@@ -232,6 +239,7 @@ router.post("/acceptOrder", auth, async (req, res) => {
         body: "قام المتجر بقبول طلبك ويتم الآن تجهيز الطلبية",
         type: "info",
       });
+
       return res.status(200).json({
         error: false,
         data: order,
