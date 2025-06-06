@@ -454,15 +454,15 @@ route.post("/category", async (req, res) => {
     // الحصول على المتاجر
     const allStores = await Store.aggregate([
       { $match: storeMatch },
-      { $sample: { size: 10 } }
+      // { $sample: { size: 10 } }
     ]);
     const allItems = await items.aggregate([
       {
         $match: itemsMatch,
       },
-      {
-        $sample: { size: 10 }
-      }
+      // {
+      //   $sample: { size: 10 }
+      // }
     ])
 
     // are you visitor 

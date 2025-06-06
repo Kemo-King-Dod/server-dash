@@ -55,9 +55,9 @@ route.post("/search", async (req, res) => {
           city: city,
         },
       },
-      {
-        $limit: 2,
-      },
+      // {
+      //   $limit: 2,
+      // },
     ]);
     // }
 
@@ -90,9 +90,9 @@ route.post("/search", async (req, res) => {
           city: city,
         },
       },
-      {
-        $limit: 4,
-      },
+      // {
+      //   $limit: 4,
+      // },
     ]);
     // }
 
@@ -226,14 +226,13 @@ route.post("/search", async (req, res) => {
       }
     }
 
-    await res.json({
+     res.json({
       error: false,
       data: {
         products: allItems,
         stores: allStores,
       },
     });
-    console.log(111)
   } catch (error) {
     console.log(error);
     res.status(401).json({
