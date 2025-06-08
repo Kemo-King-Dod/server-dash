@@ -80,6 +80,7 @@ router.post("/addOrder", auth, async (req, res) => {
           itemsdata.push({
             id: item._id,
             name: item.name,
+            image:item.imageUrl,
             options: user.cart[i].cartItem.options,
             addOns: user.cart[i].cartItem.addOns,
             quantity: 1, // update later
@@ -731,7 +732,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       type: "canceled",
       address: order.address,
       distenationPrice: order.distenationPrice,
-      reseveCode: order.reserveCode,
+      reseveCode: order.reseveCode,
       chat: order.chat,
       canceledby: "store",
     });

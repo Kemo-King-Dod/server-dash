@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Driver = require('../database/driver')
-const { auth } = require('../middleware/auth')
+const { auth } = require('../middleware/auth');
+const Transaction = require('../database/transactions');
+const Admin = require('../database/admin');
 
 router.get('/getDriver', auth, async (req, res) => {
     try {
@@ -48,5 +50,53 @@ router.post('/alterDriverPassword', auth, async (req, res) => {
         })
     }
 })
+
+
+router.post('/addWithdrawl', auth, async (req, res) => {
+    try {
+        const adminId = req.userId;
+        const companyId = "67ab9be0c878f7ab0bec38f5"
+        const driverId = req.body.id;
+        const company= await Admin.findById(companyId)
+        const driver = await Driver.findById(driverId)
+        try{
+         const transaction=await Transaction.create({
+            sender:driverId,
+            receiver:adminId,
+            amount:driver.funds,
+            description:"تمت عملية الدفع من السائق الى الشركة",
+            type:"credit",
+
+         })
+         const transaction2=await Transaction.create({
+            sender:adminId,
+            receiver:driverId,
+            amount:driver.funds,
+            description:"تمت عملية السحب من الشركة",
+            type:"credit",
+         })
+         company.balance += driver.funds;
+         driver.funds=0;
+         driver.balance=0;
+
+         
+        
+
+        }catch(e){
+
+        }
+       
+       
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: true,
+            message: err
+        })
+    }
+})
+
+
+
 
 module.exports = router
