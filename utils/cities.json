@@ -7,11 +7,21 @@
         "Arabicname": "سبها",
         "Englishname": "Sabha",
         "boundary": [
-            {"latitude": 27.032251, "longitude": 14.448614},
-            {"latitude": 27.063722, "longitude": 14.421119},
-            {"latitude": 27.050511, "longitude": 14.400473},
-            {"latitude": 27.027783, "longitude": 14.405929},
-            {"latitude": 27.016148, "longitude": 14.431503}
+            {"latitude": 27.00807, "longitude": 14.4907},
+            {"latitude": 27.0369, "longitude": 14.47771},
+            {"latitude": 27.05127, "longitude": 14.47462},
+            {"latitude": 27.06112, "longitude": 14.44011},
+            {"latitude": 27.08683, "longitude": 14.42639},
+            {"latitude": 27.10193, "longitude": 14.4087},
+            {"latitude": 27.09208, "longitude": 14.39574},
+            {"latitude": 27.04264, "longitude": 14.39018},
+            {"latitude": 27.09391, "longitude": 14.39395},
+            {"latitude": 27.2018, "longitude": 14.39395},
+            {"latitude": 27.00016, "longitude": 14.43648},
+            {"latitude": 27.00016, "longitude": 14.43648},
+            {"latitude": 27.00807, "longitude": 14.4907}
+
+           
         ]
     },
         {
