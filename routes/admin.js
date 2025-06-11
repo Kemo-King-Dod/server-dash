@@ -284,7 +284,9 @@ router.get(
   "/TransactionsForAdmin",
   /* auth, */ async (req, res) => {
     try {
-      const transactions = await Transaction.find({});
+        const companyId = "67ab9be0c878f7ab0bec38f5";
+      const transactions = await Transaction.find({$or: [{sender: companyId}, {receiver: companyId}]});
+      transactions.reverse();
       return res.status(200).json({
         error: false,
         data: {transactions},
