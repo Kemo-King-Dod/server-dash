@@ -712,6 +712,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
   try {
     console.log("req.body", req.body);
     const order = await Order.findById(req.body.orderId);
+    var driver = null;
     if (!order) {
       return res.status(404).json({
         error: true,
@@ -746,7 +747,8 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       { orders: { $pull: order._id } },
       { new: true }
     );
-    const driver = await Driver.findById(order.driver.id);
+    if(order.driver)
+     driver = await Driver.findById(order.driver.id);
     console.log("updatedUser", updatedUser);
     if (req.body.reason != "") {
       if (req.body.unavailableProducts.length > 0) {
@@ -762,7 +764,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
             " ولم يتم توفير بعض المنتجات مثل " +
             unavailableProducts,
         });
-        sendNotification({
+       if(driver) sendNotification({
           token: driver.fcmToken,
           title: "تم إلغاء طلب",
           body: "تم الغاء الطلب رقم " + order.orderId,
@@ -784,7 +786,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
           title: "تم إلغاء طلبك",
           body: "تم إلغاء طلبك بسبب" + req.body.reason,
         });
-        sendNotification({
+       if(driver) sendNotification({
           token: driver.fcmToken,
           title: "تم إلغاء طلب",
           body: "تم الغاء الطلب رقم " + order.orderId,
@@ -828,7 +830,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
           title: "تم إلغاء طلبك",
           body: "تم إلغاء طلبك ",
         });
-        sendNotification({
+       if(driver) sendNotification({
           token: driver.fcmToken,
           title: "تم إلغاء طلب",
           body: "تم الغاء الطلب رقم " + order.orderId,
