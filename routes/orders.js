@@ -19,7 +19,6 @@ const {
 const getCityName = require("../utils/getCityName");
 const Transaction = require("../database/transactions");
 const { error } = require("console");
-const driver = require("../database/driver");
 const orders = require("../database/orders");
 const Admin = require("../database/admin");
 
