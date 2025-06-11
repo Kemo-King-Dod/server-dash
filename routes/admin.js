@@ -10,7 +10,8 @@ const items = require('../database/items');
 const notification = require('../database/notification');
 const Info = require('../database/info');
 
-const { auth } = require('../middleware/auth')
+const { auth } = require('../middleware/auth');
+const Transaction = require('../database/transactions');
 
 // general
 
@@ -273,6 +274,25 @@ router.post('/search_for_customer', async (req, res) => {
         })
     }
 })
+
+router.get("/TransactionsForAdmin", /* auth, */ async (req, res) => {
+    try{ 
+
+const transaction = await Transaction.find({});
+   return res.status(200).json({
+        error: false,
+        data: transaction
+    })
+
+    }catch(e){
+        console.log(e);
+        res.status(500).json({
+            error: true,
+            message: e
+        })
+    }
+ 
+}),
 
 
 module.exports = router
