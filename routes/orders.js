@@ -173,21 +173,36 @@ router.post("/addOrder", auth, async (req, res) => {
       }
       await user.save();
 
+    try{
       sendNotification({
         token: store.fcmToken,
         title: "طلبية جديدة",
         body: "قام زبون ما بطلب طلبية من متجرك",
       });
+    }  catch(e){
+      console.log("المتجر لم يستلم الاشعار");
+    }
+    try{
       sendNotification({
         token: admin.fcmToken,
         title: "طلبية جديدة",
         body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
       });
+
+    }catch(e){
+      console.log("الادمن لم يستلم الاشعار");}
+    try{
       sendNotificationToTopic({
         topic: "admins_" + req.headers.cityen,
         title: "طلبية جديدة",
         body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
       });
+
+    }catch(e){
+      console.log("الادمن لم يستلم الاشعار");
+
+    }
+     
 
       await notification.create({
         id: store._id,
@@ -934,12 +949,12 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
       sendNotification({
         token: admin.fcmToken,
         title: "تم الغاء الطلب رقم" + order.orderId,
-        body: ` قام زبون ما بطلب طلبية من متجر ${order.store.name}`,
+        body: ` قام سائق ما بالغاء طلبية من متجر ${order.store.name}`,
       });
       sendNotificationToTopic({
         topic: "admins_" + req.headers.cityen,
         title: "تم الغاء الطلب رقم" + order.orderId,
-        body: ` قام زبون ما بالغاء طلبية من متجر ${order.store.name}`,
+        body: ` قام سائق ما بالغاء طلبية من متجر ${order.store.name}`,
       });
   
     } else {
