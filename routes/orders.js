@@ -54,8 +54,7 @@ router.post("/addOrder", auth, async (req, res) => {
         error: true,
         message: "سيتم الإطلاق قريباً",
       });
-    } 
-    else {
+    } else {
       const itemsdata = [];
       const userId = req.userId;
       const StoreId = req.body.storeId;
@@ -79,7 +78,7 @@ router.post("/addOrder", auth, async (req, res) => {
           itemsdata.push({
             id: item._id,
             name: item.name,
-            image:item.imageUrl,
+            image: item.imageUrl,
             options: user.cart[i].cartItem.options,
             addOns: user.cart[i].cartItem.addOns,
             quantity: 1, // update later
@@ -174,13 +173,18 @@ router.post("/addOrder", auth, async (req, res) => {
       }
       await user.save();
 
-      await sendNotification({
+      sendNotification({
         token: store.fcmToken,
         title: "طلبية جديدة",
         body: "قام زبون ما بطلب طلبية من متجرك",
       });
-      await sendNotification({
+      sendNotification({
         token: admin.fcmToken,
+        title: "طلبية جديدة",
+        body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+      });
+      sendNotificationToTopic({
+        topic: "admins_" + req.headers.cityen,
         title: "طلبية جديدة",
         body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
       });
@@ -193,7 +197,7 @@ router.post("/addOrder", auth, async (req, res) => {
         type: "info",
       });
 
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Order added successfully",
         data: theorderId,
@@ -461,7 +465,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
           gender: driver.gender,
           phone: driver.phone,
         };
-       
+
         await order.save();
 
         res.status(200).json({
@@ -649,6 +653,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
   try {
     const userId = req.userId;
     const user = await User.findById(userId);
+    const admin = await Admin.findOne({ phone: "0910808060" });
 
     const order = await Order.findById(req.body.orderId);
     if (!order) {
@@ -689,6 +694,17 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
     User.findByIdAndUpdate(order.customer.id, { orders: { $pull: order._id } });
 
     await user.save();
+
+    sendNotification({
+      token: admin.fcmToken,
+      title: "تم الغاء الطلب رقم" + order.orderId,
+      body: ` قام زبون ما بطلب طلبية من متجر ${order.store.name}`,
+    });
+    sendNotificationToTopic({
+      topic: "admins_" + req.headers.cityen,
+      title: "تم الغاء الطلب رقم" + order.orderId,
+      body: ` قام زبون ما بالغاء طلبية من متجر ${order.store.name}`,
+    });
 
     res.status(200).json({
       error: false,
@@ -746,8 +762,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       { orders: { $pull: order._id } },
       { new: true }
     );
-    if(order.driver)
-     driver = await Driver.findById(order.driver.id);
+    if (order.driver) driver = await Driver.findById(order.driver.id);
     console.log("updatedUser", updatedUser);
     if (req.body.reason != "") {
       if (req.body.unavailableProducts.length > 0) {
@@ -763,11 +778,12 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
             " ولم يتم توفير بعض المنتجات مثل " +
             unavailableProducts,
         });
-       if(driver) sendNotification({
-          token: driver.fcmToken,
-          title: "تم إلغاء طلب",
-          body: "تم الغاء الطلب رقم " + order.orderId,
-        });
+        if (driver)
+          sendNotification({
+            token: driver.fcmToken,
+            title: "تم إلغاء طلب",
+            body: "تم الغاء الطلب رقم " + order.orderId,
+          });
         await notification.create({
           id: updatedUser._id,
           userType: "user",
@@ -785,11 +801,12 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
           title: "تم إلغاء طلبك",
           body: "تم إلغاء طلبك بسبب" + req.body.reason,
         });
-       if(driver) sendNotification({
-          token: driver.fcmToken,
-          title: "تم إلغاء طلب",
-          body: "تم الغاء الطلب رقم " + order.orderId,
-        });
+        if (driver)
+          sendNotification({
+            token: driver.fcmToken,
+            title: "تم إلغاء طلب",
+            body: "تم الغاء الطلب رقم " + order.orderId,
+          });
         await notification.create({
           id: updatedUser._id,
           userType: "user",
@@ -829,11 +846,12 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
           title: "تم إلغاء طلبك",
           body: "تم إلغاء طلبك ",
         });
-       if(driver) sendNotification({
-          token: driver.fcmToken,
-          title: "تم إلغاء طلب",
-          body: "تم الغاء الطلب رقم " + order.orderId,
-        });
+        if (driver)
+          sendNotification({
+            token: driver.fcmToken,
+            title: "تم إلغاء طلب",
+            body: "تم الغاء الطلب رقم " + order.orderId,
+          });
         await notification.create({
           id: updatedUser._id,
           userType: "user",
@@ -885,23 +903,51 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
     }
 
     if (order.status == "onWay") {
-      order.status = "canceled";
-      order.type = "canceled";
+      const admin = await Admin.findOne({ phone: "0910808060" })
+      const orderRecord = new OrderRecodr({
+        orderId: order.orderId,
+        customer: order.customer,
+        driver: order.driver,
+        store: order.store,
+        date: order.date,
+        items: order.items,
+        totalPrice: order.totalPrice,
+        status: "canceled",
+        type: "canceled",
+        address: order.address,
+        distenationPrice: order.distenationPrice,
+        reseveCode: order.reseveCode,
+        chat: order.chat,
+        canceledby: "driver",
+      });
+      await orderRecord.save();
       // Increment cancel limit
       driver.cancelOrderLimit = (driver.cancelOrderLimit || 0) + 1;
       if (driver.cancelOrderLimit >= 5) {
         driver.status = "blocked";
       }
       await driver.save();
-      User.findByIdAndUpdate(order.customer.orderId, {
+      User.findByIdAndUpdate(order.customer.id, {
         orders: { $pull: order._id },
       });
+      await Order.findByIdAndDelete(order._id);
+      sendNotification({
+        token: admin.fcmToken,
+        title: "تم الغاء الطلب رقم" + order.orderId,
+        body: ` قام زبون ما بطلب طلبية من متجر ${order.store.name}`,
+      });
+      sendNotificationToTopic({
+        topic: "admins_" + req.headers.cityen,
+        title: "تم الغاء الطلب رقم" + order.orderId,
+        body: ` قام زبون ما بالغاء طلبية من متجر ${order.store.name}`,
+      });
+  
     } else {
       order.status = "ready";
       order.type = "ready";
       order.driver = null;
+      await order.save();
     }
-    await order.save();
     sendNotification({
       token: driver.fcmToken,
       title: "تم الغاء الطلبية",
