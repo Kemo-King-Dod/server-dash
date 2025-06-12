@@ -65,7 +65,7 @@ router.post("/addOrder", auth, async (req, res) => {
       const deliveryPrice = req.body.deliveryPrice;
       let totalprice = 0;
 
-      if (store.city != req.headers.cityen) {
+      if (store.city != getCityName(theAddress).englishName) {
         return res.status(500).json({
           error: true,
           message: "المحل غير موجود في هذه المدينة",
