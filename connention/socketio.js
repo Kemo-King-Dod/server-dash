@@ -75,298 +75,120 @@ async function connect(socket) {
   }
   
   console.log("hello")
-  socket.on("updateAdmin", async (data) => {
-    if (data.type == "chat") {
-      try {
-        const admin = await Admin.findOne({ phone: data.id });
-        if (admin && admin.connection) {
-          await socket.to(admin.connectionId).emit("updateAdmin", data);
-        }
-        return;
-      } catch (error) {
-        console.log(error);
-        return;
+ /* ------------------------------------------------------------------ *
+ *    Helpers                                                          *
+ * ------------------------------------------------------------------ */
+
+const RETRY_DELAY   = 5_000;   // 5 ثوانٍ
+const MAX_RETRIES   = 180;     // 15 دقيقة كحدّ أقصى
+
+/**
+ * ابعث الحدث إلى الهدف إذا كان متصلاً، أو انتظر لحين اتصاله ثم ابعثه.
+ *
+ * @param {Socket} socket      – سوكِت المُرسِل
+ * @param {Model}  Model       – Mongoose model (User / Admin / Store / Driver)
+ * @param {Object} query       – شرط البحث (phone أو _id …)
+ * @param {String} eventName   – اسم الحدث: "updateAdmin" مثلاً
+ * @param {Any}    payload     – البيانات المُرسَلة
+ */
+async function sendWhenConnected(socket, Model, query, eventName, payload) {
+  let target = await Model.findOne(query);
+
+  // 1) متصل بالفعل ➜ نرسل فورًا
+  if (target?.connection) {
+    return socket.to(target.connectionId).emit(eventName, payload);
+  }
+
+  // 2) غير متصل ➜ نعيد المحاولة
+  let attempts = 0;
+  const timer = setInterval(async () => {
+    attempts++;
+    target = await Model.findOne(query);
+
+    if (target?.connection || attempts >= MAX_RETRIES) {
+      if (target?.connection) {
+        socket.to(target.connectionId).emit(eventName, payload);
       }
+      clearInterval(timer);            // أوقف التايمر أياً كانت النتيجة
     }
+  }, RETRY_DELAY);
+}
 
-    try {
-      console.log(data);
-      let admin = await Admin.findOne({ phone: "0910808060" });
-      if (!admin) throw new Error("there is no user");
+/* ------------------------------------------------------------------ *
+ *    Listeners                                                        *
+ * ------------------------------------------------------------------ */
 
-      if (admin.connection) {
-        socket.to(admin.connectionId).emit("updateAdmin", data);
-      } else {
-        let timesToSendRequist = 0; // to 180
-        const times = setInterval(async () => {
-          timesToSendRequist++;
-          admin = await Admin.findOne({ phone: "0910808060" });
-          if (!admin) {
-            clearInterval(times);
-            throw new Error("there is no user");
-          }
-          if (admin.connection || timesToSendRequist > 180) {
-            if (admin.connection) {
-              socket.to(admin.connectionId).emit("updateAdmin", data);
-            }
-            clearInterval(times);
-          }
-        }, 5000);
-      }
-    } catch (error) {
-      console.log(error);
+socket.on("updateAdmin", async (data) => {
+  // 1) رسالة دردشة ➜ نستعمل phone من data.id
+  if (data.type === "chat") {
+    return sendWhenConnected(socket, Admin, { phone: data.id }, "updateAdmin", data);
+  }
+
+  // 2) أي تحديث آخر ➜ نرسل للـ Super-Admin برقم هاتفه الثابت
+  await sendWhenConnected(socket, Admin, { phone: "0910808060" }, "updateAdmin", data);
+});
+
+socket.on("updateUser", async (data) => {
+  // 1) دردشة ➜ lookup بالهاتف
+  if (data.type === "chat") {
+    return sendWhenConnected(socket, User, { phone: data.id }, "updateUser", data);
+  }
+
+  // 2) غير دردشة ➜ lookup بالـ ObjectId
+  await sendWhenConnected(
+    socket,
+    User,
+    { _id: new mongoose.Types.ObjectId(data.userID) },
+    "updateUser",
+    data
+  );
+});
+
+socket.on("updateStore", async (data) => {
+  // 1) أرسل التحديث إلى المتجر
+  await sendWhenConnected(
+    socket,
+    Store,
+    { _id: new mongoose.Types.ObjectId(data.storeID) },
+    "updateStore",
+    data
+  );
+
+  // 2) Mirror إلى الـ Admin الرئيسي
+  await sendWhenConnected(socket, Admin, { phone: "0910808060" }, "updateAdmin", data);
+});
+
+socket.on("updateDriver", async (data) => {
+  // 1) دردشة مع سائق واحد
+  if (data.type === "chat") {
+    return sendWhenConnected(socket, Driver, { phone: data.id }, "updateDriver", data);
+  }
+
+  // 2) بثّ إلى جميع السائقين المتواجدين في غرفة "drivers"
+  socket.to("drivers").emit("updateDriver", data);
+});
+
+/* ------------------------------------------------------------------ *
+ *    باقي الأحداث البسيطة                                             *
+ * ------------------------------------------------------------------ */
+
+socket.on("joinRoom", (room)  => socket.join(room));
+socket.on("leaveRoom", (room) => socket.leave(room));
+
+socket.on("disconnect", async () => {
+  // إلغاء connection لأي نموذج يحوي الـ socket.id
+  const models = [User, Store, Driver];
+  for (const Model of models) {
+    const doc = await Model.findOne({ connectionId: socket.id });
+    if (doc) {
+      await Model.updateOne(
+        { _id: doc._id },
+        { $set: { connection: false, connectionId: null } }
+      );
+      break;
     }
-  });
-
-  socket.on("updateUser", async (data) => {
-    if (data.type == "chat") {
-      try {
-        const user = await User.findOne({ phone: data.id });
-        if (user && user.connection) {
-          await socket.to(user.connectionId).emit("updateUser", data);
-        }
-        return;
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-    }
-
-    try {
-      console.log(data);
-      let user = await User.findById(new mongoose.Types.ObjectId(data.userID));
-      if (!user) throw new Error("there is no user");
-
-      if (user.connection) {
-        socket.to(user.connectionId).emit("updateUser", data);
-      } else {
-        let timesToSendRequist = 0; // to 180
-        const times = setInterval(async () => {
-          timesToSendRequist++;
-          user = await User.findById(new mongoose.Types.ObjectId(data.userID));
-          if (!user) {
-            clearInterval(times);
-            throw new Error("there is no user");
-          }
-          if (user.connection || timesToSendRequist > 180) {
-            if (user.connection) {
-              socket.to(user.connectionId).emit("updateUser", data);
-            }
-            clearInterval(times);
-          }
-        }, 5000);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  socket.on("updateStore", async (data) => {
-    try {
-      
-      let store = await Store.findById( new mongoose.Types.ObjectId(data.storeID) );
-      if (!store) {
-        throw new Error("Store not found");
-      }
-      let admin = await Admin.findOne({ phone: "0910808060" });
-
-      if (store.connection) {
-        socket.to(store.connectionId).emit("updateStore", data);
-      } else {
-        let timesToSendRequist = 0; // to 180
-        const times = setInterval(async () => {
-          timesToSendRequist++;
-          store = await Store.findById(new mongoose.Types.ObjectId(data.storeID));
-          if (!store) {
-            clearInterval(times);
-            throw new Error("Store not found");
-          }
-          if (store.connection || timesToSendRequist > 180) {
-            if (store.connection) {
-              socket.to(store.connectionId).emit("updateStore", data);
-            }
-            clearInterval(times);
-          }
-        }, 5000);
-      }
-      console.log("admin and ", data);
-      if (admin.connection) {
-        socket.to(admin.connectionId).emit("updateAdmin", data);
-        console.log("admin and ", data);
-      } else {
-        let timesToSendRequist = 0; // to 180
-        const times = setInterval(async () => {
-          timesToSendRequist++;
-          admin = await Admin.findOne({ phone: "0910808060" });
-          console.log("admin and ", data);
-
-          if (!admin) {
-            clearInterval(times);
-            throw new Error("Store not found");
-          }
-          if (admin.connection || timesToSendRequist > 180) {
-            if (admin.connection) {
-              console.log("admin and ", data);
-
-              socket.to(admin.connectionId).emit("updateAdmin", data);
-            }
-            clearInterval(times);
-          }
-        }, 5000);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  socket.on("updateDriver", async (data) => {
-    try {
-      console.log("update driver Working " , data);
-      if (data.type == "chat") {
-        const driver = await Driver.findOne({ phone: data.id });
-        if (driver && driver.connection) {
-          socket.to(driver.connectionId).emit("updateDriver", data);
-        }
-      } else {
-      console.log("update to all Drivers Working " , data);
-
-        socket.to("drivers").emit("updateDriver", data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  // socket.on("reconnect", async (token) => {
-  //   if (token) {
-  //     await jwt.verify(
-  //       token,
-  //       "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
-  //       async (err, data) => {
-  //         if (err) {
-  //           console.log("يرجى تسجيل الدخول");
-  //         } else {
-  //           let exist = await User.findOne({ _id: data.id });
-  //           if (!exist) {
-  //             exist = await Store.findOne({ _id: data.id });
-  //             if (!exist) {
-  //               exist = await Driver.findOne({ _id: data.id });
-  //               if (!exist) {
-  //                 console.log("access denied");
-  //                 return;
-  //               }
-  //               // Fixed: Added missing driver reconnection handling
-  //               await Driver.updateOne(
-  //                 { _id: data.id },
-  //                 { $set: { connection: true, connectionId: socket.id } }
-  //               );
-  //               socket.join("drivers");
-  //             } else {
-  //               await Store.updateOne(
-  //                 { _id: data.id },
-  //                 { $set: { connection: true, connectionId: socket.id } }
-  //               );
-  //             }
-  //           } else {
-  //             await User.updateOne(
-  //               { _id: data.id },
-  //               { $set: { connection: true, connectionId: socket.id } }
-  //             );
-  //           }
-  //         }
-  //       }
-  //     );
-  //   }
-  // });
-
-  socket.on("disconnect", async () => {
-    try {
-      let exist = await Store.findOne({ connectionId: socket.id });
-      if (!exist) {
-        exist = await User.findOne({ connectionId: socket.id });
-        if (!exist) {
-          exist = await Driver.findOne({ connectionId: socket.id });
-          if (!exist) {
-            return;
-          }
-          // Fixed: Added missing driver disconnect handling
-          console.log("driver disconnected ", socket.id);
-          await Driver.updateOne(
-            { connectionId: socket.id },
-            { $set: { connection: false, connectionId: null } }
-          );
-        } else {
-          await User.updateOne(
-            { connectionId: socket.id },
-            { $set: { connection: false, connectionId: null } }
-          );
-        }
-      } else {
-        await Store.updateOne(
-          { connectionId: socket.id },
-          { $set: { connection: false, connectionId: null } }
-        );
-      }
-      console.log("User disconnected:" + socket.id);
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  // socket.on("stillConnect", async (token) => {
-  //   userisstillconnected(socket);
-  //   if (token) {
-  //     await jwt.verify(
-  //       token,
-  //       "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
-  //       async (err, data) => {
-  //         if (err) {
-  //           return;
-  //         } else {
-  //           let exist = await User.findOne({ _id: data.id });
-  //           if (!exist) {
-  //             exist = await Store.findOne({ _id: data.id });
-  //             if (!exist) {
-  //               exist = await Driver.findOne({ _id: data.id });
-  //               if (!exist) {
-  //                 return;
-  //               }
-  //               // Fixed: Added missing driver stillConnect handling
-  //               await Driver.updateOne(
-  //                 { _id: data.id },
-  //                 { $set: { connection: true, connectionId: socket.id } }
-  //               );
-  //               socket.join("drivers");
-  //             } else {
-  //               await Store.updateOne(
-  //                 { _id: data.id },
-  //                 { $set: { connection: true, connectionId: socket.id } }
-  //               );
-  //             }
-  //           } else {
-  //             await User.updateOne(
-  //               { _id: data.id },
-  //               { $set: { connection: true, connectionId: socket.id } }
-  //             );
-  //           }
-  //         }
-  //       }
-  //     );
-  //   }
-  // });
-
-  // انضمام المستخدم إلى غرفة خاصة
-
-  socket.on("joinRoom", (roomName) => {
-    socket.join(roomName);
-    console.log("User " + socket.id + " joined room: " + roomName);
-  });
-
-  // مغادرة المستخدم للغرفة
-  socket.on("leaveRoom", (roomName) => {
-    socket.leave(roomName);
-    console.log("User " + socket.id + " left room: " + roomName);
-  });
+  }
+});
 
   // Initialize connection timeout check
   // isuserconnected(socket);
