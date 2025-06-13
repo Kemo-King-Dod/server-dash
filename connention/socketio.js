@@ -221,7 +221,7 @@ async function connect(socket) {
 
   socket.on("updateDriver", async (data) => {
     try {
-      console.log("update driver Working");
+      console.log("update driver Working " , data);
       if (data.type == "chat") {
         const driver = await Driver.findOne({ phone: data.id });
         if (driver && driver.connection) {
