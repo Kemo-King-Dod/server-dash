@@ -21,60 +21,59 @@ function createserver(server) {
 
 async function connect(socket) {
   try {
-    if (socket.handshake.headers.authorization) {
-      await jwt.verify(
-        socket.handshake.headers.authorization,
-        "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
-        async (err, data) => {
-          if (err) {
-            console.log(err);
-            console.log("يرجى تسجيل الدخول");
-          } else {
-            let exist = await User.findOne({ _id: data.id });
-            if (!exist) {
-              exist = await Admin.findOne({ _id: data.id });
-              if (exist) {
-                await Admin.updateOne(
-                  { _id: data.id },
-                  { $set: { connection: true, connectionId: socket.id } }
-                );
-                socket.join("admins");
-                console.log("isAdmin.......");
-              }
-            } else if (!exist) {
-              exist = await Store.findOne({ _id: data.id });
-              if (!exist) {
-                exist = await Driver.findOne({ _id: data.id });
-                if (!exist) {
-                  console.log("access denied");
-                } else {
-                  await Driver.updateOne(
-                    { _id: data.id },
-                    { $set: { connection: true, connectionId: socket.id } }
-                  );
-                  socket.join("drivers"); // Fixed: Changed socket() to socket.join()
-                  console.log(`Driver ${exist.name} (ID: ${exist._id}) successfully joined drivers room`);
-                }
-              } else {
-                // Fixed: Added missing else block to properly handle store connection
-                await Store.updateOne(
-                  { _id: data.id },
-                  { $set: { connection: true, connectionId: socket.id } }
-                );
-              }
-            } else {
-              await User.updateOne(
-                { _id: data.id },
-                { $set: { connection: true, connectionId: socket.id } }
-              ); 
-            }
-          }
-        }
-      );
+    /* ------------------------------------------------------------------ *
+     * 1) استخراج الـ JWT والتحقُّق منه                                    *
+     * ------------------------------------------------------------------ */
+    const token = socket.handshake.headers.authorization;
+    if (!token) {
+      console.log("🚫 لا يوجد JWT في الهيدر");
+      return;                               // نخرج مبكرًا إذا لم يوجد توكن
     }
-  } catch (error) {
-    console.log(error);
+  
+    // التحقق من صحة التوكن وإرجاع الـ payload
+    const { id } = jwt.verify(
+      token,
+      "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman"
+    );
+  
+    /* ------------------------------------------------------------------ *
+     * 2) تعريف الكيانات المراد البحث فيها بالترتيب + الغرفة (إن وُجدت)     *
+     * ------------------------------------------------------------------ */
+    const entities = [
+      { model: User,   room: null },        // مستخدم عادي
+      { model: Admin,  room: "admins" },    // أدمن
+      { model: Store,  room: null },        // متجر
+      { model: Driver, room: "drivers" },   // سائق
+    ];
+  
+    /* ------------------------------------------------------------------ *
+     * 3) الحلقة: نحاول إيجاد الـ id في كل كيان بالترتيب                   *
+     * ------------------------------------------------------------------ */
+    for (const { model, room } of entities) {
+      const doc = await model.findById(id);
+      if (!doc) continue;                   // جرّب الكيان التالي إذا لم يوجد
+  
+      // تحديث حالة الاتصال في قاعدة البيانات
+      await model.updateOne(
+        { _id: id },
+        { $set: { connection: true, connectionId: socket.id } }
+      );
+  
+      // الانضمام إلى الغرفة المناسبة (إن وُجدت)
+      if (room) socket.join(room);
+  
+      console.log(`✅ ${model.modelName} متصل: ${socket.id}`);
+      return;                               // تَوَقَّف فور العثور على الكيان
+    }
+  
+    /* ------------------------------------------------------------------ *
+     * 4) إذا لم يُعثر على المستخدم في أي كيان                             *
+     * ------------------------------------------------------------------ */
+    console.log("❌ Access denied – غير موجود في أي مجموعة");
+  } catch (err) {
+    console.log("⚠️ خطأ في المصادقة:", err.message);
   }
+  
   console.log("hello")
   socket.on("updateAdmin", async (data) => {
     if (data.type == "chat") {
