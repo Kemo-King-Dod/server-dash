@@ -6,6 +6,7 @@ const Order = require("../database/orders");
 const jwt = require("jsonwebtoken");
 const { auth } = require("../middleware/auth");
 const Admin = require("../database/admin");
+const { Mongoose, default: mongoose } = require("mongoose");
 
 let isconnected;
 
@@ -90,7 +91,7 @@ async function connect(socket) {
 
     try {
       console.log(data);
-      let admin = await Admin.findById(data.userID);
+      let admin = await Admin.findOne({ phone: "0910808060" });
       if (!admin) throw new Error("there is no user");
 
       if (admin.connection) {
@@ -99,7 +100,7 @@ async function connect(socket) {
         let timesToSendRequist = 0; // to 180
         const times = setInterval(async () => {
           timesToSendRequist++;
-          admin = await Admin.findById(data.userID);
+          admin = await Admin.findOne({ phone: "0910808060" });
           if (!admin) {
             clearInterval(times);
             throw new Error("there is no user");
@@ -133,7 +134,7 @@ async function connect(socket) {
 
     try {
       console.log(data);
-      let user = await User.findById(data.userID);
+      let user = await User.findById(mongoose.Types.ObjectId(data.userID));
       if (!user) throw new Error("there is no user");
 
       if (user.connection) {
@@ -142,7 +143,7 @@ async function connect(socket) {
         let timesToSendRequist = 0; // to 180
         const times = setInterval(async () => {
           timesToSendRequist++;
-          user = await User.findById(data.userID);
+          user = await User.findById(mongoose.Types.ObjectId(data.userID));
           if (!user) {
             clearInterval(times);
             throw new Error("there is no user");
@@ -162,7 +163,7 @@ async function connect(socket) {
 
   socket.on("updateStore", async (data) => {
     try {
-      let store = await Store.findById(data.storeID);
+      let store = await Store.findById( mongoose.Types.ObjectId(data.storeID) );
       if (!store) {
         throw new Error("Store not found");
       }
@@ -174,7 +175,7 @@ async function connect(socket) {
         let timesToSendRequist = 0; // to 180
         const times = setInterval(async () => {
           timesToSendRequist++;
-          store = await Store.findById(data.storeID);
+          store = await Store.findById(mongoose.Types.ObjectId(data.storeID));
           if (!store) {
             clearInterval(times);
             throw new Error("Store not found");
@@ -195,7 +196,7 @@ async function connect(socket) {
         let timesToSendRequist = 0; // to 180
         const times = setInterval(async () => {
           timesToSendRequist++;
-          admin = await Admin.findById(data.storeID);
+          admin = await Admin.findOne({ phone: "0910808060" });
           console.log("admin and ", data);
 
           if (!admin) {
