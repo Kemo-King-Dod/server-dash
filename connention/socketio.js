@@ -63,7 +63,7 @@ async function connect(socket) {
       if (room) socket.join(room);
   
       console.log(`✅ ${model.modelName} متصل: ${socket.id}`);
-      return;                               // تَوَقَّف فور العثور على الكيان
+                             // تَوَقَّف فور العثور على الكيان
     }
   
     /* ------------------------------------------------------------------ *
