@@ -48,7 +48,6 @@ router.get("/getAllOrders", auth, async (req, res) => {
 // orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
   try {
-    console.log(req.userId);
     if (req.userId !== "682e92122f76a6aadd90d682") {
       return res.status(500).json({
         error: true,
@@ -373,7 +372,6 @@ router.get("/getOrdersForStore", auth, async (req, res) => {
 router.get("/getReadyOrderForDriver", auth, async (req, res) => {
   try {
     const id = req.userId;
-    console.log("req.headers.cityen", req.headers.cityen);
     const acceptedorders = await Order.find({
       "driver.id": id,
       status: { $in: ["driverAccepted", "onWay", "delivered"] },
@@ -405,8 +403,6 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
     if (acceptedorders.length > 0) {
       order.push(...acceptedorders);
     }
-    console.log(" orders", order);
-    console.log(" accept orders", acceptedorders);
 
     res.status(200).json({
       error: false,
@@ -444,8 +440,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
   try {
     const id = req.body.orderId;
     const driver = await Driver.findById(req.userId);
-    console.log("req.headers", req.headers);
-    console.log("req.headers.cityen", req.headers.cityen);
+ 
     const acceptedordersCount = await Order.countDocuments({
       "driver.id": req.user.id.toString(),
       status: { $in: ["driverAccepted", "onWay", "delivered"] },
@@ -457,7 +452,6 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
       });
     } else {
-      console.log("driver.cancelOrderLimit", driver.cancelOrderLimit);
     }
 
     if (req.user.userType !== "admin" && acceptedordersCount >= 3) {
@@ -466,7 +460,6 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
         message: "لقد وصلت الى الحد الاقصى للطلبات",
       });
     } else {
-      console.log("accept order for driver", acceptedordersCount);
     }
 
     const order = await Order.findById(id);
@@ -531,7 +524,6 @@ router.post("/examineCode", auth, async (req, res) => {
       });
       await transaction.save();
       const driver = await Driver.findById(order.driver.id);
-      console.log(driver);
       if (!driver._doc.funds) driver._doc.funds = order.totalPrice;
       else driver._doc.funds += order.totalPrice;
       await driver.save();
@@ -742,7 +734,6 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
 
 router.post("/cancelOrderStore", auth, async (req, res) => {
   try {
-    console.log("req.body", req.body);
     const order = await Order.findById(req.body.orderId);
     var driver = null;
     if (!order) {
@@ -781,7 +772,6 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       { new: true }
     );
     if (order.driver) driver = await Driver.findById(order.driver.id);
-    console.log("updatedUser", updatedUser);
     if (req.body.reason != "") {
       if (req.body.unavailableProducts.length > 0) {
         const unavailableProducts = req.body.unavailableProducts

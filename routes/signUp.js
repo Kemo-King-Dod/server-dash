@@ -31,7 +31,7 @@ const deleteUploadedFile = async (filePath) => {
 router.post('/user', async (req, res) => {
     try {
         const { name, password, gender, phone, locations, fcmToken } = req.body;
-        console.log(req.body)
+         
         if (!name || !password || !phone || !gender) {
             return res.status(400).json({
                 error: true,
@@ -99,7 +99,7 @@ router.post('/user', async (req, res) => {
 // Driver Signup
 router.post('/driver', async (req, res) => {
     try {
-        console.log(req.body)
+         
         const { name, phone, age, gender, vehicleType, licenseNumber, licenseImage, passportImage, carBookImage, carImage } = req.body.driver;
         const password = req.body.password
 

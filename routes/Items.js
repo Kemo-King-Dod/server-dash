@@ -111,7 +111,7 @@ route.post("/updateItem", auth, async (req, res) => {
       addOns,
       imageUrl,
     } = req.body;
-    console.log(req.body)
+     
    
     const item = await items.findById(req.body.id);
     if(!item){

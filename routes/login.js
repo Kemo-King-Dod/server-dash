@@ -18,7 +18,7 @@ const sign = function (id, type) {
 route.post("/login", async (req, res) => {
     try {
         const { phone, password } = req.body
-        console.log(req.body)
+         
         // Find user across all collections
         let exist = await Admin.findOne({ phone })
         if (!exist) exist = await Store.findOne({ phone })
