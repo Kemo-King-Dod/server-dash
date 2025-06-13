@@ -41,29 +41,41 @@ async function connect(socket) {
     if (user) {
       userType = "user";
       userDoc = user;
-      await User.updateOne({ _id: user._id }, { $set: { connection: true, connectionId: socket.id } });
+      await User.updateOne(
+        { _id: user._id },
+        { $set: { connection: true, connectionId: socket.id } }
+      );
     }
 
-    const admin = !userDoc && await Admin.findById(decoded.id);
+    const admin = !userDoc && (await Admin.findById(decoded.id));
     if (admin) {
       userType = "admin";
       userDoc = admin;
-      await Admin.updateOne({ _id: admin._id }, { $set: { connection: true, connectionId: socket.id } });
+      await Admin.updateOne(
+        { _id: admin._id },
+        { $set: { connection: true, connectionId: socket.id } }
+      );
       socket.join("admins");
     }
 
-    const store = !userDoc && await Store.findById(decoded.id);
+    const store = !userDoc && (await Store.findById(decoded.id));
     if (store) {
       userType = "store";
       userDoc = store;
-      await Store.updateOne({ _id: store._id }, { $set: { connection: true, connectionId: socket.id } });
+      await Store.updateOne(
+        { _id: store._id },
+        { $set: { connection: true, connectionId: socket.id } }
+      );
     }
 
-    const driver = !userDoc && await Driver.findById(decoded.id);
+    const driver = !userDoc && (await Driver.findById(decoded.id));
     if (driver) {
       userType = "driver";
       userDoc = driver;
-      await Driver.updateOne({ _id: driver._id }, { $set: { connection: true, connectionId: socket.id } });
+      await Driver.updateOne(
+        { _id: driver._id },
+        { $set: { connection: true, connectionId: socket.id } }
+      );
       socket.join("drivers");
       console.log(`✅ Driver ${driver.name} joined drivers room`);
     }
@@ -72,7 +84,6 @@ async function connect(socket) {
       console.log("❌ Access denied: user not found in any collection");
       return;
     }
-
   } catch (error) {
     console.error("⚠️ Authentication error:", error.message);
     return;
@@ -86,7 +97,12 @@ async function connect(socket) {
       if (admin?.connection) {
         socket.to(admin.connectionId).emit("updateAdmin", data);
       } else {
-        await waitForConnection(Admin, { phone: "0910808060" }, "updateAdmin", data);
+        await waitForConnection(
+          Admin,
+          { phone: "0910808060" },
+          "updateAdmin",
+          data
+        );
       }
     } catch (err) {
       console.log(err);
@@ -108,18 +124,30 @@ async function connect(socket) {
 
   socket.on("updateStore", async (data) => {
     try {
+      console.log("updateStore ", data);
       const store = await Store.findById(data.storeID);
       if (store?.connection) {
         socket.to(store.connectionId).emit("updateStore", data);
       } else {
-        await waitForConnection(Store, { _id: data.storeID }, "updateStore", data);
+        await waitForConnection(
+          Store,
+          { _id: data.storeID },
+          "updateStore",
+          data
+        );
       }
 
       const admin = await Admin.findOne({ phone: "0910808060" });
       if (admin?.connection) {
         socket.to(admin.connectionId).emit("updateAdmin", data);
+        console.log("updateStore ", data);
       } else {
-        await waitForConnection(Admin, { phone: "0910808060" }, "updateAdmin", data);
+        await waitForConnection(
+          Admin,
+          { phone: "0910808060" },
+          "updateAdmin",
+          data
+        );
       }
     } catch (err) {
       console.log(err);
@@ -157,7 +185,10 @@ async function connect(socket) {
       for (const Model of types) {
         const user = await Model.findOne({ connectionId: socket.id });
         if (user) {
-          await Model.updateOne({ _id: user._id }, { $set: { connection: false, connectionId: null } });
+          await Model.updateOne(
+            { _id: user._id },
+            { $set: { connection: false, connectionId: null } }
+          );
           console.log(`🔴 ${Model.modelName} disconnected: ${socket.id}`);
           break;
         }
