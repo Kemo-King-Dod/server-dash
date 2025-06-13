@@ -44,7 +44,10 @@ const orders_record = new Schema({
   },
   canceledby: {
     type: "String"
-  }
+  },
+  companyFee: {
+    type: Number
+  },
 });
 
 module.exports = mongoose.model("OrderRecodr", orders_record);

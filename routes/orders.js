@@ -627,6 +627,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
       reseveCode: order.reseveCode,
       chat: order.chat,
       canceledby: null,
+      companyFee: order.companyFee,
     });
     await orderRecord.save();
 
@@ -695,6 +696,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
       reseveCode: order.reseveCode,
       chat: order.chat,
       canceledby: "user",
+      companyFee: order.companyFee,
     });
     await orderRecord.save();
 
@@ -766,6 +768,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       reseveCode: order.reseveCode,
       chat: order.chat,
       canceledby: "store",
+      companyFee: order.companyFee,
     });
     await orderRecord.save();
 
@@ -934,6 +937,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         reseveCode: order.reseveCode,
         chat: order.chat,
         canceledby: "driver",
+        companyFee: order.companyFee,
       });
       await orderRecord.save();
       // Increment cancel limit

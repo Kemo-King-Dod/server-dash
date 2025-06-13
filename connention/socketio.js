@@ -163,6 +163,7 @@ async function connect(socket) {
 
   socket.on("updateStore", async (data) => {
     try {
+      
       let store = await Store.findById( new mongoose.Types.ObjectId(data.storeID) );
       if (!store) {
         throw new Error("Store not found");
