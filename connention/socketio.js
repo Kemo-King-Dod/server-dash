@@ -42,9 +42,11 @@ try {
   // Check user type and update connection status
   const updateConnection = async (Model, room) => {
     const update = {
+
       connection: true,
       connectionId: socket.id
     };
+    console.log("update is ",update)
     await Model.updateOne({ _id: data.id }, { $set: update });
     if (room) {
       socket.join(room);
