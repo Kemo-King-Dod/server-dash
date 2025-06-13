@@ -228,6 +228,8 @@ async function connect(socket) {
           socket.to(driver.connectionId).emit("updateDriver", data);
         }
       } else {
+      console.log("update to all Drivers Working " , data);
+
         socket.to("drivers").emit("updateDriver", data);
       }
     } catch (error) {
