@@ -20,61 +20,70 @@ function createserver(server) {
 }
 
 async function connect(socket) {
-  try {
-    if (socket.handshake.headers.authorization) {
-      await jwt.verify(
-        socket.handshake.headers.authorization,
-        "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman",
-        async (err, data) => {
-          if (err) {
-            console.log(err);
-            console.log("يرجى تسجيل الدخول");
-          } else {
-            let exist = await User.findOne({ _id: data.id });
-            if (!exist) {
-              exist = await Admin.findOne({ _id: data.id });
-              if (exist) {
-                await Admin.updateOne(
-                  { _id: data.id },
-                  { $set: { connection: true, connectionId: socket.id } }
-                );
-                socket.join("admins");
-                console.log("isAdmin.......");
-              }
-            } else if (!exist) {
-              exist = await Store.findOne({ _id: data.id });
-              if (!exist) {
-                exist = await Driver.findOne({ _id: data.id });
-                if (!exist) {
-                  console.log("access denied");
-                } else {
-                  await Driver.updateOne(
-                    { _id: data.id },
-                    { $set: { connection: true, connectionId: socket.id } }
-                  );
-                  socket.join("drivers"); // Fixed: Changed socket() to socket.join()
-                  console.log(`Driver ${exist.name} (ID: ${exist._id}) successfully joined drivers room`);
-                }
-              } else {
-                // Fixed: Added missing else block to properly handle store connection
-                await Store.updateOne(
-                  { _id: data.id },
-                  { $set: { connection: true, connectionId: socket.id } }
-                );
-              }
-            } else {
-              await User.updateOne(
-                { _id: data.id },
-                { $set: { connection: true, connectionId: socket.id } }
-              );
-            }
-          }
-        }
-      );
-    }
-  } catch (error) {
-    console.log(error);
+try {
+  if (!socket.handshake.headers.authorization) {
+    console.log("No authorization token provided");
+    return;
   }
+
+  const token = socket.handshake.headers.authorization;
+  const secretKey = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
+
+  const data = await new Promise((resolve, reject) => {
+    jwt.verify(token, secretKey, (err, decoded) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(decoded);
+      }
+    });
+  });
+
+  // Check user type and update connection status
+  const updateConnection = async (Model, room) => {
+    const update = {
+      connection: true,
+      connectionId: socket.id
+    };
+    await Model.updateOne({ _id: data.id }, { $set: update });
+    if (room) {
+      socket.join(room);
+    }
+  };
+
+  // Try to find user in different collections
+  const user = await User.findOne({ _id: data.id });
+  if (user) {
+    await updateConnection(User);
+    return;
+  }
+
+  const admin = await Admin.findOne({ _id: data.id });
+  if (admin) {
+    await updateConnection(Admin, "admins");
+    console.log("Admin connected");
+    return;
+  }
+
+  const store = await Store.findOne({ _id: data.id });
+  if (store) {
+    await updateConnection(Store);
+    console.log("Store connected");
+    return;
+  }
+
+  const driver = await Driver.findOne({ _id: data.id });
+  if (driver) {
+    await updateConnection(Driver, "drivers");
+    console.log(`Driver ${driver.name} (ID: ${driver._id}) successfully joined drivers room`);
+    return;
+  }
+
+  console.log("Access denied - User not found in any collection");
+
+} catch (error) {
+  console.error("Authentication error:", error.message);
+}
 
   socket.on("updateAdmin", async (data) => {
     if (data.type == "chat") {
