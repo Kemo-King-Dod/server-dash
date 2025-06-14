@@ -163,6 +163,11 @@ socket.on("updateDriver", async (data) => {
   if (data.type === "chat") {
     return sendWhenConnected(socket, Driver, { phone: data.id }, "updateDriver", data);
   }
+  if(data.type == "cancelOrder"){
+    console.log("cancel order socket ", data);
+    return sendWhenConnected(socket, Driver, { phone: data.id }, "updateDriver", data);
+
+  }
 
   // 2) بثّ إلى جميع السائقين المتواجدين في غرفة "drivers"
   socket.to("drivers").emit("updateDriver", data);
