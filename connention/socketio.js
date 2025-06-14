@@ -157,7 +157,9 @@ socket.on("updateStore", async (data) => {
   );
 
   // 2) Mirror إلى الـ Admin الرئيسي
-  await sendWhenConnected(socket, Admin, { phone: "0910808060" }, "updateAdmin", data);
+  // await sendWhenConnected(socket, Admin, { phone: "0910808060" }, "updateAdmin", data);
+  socket.to("admins").emit("updateAdmin", data);
+
 });
 
 socket.on("updateDriver", async (data) => {
