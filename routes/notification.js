@@ -25,6 +25,32 @@ router.get('/notification', auth, async (req, res) => {
     }
 })
 
+// Get count of unread notifications
+router.get("/notificationCount", auth, async (req, res) => {
+    try {
+        // Get count of unread notifications for the authenticated user
+        const count = await notification.countDocuments({
+            id: req.userId,
+            isRead: false
+        });
+
+        return res.json({
+            error: false,
+            data: {
+                count
+            }
+        });
+    } catch (error) {
+        // Log error for debugging
+        console.error('Error getting notification count:', error);
+
+        return res.status(500).json({
+            error: true,
+            message: 'Failed to get notification count'
+        });
+    }
+});
+
 router.post('/deleteNotification', auth, async (req, res) => {
     try {
         await notification.findByIdAndDelete(req.body.id)
