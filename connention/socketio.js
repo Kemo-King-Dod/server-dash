@@ -96,6 +96,7 @@ async function sendWhenConnected(socket, Model, query, eventName, payload) {
 
   // 1) متصل بالفعل ➜ نرسل فورًا
   if (target?.connection) {
+    console.log("target",target);
     return socket.to(target.connectionId).emit(eventName, payload);
   }
 
