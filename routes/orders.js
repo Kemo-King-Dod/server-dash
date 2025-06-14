@@ -172,36 +172,33 @@ router.post("/addOrder", auth, async (req, res) => {
       }
       await user.save();
 
-    try{
-      sendNotification({
-        token: store.fcmToken,
-        title: "طلبية جديدة",
-        body: "قام زبون ما بطلب طلبية من متجرك",
-      });
-    }  catch(e){
-      console.log("المتجر لم يستلم الاشعار");
-    }
-    try{
-      sendNotification({
-        token: admin.fcmToken,
-        title: "طلبية جديدة",
-        body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
-      });
-
-    }catch(e){
-      console.log("الادمن لم يستلم الاشعار");}
-    try{
-      sendNotificationToTopic({
-        topic: "admins_" + req.headers.cityen,
-        title: "طلبية جديدة",
-        body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
-      });
-
-    }catch(e){
-      console.log("الادمن لم يستلم الاشعار");
-
-    }
-     
+      try {
+        sendNotification({
+          token: store.fcmToken,
+          title: "طلبية جديدة",
+          body: "قام زبون ما بطلب طلبية من متجرك",
+        });
+      } catch (e) {
+        console.log("المتجر لم يستلم الاشعار");
+      }
+      try {
+        sendNotification({
+          token: admin.fcmToken,
+          title: "طلبية جديدة",
+          body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+        });
+      } catch (e) {
+        console.log("الادمن لم يستلم الاشعار");
+      }
+      try {
+        sendNotificationToTopic({
+          topic: "admins_" + req.headers.cityen,
+          title: "طلبية جديدة",
+          body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+        });
+      } catch (e) {
+        console.log("الادمن لم يستلم الاشعار");
+      }
 
       await notification.create({
         id: store._id,
@@ -440,7 +437,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
   try {
     const id = req.body.orderId;
     const driver = await Driver.findById(req.userId);
- 
+
     const acceptedordersCount = await Order.countDocuments({
       "driver.id": req.user.id.toString(),
       status: { $in: ["driverAccepted", "onWay", "delivered"] },
@@ -911,7 +908,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
     }
 
     if (order.status == "onWay") {
-      const admin = await Admin.findOne({ phone: "0910808060" })
+      const admin = await Admin.findOne({ phone: "0910808060" });
       const orderRecord = new OrderRecodr({
         orderId: order.orderId,
         customer: order.customer,
@@ -936,21 +933,35 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         driver.status = "blocked";
       }
       await driver.save();
-      User.findByIdAndUpdate(order.customer.id, {
+      await User.findByIdAndUpdate(order.customer.id, {
         orders: { $pull: order._id },
       });
+
       await Order.findByIdAndDelete(order._id);
       sendNotification({
         token: admin.fcmToken,
         title: "تم الغاء الطلب رقم" + order.orderId,
         body: ` قام سائق ما بالغاء طلبية من متجر ${order.store.name}`,
       });
+      sendNotification({
+        token: user.fcmToken,
+        title: "عذراً! تم إلغاء طلبيتك رقم " + order.orderId,
+        body: "عزيزي العميل، نأسف لإبلاغك بأن السائق قام بإلغاء طلبيتك. نرجو منك إعادة الطلب مرة أخرى ونعدك بخدمة أفضل 🙏",
+      });
+
       sendNotificationToTopic({
         topic: "admins_" + req.headers.cityen,
         title: "تم الغاء الطلب رقم" + order.orderId,
         body: ` قام سائق ما بالغاء طلبية من متجر ${order.store.name}`,
       });
-  
+
+      await notification.create({
+        id: user._id,
+        userType: "user",
+        title: "عذراً! تم إلغاء طلبيتك رقم " + order.orderId,
+        body: "عزيزي العميل، نأسف لإبلاغك بأن السائق قام بإلغاء طلبيتك. نرجو منك إعادة الطلب مرة أخرى ونعدك بخدمة أفضل 🙏",
+        type: "warning",
+      });
     } else {
       order.status = "ready";
       order.type = "ready";
