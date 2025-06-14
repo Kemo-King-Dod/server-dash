@@ -167,7 +167,7 @@ socket.on("updateDriver", async (data) => {
   }
   if(data.type == "cancelOrder"){
     console.log("cancel order socket ", data);
-    return sendWhenConnected(socket, Driver, { phone: data.phone }, "updateDriver", data);
+    return sendWhenConnected(socket, Driver, { phone: data.data.phone }, "updateDriver", data);
 
   }
 
