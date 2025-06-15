@@ -658,7 +658,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
 router.post("/cancelOrderUser", auth, async (req, res) => {
   try {
     const { orderId } = req.body;
-    let orderObj;
+    let orderObj =await Order.findById(orderId);
   
     if (!mongoose.Types.ObjectId.isValid(orderId))
       return res.status(400).json({ error: true, message: "معرّف غير صالح" });
@@ -743,12 +743,13 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
       });
     } catch (err) {
       console.error(err);
-      throw new Error(err)
+      res.status(500).json({ error: true, message: err.message });
+
     } finally {
       session.endSession();
     }
   } catch (error) {
-    res.status(500).json({ error: true, message: err.message });
+    console.log( "2",error)
   }
  
 });
