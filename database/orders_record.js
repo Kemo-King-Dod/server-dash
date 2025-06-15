@@ -50,4 +50,5 @@ const orders_record = new Schema({
   },
 });
 
-module.exports = mongoose.model("OrderRecodr", orders_record);
+const OrderRecord = mongoose.model("OrderRecodr", orders_record);
+module.exports = OrderRecord;

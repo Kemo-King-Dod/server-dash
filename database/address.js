@@ -15,5 +15,5 @@ const address = new Schema({
         type: Number
     }
 })
-
-module.exports = mongoose.model('Address', address)
+const Address=mongoose.model('Address', address);
+module.exports = Address;

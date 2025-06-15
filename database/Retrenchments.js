@@ -22,5 +22,5 @@ const retrenchments = new Schema({
     }
 })
 
-
-module.exports = mongoose.model('Retrenchment', retrenchments)
+const Retrenchments = mongoose.model('Retrenchment', retrenchments)
+module.exports = Retrenchments;

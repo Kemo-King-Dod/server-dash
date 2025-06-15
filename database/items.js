@@ -64,5 +64,5 @@ const items = new Schema({
         type: String,
     },
 })
-
-module.exports = mongoose.model('Item', items)
+const Items= mongoose.model('Item', items);
+module.exports = Items

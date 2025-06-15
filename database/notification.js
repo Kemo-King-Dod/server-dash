@@ -30,6 +30,6 @@ const notification = new mongoose.Schema({
 
 // Index for better query performance
 notification.index({ id: 1 });
-
-module.exports = mongoose.model('Notification', notification)
+const Notification=mongoose.model('Notification', notification)
+module.exports = Notification
 

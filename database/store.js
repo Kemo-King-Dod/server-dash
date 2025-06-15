@@ -167,5 +167,6 @@ const stores = new Schema(
     timestamps: true,
   }
 );
+const Store= mongoose.model("Store", stores);
 
-module.exports = mongoose.model("Store", stores);
+module.exports =Store;

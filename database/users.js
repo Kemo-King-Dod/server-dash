@@ -81,5 +81,5 @@ const users = new Schema({
         default:0,
     }
 })
-
-module.exports = mongoose.model('User', users)
+const User = mongoose.model('User', users);
+module.exports = User

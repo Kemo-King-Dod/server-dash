@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Order = require("../database/orders");
-const OrderRecodr = require("../database/orders_record");
+const OrderRecord = require("../database/orders_record");
 const Store = require("../database/store");
 const Driver = require("../database/driver");
 const Address = require("../database/address");
@@ -21,6 +21,7 @@ const Transaction = require("../database/transactions");
 const { error } = require("console");
 const orders = require("../database/orders");
 const Admin = require("../database/admin");
+const { notifyStakeholders } = require("../utils/notifyStakeholders");
 
 let ordersNum;
 
@@ -601,7 +602,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
     }
 
     // Create record in OrderRecord collection
-    const orderRecord = new OrderRecodr({
+    const orderRecord = new OrderRecord({
       orderId: order.orderId,
       customer: order.customer,
       driver: order.driver,
@@ -669,7 +670,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
     }
 
     // Create record in OrderRecord collection
-    const orderRecord = new OrderRecodr({
+    const orderRecord = new OrderRecord({
       orderId: order.orderId,
       customer: order.customer,
       driver: order.driver,
@@ -730,156 +731,44 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
 });
 
 router.post("/cancelOrderStore", auth, async (req, res) => {
+  const { orderId, reason = "", unavailableProducts = [] } = req.body;
+  if (!mongoose.Types.ObjectId.isValid(orderId)) return res.status(400).json({ error: true, message: "معرّف غير صالح" });
+
+  const session = await mongoose.startSession();
   try {
-    const order = await Order.findById(req.body.orderId);
-    var driver = null;
-    if (!order) {
-      return res.status(404).json({
-        error: true,
-        message: "الطلب غير موجود",
-      });
-    }
+    await session.withTransaction(async () => {
+      const order = await Order.findById(orderId).session(session);
+      if (!order) throw new Error("الطلب غير موجود");
 
-    // Create record in OrderRecord collection
-    const orderRecord = new OrderRecodr({
-      orderId: order.orderId,
-      customer: order.customer,
-      driver: order.driver,
-      store: order.store,
-      date: order.date,
-      items: order.items,
-      totalPrice: order.totalPrice,
-      status: "canceled",
-      type: "canceled",
-      address: order.address,
-      distenationPrice: order.distenationPrice,
-      reseveCode: order.reseveCode,
-      chat: order.chat,
-      canceledby: "store",
-      companyFee: order.companyFee,
+      // التحقق من ملكية المتجر
+      if (order.store.toString() !== req.user.storeId) throw new Error("صلاحيات غير كافية");
+
+      await OrderRecord.create([{ ...order.toObject(), status: "canceled", canceledAt: new Date(), canceledBy: "store" }], { session });
+      await Order.deleteOne({ _id: orderId }).session(session);
+      await User.updateOne({ _id: order.customer }, { $pull: { orders: order._id } }).session(session);
+
+      // إشعارات
+      await notifyStakeholders({ order, reason, unavailableProducts });
     });
-    await orderRecord.save();
 
-    // Delete original order
-    await Order.findByIdAndDelete(req.body.orderId);
-
-    const updatedUser = await User.findByIdAndUpdate(
-      order.customer.id,
-      { orders: { $pull: order._id } },
-      { new: true }
-    );
-    if (order.driver) driver = await Driver.findById(order.driver.id);
-    if (req.body.reason != "") {
-      if (req.body.unavailableProducts.length > 0) {
-        const unavailableProducts = req.body.unavailableProducts
-          .map((product) => product.name)
-          .join(", ");
-        await sendNotification({
-          token: updatedUser.fcmToken,
-          title: "تم إلغاء طلبك رقم" + order.orderId,
-          body:
-            "تم إلغاء طلبك بسبب" +
-            req.body.reason +
-            " ولم يتم توفير بعض المنتجات مثل " +
-            unavailableProducts,
-        });
-        if (driver)
-          sendNotification({
-            token: driver.fcmToken,
-            title: "تم إلغاء طلب",
-            body: "تم الغاء الطلب رقم " + order.orderId,
-          });
-        await notification.create({
-          id: updatedUser._id,
-          userType: "user",
-          title: "تم إلغاء طلبك رقم" + order.orderId,
-                    body:
-            "تم إلغاء طلبك بسبب" +
-            req.body.reason +
-            " ولم يتم توفير بعض المنتجات مثل " +
-            unavailableProducts,
-          type: "success",
-        });
-      } else {
-        await sendNotification({
-          token: updatedUser.fcmToken,
-          title: "تم إلغاء طلبك",
-          body: "تم إلغاء طلبك بسبب" + req.body.reason,
-        });
-        if (driver)
-          sendNotification({
-            token: driver.fcmToken,
-            title: "تم إلغاء طلب",
-            body: "تم الغاء الطلب رقم " + order.orderId,
-          });
-        await notification.create({
-          id: updatedUser._id,
-          userType: "user",
-          title: "تم إلغاء طلبك رقم" + order.orderId,
-          body: "تم إلغاء طلبك من المتجر" + req.body.reason,
-          type: "success",
-          date: new Date(),
-        });
-      }
-    } else {
-      if (req.body.unavailableProducts.length > 0) {
-        const unavailableProducts = req.body.unavailableProducts
-          .map((product) => product.name)
-          .join(", ");
-        await sendNotification({
-          token: updatedUser.fcmToken,
-          title: "تم إلغاء طلبك",
-          body:
-            "تم إلغاء طلبك " +
-            " ولم يتم توفير بعض المنتجات مثل " +
-            unavailableProducts,
-        });
-        await notification.create({
-          id: updatedUser._id,
-          userType: "user",
-          title: "تم إلغاء طلبك",
-          body:
-            "تم إلغاء طلبك بسبب" +
-            req.body.reason +
-            " ولم يتم توفير بعض المنتجات مثل " +
-            unavailableProducts,
-          type: "success",
-        });
-      } else {
-        await sendNotification({
-          token: updatedUser.fcmToken,
-          title: "تم إلغاء طلبك",
-          body: "تم إلغاء طلبك ",
-        });
-        if (driver)
-          sendNotification({
-            token: driver.fcmToken,
-            title: "تم إلغاء طلب",
-            body: "تم الغاء الطلب رقم " + order.orderId,
-          });
-        await notification.create({
-          id: updatedUser._id,
-          userType: "user",
-          title: "تم إلغاء طلبك",
-          body: "تم إلغاء طلبك بسبب" + req.body.reason,
-          type: "success",
-        });
-      }
-    }
-
-    res.status(200).json({
-      error: false,
-      message: "تم إلغاء الطلب بنجاح",
-    });
+    res.json({ error: false, message: "تم إلغاء الطلب بنجاح" });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      error: true,
-      message: "Error cancelling order",
-      error: err.message,
-    });
+    console.error(err);
+    res.status(500).json({ error: true, message: err.message });
+  } finally {
+    session.endSession();
   }
 });
+
+const notifyUser = async ({reason, unavailable}) => {
+  let body = "تم إلغاء طلبك";
+  if (reason)   body += " بسبب " + reason;
+  if (unavailable.length)
+    body += " ولم يتوفر " + unavailable.join(", ");
+
+  await sendNotification({ token: updatedUser.fcmToken, title, body });
+  await notification.create({ id: updatedUser._id, userType: "user", title, body, type: "success" });
+};
 
 router.post("/cancelOrderDriver", auth, async (req, res) => {
   try {
@@ -909,7 +798,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
 
     if (order.status == "onWay") {
       const admin = await Admin.findOne({ phone: "0910808060" });
-      const orderRecord = new OrderRecodr({
+      const orderRecord = new OrderRecord({
         orderId: order.orderId,
         customer: order.customer,
         driver: order.driver,
