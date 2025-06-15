@@ -8,7 +8,6 @@ const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
 
 const auth = async (req, res, next) => {
   try {
-    console.log(req.headers);
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
       return res.status(401).json({

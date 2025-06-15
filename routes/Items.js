@@ -195,7 +195,6 @@ route.get("/getAllItems", async (req, res) => {
       id = decoded.id;
     }
 
-    console.log(req.headers)
     if (!req.headers.cityen) {
       return res.status(400).json({
         error: false,
