@@ -20,8 +20,8 @@ async function notifyStakeholders({
   unavailableProducts = [],
 }) {
   // 1) جلب العميل والسائق
-  const user   = await User.findById(order.customer);
-  const driver = order.driver ? await Driver.findById(order.driver) : null;
+  const user   = await User.findById(order.customer.id);
+  const driver = order.driver ? await Driver.findById(order.driver.id) : null;
 
   // 2) تجهيز نص الإشعار للعميل
   const titleUser = `تم إلغاء طلبك رقم ${order.orderId}`;
