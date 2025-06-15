@@ -743,7 +743,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       if (!order) throw new Error("الطلب غير موجود");
 
       // التحقق من ملكية المتجر
-      if (order.store.id !== req.user._id || req.user.userType!=="Admin") throw new Error("صلاحيات غير كافية");
+      if (order.store.id !== req.user._id || req.user.userType!="Admin") throw new Error("صلاحيات غير كافية");
 
       await OrderRecord.create([{ ...order.toObject(), status: "canceled", canceledAt: new Date(), canceledBy: "store" }], { session });
       await Order.deleteOne({ _id: orderId }).session(session);
