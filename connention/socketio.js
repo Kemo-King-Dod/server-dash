@@ -93,11 +93,9 @@ const MAX_RETRIES   = 180;     // 15 دقيقة كحدّ أقصى
  */
 async function sendWhenConnected(socket, Model, query, eventName, payload) {
   let target = await Model.findOne(query);
-  console.log("target is ",target);
 
   // 1) متصل بالفعل ➜ نرسل فورًا
   if (target?.connection) {
-    console.log("target",target);
     return socket.to(target.connectionId).emit(eventName, payload);
   }
 
