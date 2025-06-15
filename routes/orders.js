@@ -732,6 +732,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
 
 router.post("/cancelOrderStore", auth, async (req, res) => {
   const { orderId, reason = "", unavailableProducts = [] } = req.body;
+  console.log(req.body)
   if (!mongoose.Types.ObjectId.isValid(orderId)) return res.status(400).json({ error: true, message: "معرّف غير صالح" });
 
   const session = await mongoose.startSession();
