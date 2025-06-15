@@ -625,13 +625,13 @@ router.post("/confirmOrder", auth, async (req, res) => {
     });
     sendNotification({
       token: user.fcmToken,
-      title: "تم تسليم طلبك",
+      title: "تم تسليم طلبك"+ order.orderId,
       body: "نتمنى أن الخدمة قد نالت رضاكم",
     });
     await notification.create({
       id: order.customer.id,
       userType: "user",
-      title: "تم تسليم طلبك",
+      title: "تم تسليم طلبك رقم " + order.orderId,
       body: "نتمنى أن الخدمة قد نالت رضاكم",
       type: "success",
     });
@@ -776,7 +776,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
           .join(", ");
         await sendNotification({
           token: updatedUser.fcmToken,
-          title: "تم إلغاء طلبك",
+          title: "تم إلغاء طلبك رقم" + order.orderId,
           body:
             "تم إلغاء طلبك بسبب" +
             req.body.reason +
@@ -792,8 +792,8 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
         await notification.create({
           id: updatedUser._id,
           userType: "user",
-          title: "تم إلغاء طلبك",
-          body:
+          title: "تم إلغاء طلبك رقم" + order.orderId,
+                    body:
             "تم إلغاء طلبك بسبب" +
             req.body.reason +
             " ولم يتم توفير بعض المنتجات مثل " +
@@ -815,8 +815,8 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
         await notification.create({
           id: updatedUser._id,
           userType: "user",
-          title: "تم إلغاء طلبك",
-          body: "تم إلغاء طلبك بسبب" + req.body.reason,
+          title: "تم إلغاء طلبك رقم" + order.orderId,
+          body: "تم إلغاء طلبك من المتجر" + req.body.reason,
           type: "success",
           date: new Date(),
         });
