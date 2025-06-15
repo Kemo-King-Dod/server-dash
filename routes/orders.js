@@ -747,7 +747,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
 
       await OrderRecord.create([{ ...order.toObject(), status: "canceled", canceledAt: new Date(), canceledBy: "store" }], { session });
       await Order.deleteOne({ _id: orderId }).session(session);
-      await User.updateOne({ _id: order.customer }, { $pull: { orders: order._id } }).session(session);
+      await User.updateOne({ _id: order.customer.id }, { $pull: { orders: order._id } }).session(session);
 
       // إشعارات
       await notifyStakeholders({ order, reason, unavailableProducts });
