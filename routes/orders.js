@@ -804,6 +804,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
   const { orderId } = req.body;
   if (!mongoose.Types.ObjectId.isValid(orderId))
     return res.status(400).json({ error: true, message: "معرّف غير صالح" });
+  let orderObj =await Order.findById(orderId);
 
   const session = await mongoose.startSession();
   try {
