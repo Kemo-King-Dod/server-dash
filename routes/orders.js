@@ -814,7 +814,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
       const driver = await Driver.findById(driverId).session(session);
       const order  = await Order.findById(orderId).session(session);
       if (!order) throw new Error("الطلب غير موجود");
-      if (!order.driver?.id.equals(driverId))
+      if (order.driver.id!=driverId)
         throw new Error("صلاحيات غير كافية");
 
       /* 2) منطق الإلغاء أو الإرجاع */
