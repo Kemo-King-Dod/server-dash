@@ -6,12 +6,12 @@ const { sendNotification, sendNotificationToTopic } = require("./firebase/notifi
 // database
 const { createserver, connect } = require("./connention/socketio.js");
 const connecting = require("./database/database.js");
-connecting();
+connecting(); 
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+ 
 const expressserver = app.listen(4000, () => {
   console.log("server is listening on port 4000");
 });

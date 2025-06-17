@@ -5,7 +5,7 @@
             "longitude": 13.1913
         },
         "Arabicname": "طرابلس",
-        "Englishname": "Tripoli",
+        "Englishname": "Tripoli", 
         "boundary": [
             {"latitude": 33.431503, "longitude": 12.848614},  
             {"latitude": 33.2431503, "longitude": 13.421119},  
