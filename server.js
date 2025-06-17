@@ -15,7 +15,7 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
  const PORT = process.env.PORT || 3500;
 const expressserver = app.listen(4000, () => {
-  console.log(`server is listening on port ${PORT}`);
+  console.log(`server is listening on  ${PORT}`);
 });
 
 const io = createserver(expressserver);
