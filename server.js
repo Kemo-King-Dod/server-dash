@@ -3,6 +3,8 @@ const app = express();
 const fireAdmin = require("./firebase/firebase_admin.js")
 const path = require("path");
 const { sendNotification, sendNotificationToTopic } = require("./firebase/notification.js")
+require("dotenv").config(); // CommonJS
+
 // database
 const { createserver, connect } = require("./connention/socketio.js");
 const connecting = require("./database/database.js");
@@ -11,9 +13,9 @@ connecting();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
- 
+ const PORT = process.env.PORT || 3500;
 const expressserver = app.listen(4000, () => {
-  console.log("server is listening on port 4000");
+  console.log(`server is listening on port ${PORT}`);
 });
 
 const io = createserver(expressserver);

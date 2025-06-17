@@ -15,7 +15,10 @@ module.exports = {
                                         "node_modules", // مجلد node_modules
                               ],
 
-                              env: { NODE_ENV: "development" },
+                              env: {
+                                        NODE_ENV: "development", 
+                                        PORT: 3000
+                              },
                               env_production: { NODE_ENV: "production" }
                     }
           ]
