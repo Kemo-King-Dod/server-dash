@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
  const PORT = process.env.PORT || 3500;
-const expressserver = app.listen(4000, () => {
+const expressserver = app.listen(PORT, () => {
   console.log(`server is listening on  ${PORT}`);
 });
 
