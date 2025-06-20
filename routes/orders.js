@@ -501,159 +501,196 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
 });
 
 // examine code
+/**
+ * @route   POST /examineCode
+ * @desc    فحص كود الطلب وتحديث حالة الطلب والمعاملات المالية
+ * @access  Private
+ */
 router.post("/examineCode", auth, async (req, res) => {
   try {
-    const order = await Order.findById(req.body.orderId);
-    if (order) {
-      order.status = "onWay";
-      order.type = "onWay";
-      await order.save();
-
-      const store = await Store.findById(order.store.id);
-      store.funds += order.totalPrice;
-      await store.save();
-
-      const transaction = new Transaction({
-        receiver: store._id,
-        sender: order.driver.id,
-        amount: order.totalPrice,
-        type: "credit",
-        description: "طلبية رقم " + order.orderId,
-      });
-      await transaction.save();
-      const driver = await Driver.findById(order.driver.id);
-      if (!driver._doc.funds) driver._doc.funds = order.totalPrice;
-      else driver._doc.funds += order.totalPrice;
-      await driver.save();
-
-      res.status(200).json({
-        error: false,
-        data: "تمت العملية بنجاح",
-      });
-    } else {
-      res.status(500).json({
-        error: true,
-        message: "الطلب غير موجود",
+    // التحقق من وجود معرف الطلب
+    const { orderId } = req.body;
+    if (!orderId) {
+      return res.status(400).json({
+        success: false,
+        message: "يجب توفير معرف الطلب"
       });
     }
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      error: true,
-      message: "Error adding order",
-      error: err.message,
-    });
-  }
-});
 
-router.post("/confirmOrder", auth, async (req, res) => {
-  try {
-    const order = await Order.findById(req.body.orderId);
-    const driver = await Driver.findById(
-      new mongoose.Types.ObjectId(order.driver.id)
-    );
-    const user = await User.findById(
-      new mongoose.Types.ObjectId(order.customer.id)
-    );
-
+    // البحث عن الطلب في قاعدة البيانات
+    const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({
-        error: true,
-        message: "الطلب غير موجود",
+        success: false,
+        message: "الطلب غير موجود"
       });
     }
-    if (!driver) {
-      return res.status(404).json({
-        error: true,
-        message: "السائق غير موجود",
+
+    // التحقق من حالة الطلب الحالية لتجنب التحديثات المتكررة
+    if (order.status === "onWay") {
+      return res.status(400).json({
+        success: false,
+        message: "تم تحديث حالة الطلب مسبقًا"
       });
     }
-    if (!user) {
-      return res.status(404).json({
-        error: true,
-        message: "المستخدم غير موجود",
+
+    // التحقق من وجود معلومات المتجر والسائق
+    if (!order.store || !order.store.id || !order.driver || !order.driver.id) {
+      return res.status(400).json({
+        success: false,
+        message: "معلومات المتجر أو السائق غير مكتملة"
       });
     }
+
+    // بدء معاملة قاعدة البيانات
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
-      driver.funds += order.companyFee;
-      driver.balance += order.distenationPrice - order.companyFee;
-      if (order.handcheck) {
-        driver.funds += order.totalPrice;
+      // تحديث حالة الطلب
+      order.status = "onWay";
+      order.type = "onWay";
+      await order.save({ session });
+
+      // تحديث رصيد المتجر
+      const store = await Store.findById(order.store.id).session(session);
+      if (!store) {
+        throw new Error("المتجر غير موجود");
       }
+      
+      // إضافة المبلغ إلى رصيد المتجر
+      store.funds = store.funds || 0;
+      store.funds += order.totalPrice;
+      await store.save({ session });
 
-      await driver.save();
-    } catch (err) {
-      console.log(err);
-      await notification.create({
-        id: order.driver.id,
-        userType: "driver",
-        title:
-          "حصل خطأ في تعديل مستحقات الشركة في رقم الطلبية ذات الرقم " +
-          order.orderId +
-          " id =" +
-          order._id,
-        body: "يرجى التوجه إلى المكتب الرئيسي للتعديل",
-        type: "warning",
+      // تحديث رصيد السائق
+      const driver = await Driver.findById(order.driver.id).session(session);
+      if (!driver) {
+        throw new Error("السائق غير موجود");
+      }
+      
+     
+
+      // إنشاء سجل معاملة جديد
+     
+
+      // تأكيد المعاملة
+      await session.commitTransaction();
+      session.endSession();
+
+      // إرسال استجابة نجاح
+      return res.status(200).json({
+        success: true,
+        message: "تمت العملية بنجاح",
+        data: {
+          orderId: order.orderId,
+          status: order.status,
+          transactionId: transaction._id
+        }
       });
-      return res.status(500).json({
-        error: true,
-        message: "حصل خطأ في تعديل مستحقات ",
-      });
+    } catch (error) {
+      // إلغاء المعاملة في حالة حدوث خطأ
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
     }
-
-    // Create record in OrderRecord collection
-    const orderRecord = new OrderRecord({
-      orderId: order.orderId,
-      customer: order.customer,
-      driver: order.driver,
-      store: order.store,
-      date: order.date,
-      items: order.items,
-      totalPrice: order.totalPrice,
-      status: "confirmed",
-      type: "confirmed",
-      address: order.address,
-      distenationPrice: order.distenationPrice,
-      reseveCode: order.reseveCode,
-      chat: order.chat,
-      canceledby: null,
-      companyFee: order.companyFee,
-    });
-    await orderRecord.save();
-
-    await User.findByIdAndUpdate(order.customer.id, {
-      orders: { $pull: order._id },
-    });
-    sendNotification({
-      token: user.fcmToken,
-      title: "تم تسليم طلبك" + order.orderId,
-      body: "نتمنى أن الخدمة قد نالت رضاكم",
-    });
-    await notification.create({
-      id: order.customer.id,
-      userType: "user",
-      title: "تم تسليم طلبك رقم " + order.orderId,
-      body: "نتمنى أن الخدمة قد نالت رضاكم",
-      type: "success",
-    });
-
-    // Delete original order
-    await Order.findByIdAndDelete(req.body.orderId);
-
-    res.status(200).json({
-      error: false,
-      message: "تم تأكيد الطلب بنجاح",
-      data: orderRecord,
-    });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      error: true,
-      message: "Error confirming order",
-      error: err.message,
+    console.error(`خطأ في فحص كود الطلب: ${err.message}`);
+    return res.status(500).json({
+      success: false,
+      message: "حدث خطأ أثناء معالجة الطلب",
+      error: err.message
     });
   }
 });
+router.post("/confirmOrder", auth, async (req, res) => {
+  const { orderId } = req.body;
+  if (!mongoose.Types.ObjectId.isValid(orderId))
+    return res.status(400).json({ error: true, message: "معرّف غير صالح" });
+
+  const session = await mongoose.startSession();
+  try {
+    let order, driver, user;
+
+    await session.withTransaction(async () => {
+      /* 1) جلب الطلب والسائق والعميل */
+      order  = await Order.findById(orderId).session(session);
+      if (!order) throw new Error("الطلب غير موجود");
+
+      driver = await Driver.findById(order.driver).session(session);
+      if (!driver) throw new Error("السائق غير موجود");
+
+      user   = await User.findById(order.customer).session(session);
+      if (!user) throw new Error("المستخدم غير موجود");
+
+      // تأكد أن السائق نفسه هو من يؤكد الطلب
+      if (!order.driver.id.equals(req.user._id))
+        throw new Error("صلاحيات غير كافية");
+
+      /* 2) تحديث رصيد السائق */
+      const incObj = {
+        funds   :  order.companyFee,
+        balance :  order.distenationPrice - order.companyFee
+      };
+      if (order.handcheck) incObj.funds += order.totalPrice;
+
+      await Driver.updateOne(
+        { _id: driver._id },
+        { $inc: incObj },
+        { session }
+      );
+
+      /* 3) إنشاء سجل التأكيد */
+      await OrderRecord.create(
+        [{
+          ...order.toObject(),
+          status: "confirmed",
+          type  : "confirmed",
+          canceledBy: null,
+          confirmedAt: new Date()
+        }],
+        { session }
+      );
+
+      /* 4) حذف الطلب وتحديث قائمة الطلبات عند المستخدم */
+      await Promise.all([
+        Order.deleteOne({ _id: orderId }).session(session),
+        User.updateOne(
+          { _id: user._id },
+          { $pull: { orders: order._id } }
+        ).session(session)
+      ]);
+    });
+
+    /* --- إشعارات خارج الـ transaction --- */
+    await Promise.all([
+      sendNotification({
+        token: user.fcmToken,
+        title: `تم تسليم طلبك رقم ${order.orderId}`,
+        body : "نتمنى أن الخدمة قد نالت رضاكم 🙏"
+      }),
+      notification.create({
+        id: user._id,
+        userType: "user",
+        title: `تم تسليم طلبك رقم ${order.orderId}`,
+        body : "نتمنى أن الخدمة قد نالت رضاكم 🙏",
+        type : "success"
+      })
+    ]);
+
+    res.json({
+      error: false,
+      message: "تم تأكيد الطلب بنجاح",
+      data: { orderId: order.orderId }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: true, message: err.message });
+  } finally {
+    session.endSession();
+  }
+});
+
 
 router.post("/cancelOrderUser", auth, async (req, res) => {
   try {
