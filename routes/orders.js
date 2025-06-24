@@ -617,10 +617,10 @@ router.post("/confirmOrder", auth, async (req, res) => {
       order  = await Order.findById(orderId).session(session);
       if (!order) throw new Error("الطلب غير موجود");
 
-      driver = await Driver.findById(order.driver).session(session);
+      driver = await Driver.findById(order.driver.id).session(session);
       if (!driver) throw new Error("السائق غير موجود");
 
-      user   = await User.findById(order.customer).session(session);
+      user   = await User.findById(order.customer.id).session(session);
       if (!user) throw new Error("المستخدم غير موجود");
 
       // تأكد أن السائق نفسه هو من يؤكد الطلب
