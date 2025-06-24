@@ -624,7 +624,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
       if (!user) throw new Error("المستخدم غير موجود");
 
       // تأكد أن السائق نفسه هو من يؤكد الطلب
-      if (!order.driver.id.equals(req.user._id))
+      if (!order.driver.id == req.user._id)
         throw new Error("صلاحيات غير كافية");
 
       /* 2) تحديث رصيد السائق */
