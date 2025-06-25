@@ -25,6 +25,10 @@ const info = new Schema({
     },
     withdrawals_number: {
         type: Number
+    },
+    orders_number:{
+        type: Number,
+        default: 0
     }
 })
 

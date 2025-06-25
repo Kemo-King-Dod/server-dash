@@ -22,20 +22,32 @@ const { error } = require("console");
 const orders = require("../database/orders");
 const Admin = require("../database/admin");
 const { notifyStakeholders } = require("../utils/notifyStakeholders");
+const Info = require("../database/info");
 
 let ordersNum;
 
+// ***********************
 async function read() {
-  const data = await fs.readFile(
-    path.join(__dirname, "..", "data", "order.txt")
-  );
-  ordersNum = parseInt(data.toString());
-  await fs.writeFile(
-    path.join(__dirname, "..", "data", "order.txt"),
-    `${++ordersNum}`
-  );
-  return ordersNum;
+  try {
+    const result = await Info.findOneAndUpdate(
+      {},                            // لا شرط لأنك تضمن وجود وثيقة واحدة فقط
+      { $inc: { orders_number: 1 } },// زيادة orders_number بمقدار 1
+      {
+        returnOriginal: false,       // إرجاع الوثيقة بعد التحديث (لـ Mongoose)
+        upsert: true                 // إنشاء الوثيقة إذا لم تكن موجودة (اختياري)
+      }
+    );
+
+    return result.orders_number;
+
+  } catch (error) {
+    console.error("خطأ أثناء تحديث orders_number:", error);
+    throw error;
+  }
 }
+
+// ***********************
+
 router.get("/getAllOrders", auth, async (req, res) => {
   var Orders = await orders.find({});
   return res.status(200).json({
@@ -557,7 +569,7 @@ router.post("/examineCode", auth, async (req, res) => {
       if (!store) {
         throw new Error("المتجر غير موجود");
       }
-      
+
       // إضافة المبلغ إلى رصيد المتجر
       store.funds = store.funds || 0;
       store.funds += order.totalPrice;
@@ -568,11 +580,11 @@ router.post("/examineCode", auth, async (req, res) => {
       if (!driver) {
         throw new Error("السائق غير موجود");
       }
-      
-     
+
+
 
       // إنشاء سجل معاملة جديد
-     
+
 
       // تأكيد المعاملة
       await session.commitTransaction();
@@ -614,13 +626,13 @@ router.post("/confirmOrder", auth, async (req, res) => {
 
     await session.withTransaction(async () => {
       /* 1) جلب الطلب والسائق والعميل */
-      order  = await Order.findById(orderId).session(session);
+      order = await Order.findById(orderId).session(session);
       if (!order) throw new Error("الطلب غير موجود");
 
       driver = await Driver.findById(order.driver.id).session(session);
       if (!driver) throw new Error("السائق غير موجود");
 
-      user   = await User.findById(order.customer.id).session(session);
+      user = await User.findById(order.customer.id).session(session);
       if (!user) throw new Error("المستخدم غير موجود");
 
       // تأكد أن السائق نفسه هو من يؤكد الطلب
@@ -629,8 +641,8 @@ router.post("/confirmOrder", auth, async (req, res) => {
 
       /* 2) تحديث رصيد السائق */
       const incObj = {
-        funds   :  order.companyFee,
-        balance :  order.distenationPrice - order.companyFee
+        funds: order.companyFee,
+        balance: order.distenationPrice - order.companyFee
       };
       if (order.handcheck) incObj.funds += order.totalPrice;
 
@@ -645,7 +657,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
         [{
           ...order.toObject(),
           status: "confirmed",
-          type  : "confirmed",
+          type: "confirmed",
           canceledBy: null,
           confirmedAt: new Date()
         }],
@@ -667,14 +679,14 @@ router.post("/confirmOrder", auth, async (req, res) => {
       sendNotification({
         token: user.fcmToken,
         title: `تم تسليم طلبك رقم ${order.orderId}`,
-        body : "نتمنى أن الخدمة قد نالت رضاكم 🙏"
+        body: "نتمنى أن الخدمة قد نالت رضاكم 🙏"
       }),
       notification.create({
         id: user._id,
         userType: "user",
         title: `تم تسليم طلبك رقم ${order.orderId}`,
-        body : "نتمنى أن الخدمة قد نالت رضاكم 🙏",
-        type : "success"
+        body: "نتمنى أن الخدمة قد نالت رضاكم 🙏",
+        type: "success"
       })
     ]);
 
@@ -695,24 +707,24 @@ router.post("/confirmOrder", auth, async (req, res) => {
 router.post("/cancelOrderUser", auth, async (req, res) => {
   try {
     const { orderId } = req.body;
-    let orderObj =await Order.findById(orderId);
-  
+    let orderObj = await Order.findById(orderId);
+
     if (!mongoose.Types.ObjectId.isValid(orderId))
       return res.status(400).json({ error: true, message: "معرّف غير صالح" });
-  
+
     const session = await mongoose.startSession();
     try {
       await session.withTransaction(async () => {
         /* 1) جلب المستندات - بالتتالي */
-        const user  = await User.findById(req.userId).session(session);
+        const user = await User.findById(req.userId).session(session);
         const order = await Order.findById(orderId).session(session);
         const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5").session(session);
-      
+
         if (!order) throw new Error("الطلب غير موجود");
         if (!order.customer.id.equals(req.userId)) throw new Error("صلاحيات غير كافية");
         if (!["waiting"].includes(order.status))
           throw new Error("لا يمكن إلغاء هذا الطلب حاليًا");
-      
+
         /* 2) إنشاء سجل الإلغاء */
         await OrderRecord.create(
           [{
@@ -724,24 +736,24 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
           }],
           { session }
         );
-      
+
         /* 3) حذف الطلب */
         await Order.deleteOne({ _id: orderId }).session(session);
-      
+
         /* 4) تحديث المستخدم */
         await User.updateOne(
           { _id: req.userId },
           {
-            $inc : { cancelOrderLimit: 1 },
+            $inc: { cancelOrderLimit: 1 },
             $pull: { orders: order._id },
             ...(user.cancelOrderLimit + 1 >= 5 && { status: "blocked" }),
           }
         ).session(session);
       });
-      
+
       const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5");
       const store = await Store.findById(orderObj.store.id);
-  
+
       const driver = orderObj.driver
         ? await Driver.findById(orderObj.driver.id)
         : null;
@@ -763,13 +775,13 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
           body: "",
         }),
         orderObj.driver &&
-          sendNotification({
+        sendNotification({
             /* إلى السائق */ token: driver.fcmToken,
-            title: "تم الغاء الطلب رقم" + orderObj.orderId,
-            body: "",
-          }),
+          title: "تم الغاء الطلب رقم" + orderObj.orderId,
+          body: "",
+        }),
       ]);
-  
+
       const user = await User.findById(req.user._id); // جلب السقف بعد التحديث
       res.json({
         error: false,
@@ -786,14 +798,14 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
       session.endSession();
     }
   } catch (error) {
-    console.log( "2",error)
+    console.log("2", error)
   }
- 
+
 });
 
 router.post("/cancelOrderStore", auth, async (req, res) => {
   const { orderId, reason = "", unavailableProducts = [] } = req.body;
-  let orderObj =await Order.findById(orderId);
+  let orderObj = await Order.findById(orderId);
 
   if (!mongoose.Types.ObjectId.isValid(orderId))
     return res.status(400).json({ error: true, message: "معرّف غير صالح" });
@@ -841,7 +853,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
   const { orderId } = req.body;
   if (!mongoose.Types.ObjectId.isValid(orderId))
     return res.status(400).json({ error: true, message: "معرّف غير صالح" });
-  let orderObj =await Order.findById(orderId);
+  let orderObj = await Order.findById(orderId);
 
   const session = await mongoose.startSession();
   try {
@@ -850,9 +862,9 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
 
       /* 1) جلب المستندات */
       const driver = await Driver.findById(driverId).session(session);
-      const order  = await Order.findById(orderId).session(session);
+      const order = await Order.findById(orderId).session(session);
       if (!order) throw new Error("الطلب غير موجود");
-      if (order.driver.id!=driverId)
+      if (order.driver.id != driverId)
         throw new Error("صلاحيات غير كافية");
 
       /* 2) منطق الإلغاء أو الإرجاع */
@@ -860,10 +872,10 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         // سجل الإلغاء
         await OrderRecord.create([{
           ...order.toObject(),
-          status:      "canceled",
-          type:        "canceled",
-          canceledBy:  "driver",
-          canceledAt:  new Date(),
+          status: "canceled",
+          type: "canceled",
+          canceledBy: "driver",
+          canceledAt: new Date(),
         }], { session });
 
         // حذف الطلب
@@ -873,7 +885,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         await Driver.updateOne(
           { _id: driverId },
           {
-            $inc : { cancelOrderLimit: 1 },
+            $inc: { cancelOrderLimit: 1 },
             ...(driver.cancelOrderLimit + 1 >= 5 && { status: "blocked" }),
           }
         ).session(session);
@@ -905,27 +917,27 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
       sendNotification({
         token: admin.fcmToken,
         title: `تم إلغاء الطلب رقم ${orderObj.orderId}`,
-        body : "قام سائق بإلغاء الطلب.",
+        body: "قام سائق بإلغاء الطلب.",
       }),
       sendNotification({
         token: user.fcmToken,
         title: `عذراً! تم إلغاء طلبيتك رقم ${orderObj.orderId}`,
-        body : "قام السائق بإلغاء الطلب، يُرجى إعادة الطلب.",
+        body: "قام السائق بإلغاء الطلب، يُرجى إعادة الطلب.",
       }),
       sendNotification({
         token: store.fcmToken,
         title: `إلغاء من السائق للطلب رقم ${orderObj.orderId}`,
-        body : "السائق ألغى الطلب، الطلب متاح لسائق آخر.",
+        body: "السائق ألغى الطلب، الطلب متاح لسائق آخر.",
       }),
       sendNotification({
         token: driver.fcmToken,
         title: `تم إلغاء الطلبية`,
-        body : `لقد ألغيت الطلبية رقم ${orderObj.orderId}`,
+        body: `لقد ألغيت الطلبية رقم ${orderObj.orderId}`,
       }),
       sendNotificationToTopic({
         topic: `admins_${req.headers.cityen}`,
         title: `تم إلغاء الطلب رقم ${orderId}`,
-        body : "قام سائق ما بإلغاء الطلب.",
+        body: "قام سائق ما بإلغاء الطلب.",
       }),
     ];
 
