@@ -76,6 +76,14 @@ router.post("/addOrder", auth, async (req, res) => {
       const user = await User.findById(userId);
       const deliveryPrice = req.body.deliveryPrice;
       let totalprice = 0;
+      let activeOrderCount=await Order.countDocuments({"customer.id":req.userId ,status:{$in:['waiting','accepted','ready',"driverAccepted", "onWay"]}});
+
+      if(activeOrderCount>3){
+         return res.status(500).json({
+        error: true,
+        message: "لديك 3 طلبيات جارية بالفعل الرجاء الانتظار الى حين انتهاء احد الطلبيات",
+      });
+      }
 
       if (store.city != getCityName(theAddress).englishName) {
         return res.status(500).json({
@@ -83,6 +91,7 @@ router.post("/addOrder", auth, async (req, res) => {
           message: "المحل غير موجود في هذه المدينة",
         });
       }
+      
 
       for (var i = 0; i < user.cart.length; i++) {
         if (user.cart[i].cartItem.storeID == StoreId) {
