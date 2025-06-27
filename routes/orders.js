@@ -79,13 +79,20 @@ router.post("/addOrder", auth, async (req, res) => {
       let activeOrderCount = await Order.countDocuments({ "customer.id": new mongoose.Types.ObjectId(req.userId), status: { $in: ['waiting', 'accepted', 'ready', "driverAccepted", "onWay"] } });
       console.log("count: %d", activeOrderCount)
 
-      // if (activeOrderCount >= 3) {
-      //   return res.status(500).json({
-      //     error: true,
-      //     message: "لديك 3 طلبيات جارية بالفعل الرجاء الانتظار الى حين انتهاء احد الطلبيات",
-      //   });
-      // }
+      if (activeOrderCount >= 3) {
+        return res.status(500).json({
+          error: true,
+          message: "لديك 3 طلبيات جارية بالفعل الرجاء الانتظار الى حين انتهاء احد الطلبيات",
+        });
+      }
+      // Check for blocked status based on cancelOrderLimit
+      if (user.cancelOrderLimit >= 5) {
 
+        return res.status(403).json({
+          error: true,
+          data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
+        });
+      }
       if (store.city != getCityName(theAddress).englishName) {
         return res.status(500).json({
           error: true,
@@ -175,7 +182,7 @@ router.post("/addOrder", auth, async (req, res) => {
       await order.save();
 
       // const theorderId = await Order.findOne({ orderId: ordersNum });
-      const theorderId =order.toObject();
+      const theorderId = order.toObject();
       // const theorderId = await Order.findOne({ _id: order._id });
 
       // Update store's orders array
@@ -730,7 +737,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
         /* 1) جلب المستندات - بالتتالي */
         const user = await User.findById(req.userId).session(session);
         const order = await Order.findById(orderId).session(session);
-        const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5").session(session);
+        // const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5").session(session);
 
         if (!order) throw new Error("الطلب غير موجود");
         if (!order.customer.id.equals(req.userId)) throw new Error("صلاحيات غير كافية");
