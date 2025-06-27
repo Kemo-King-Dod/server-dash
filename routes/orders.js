@@ -79,12 +79,12 @@ router.post("/addOrder", auth, async (req, res) => {
       let activeOrderCount = await Order.countDocuments({ "customer.id": new mongoose.Types.ObjectId(req.userId), status: { $in: ['waiting', 'accepted', 'ready', "driverAccepted", "onWay"] } });
       console.log("count: %d", activeOrderCount)
 
-      if (activeOrderCount > 3) {
-        return res.status(500).json({
-          error: true,
-          message: "لديك 3 طلبيات جارية بالفعل الرجاء الانتظار الى حين انتهاء احد الطلبيات",
-        });
-      }
+      // if (activeOrderCount >= 3) {
+      //   return res.status(500).json({
+      //     error: true,
+      //     message: "لديك 3 طلبيات جارية بالفعل الرجاء الانتظار الى حين انتهاء احد الطلبيات",
+      //   });
+      // }
 
       if (store.city != getCityName(theAddress).englishName) {
         return res.status(500).json({
