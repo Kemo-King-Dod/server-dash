@@ -174,7 +174,9 @@ router.post("/addOrder", auth, async (req, res) => {
       // Save order
       await order.save();
 
-      const theorderId = await Order.findOne({ orderId: ordersNum });
+      // const theorderId = await Order.findOne({ orderId: ordersNum });
+      const theorderId =order.toObject();
+      // const theorderId = await Order.findOne({ _id: order._id });
 
       // Update store's orders array
       await Store.findByIdAndUpdate(StoreId, {
