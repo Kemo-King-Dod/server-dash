@@ -84,6 +84,7 @@ router.post("/addOrder", auth, async (req, res) => {
         message: "لديك 3 طلبيات جارية بالفعل الرجاء الانتظار الى حين انتهاء احد الطلبيات",
       });
       }
+      console.log("count: %d", activeOrderCount)
 
       if (store.city != getCityName(theAddress).englishName) {
         return res.status(500).json({
