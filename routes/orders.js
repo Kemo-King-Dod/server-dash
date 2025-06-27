@@ -87,8 +87,7 @@ router.post("/addOrder", auth, async (req, res) => {
       }
       // Check for blocked status based on cancelOrderLimit
       if (user.cancelOrderLimit >= 5) {
-
-        return res.status(403).json({
+        return res.status(500).json({
           error: true,
           data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
         });
@@ -99,8 +98,6 @@ router.post("/addOrder", auth, async (req, res) => {
           message: "المحل غير موجود في هذه المدينة",
         });
       }
-
-
       for (var i = 0; i < user.cart.length; i++) {
         if (user.cart[i].cartItem.storeID == StoreId) {
           const item = await Item.findById(user.cart[i].cartItem.id);
@@ -292,7 +289,6 @@ router.post("/acceptOrder", auth, async (req, res) => {
         data: order,
       });
     }
-
     if (store.ByCode == false) {
       sendNotificationToTopic({
         topic: `${order.city.englishName}Drivers`,
