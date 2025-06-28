@@ -4,6 +4,8 @@ const Driver = require("../database/driver");
 const { auth } = require("../middleware/auth");
 const Transaction = require("../database/transactions");
 const Admin = require("../database/admin");
+const { default: mongoose } = require("mongoose");
+ 
 
 router.get("/getDriver", auth, async (req, res) => {
   try {
@@ -55,6 +57,9 @@ router.post("/alterDriverPassword", auth, async (req, res) => {
 
 router.post("/addWithdrawl", auth, async (req, res) => {
   // بدء جلسة mongoose للتعاملات
+  console.log(
+    "hello"
+  )
   const session = await mongoose.startSession();
   try {
     // بدء المعاملة
