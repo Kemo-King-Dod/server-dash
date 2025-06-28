@@ -121,6 +121,8 @@ router.post("/addWithdrawl", auth, async (req, res) => {
       company.balance += driver.funds;
       driver.funds = 0;
       driver.balance = 0;
+      // تسجيل وقت السحب
+      driver.lastWithdrawal = new Date();
       
       // حفظ التغييرات مع استخدام session
       await company.save({ session });
@@ -136,6 +138,7 @@ router.post("/addWithdrawl", auth, async (req, res) => {
         data: {
           balance: driver.balance,
           funds: driver.funds,
+          lastWithdrawal: driver.lastWithdrawal
         },
         data2: transaction2[0],
         data3: transaction[0],
@@ -162,6 +165,40 @@ router.post("/addWithdrawl", auth, async (req, res) => {
     res.status(500).json({
       error: true,
       message: err.message || "حدث خطأ في الخادم",
+    });
+  }
+});
+
+
+// نقطة نهاية للحصول على السائقين الذين لم يقوموا بالسحب منذ أكثر من يوم واحد
+router.get("/getDriversWithoutWithdrawalForDay", auth, async (req, res) => {
+  try {
+    // حساب التاريخ قبل يوم واحد
+    const oneDayAgo = new Date();
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+    
+    // البحث عن السائقين الذين لم يقوموا بالسحب منذ أكثر من يوم واحد
+    // أو الذين لم يقوموا بالسحب مطلقاً (lastWithdrawal === null)
+    const drivers = await Driver.find({
+      $or: [
+        { lastWithdrawal: { $lt: oneDayAgo } },
+        { lastWithdrawal: null }
+      ],
+      // التأكد من أن لديهم رصيد للسحب
+      funds: { $gt: 0 }
+    }).select('-password'); // استبعاد كلمة المرور من النتائج للأمان
+    
+    res.status(200).json({
+      error: false,
+      message: "تم جلب السائقين بنجاح",
+      count: drivers.length,
+      data: drivers
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      error: true,
+      message: err.message || "حدث خطأ في الخادم"
     });
   }
 });

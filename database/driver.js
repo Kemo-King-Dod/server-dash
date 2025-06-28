@@ -103,6 +103,10 @@ const drivers = new Schema({
     timesForgetPassword:{
         type: Number,
         default:0,
+    },
+    lastWithdrawal: {
+        type: Date,
+        default: null
     }
 })
 const Driver = mongoose.model('Driver', drivers);
