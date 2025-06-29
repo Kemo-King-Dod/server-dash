@@ -245,6 +245,8 @@ router.patch("/deleteitemfromcart", auth, async (req, res) => {
     const cartItemIndex = user.cart.findIndex(
       (item) => item.id === id
     );
+    console.log("user cart" ,user.cart)
+    console.log("id" ,id)
 
     if (cartItemIndex === -1) {
       return res.status(404).json({
