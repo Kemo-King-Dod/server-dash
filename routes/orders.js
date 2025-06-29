@@ -30,16 +30,15 @@ let ordersNum;
 async function read() {
   try {
     const result = await Info.findOneAndUpdate(
-      {},                            // لا شرط لأنك تضمن وجود وثيقة واحدة فقط
-      { $inc: { orders_number: 1 } },// زيادة orders_number بمقدار 1
+      {}, // لا شرط لأنك تضمن وجود وثيقة واحدة فقط
+      { $inc: { orders_number: 1 } }, // زيادة orders_number بمقدار 1
       {
-        returnOriginal: false,       // إرجاع الوثيقة بعد التحديث (لـ Mongoose)
-        upsert: true                 // إنشاء الوثيقة إذا لم تكن موجودة (اختياري)
+        returnOriginal: false, // إرجاع الوثيقة بعد التحديث (لـ Mongoose)
+        upsert: true, // إنشاء الوثيقة إذا لم تكن موجودة (اختياري)
       }
     );
 
     return result.orders_number;
-
   } catch (error) {
     console.error("خطأ أثناء تحديث orders_number:", error);
     throw error;
@@ -76,20 +75,26 @@ router.post("/addOrder", auth, async (req, res) => {
       const user = await User.findById(userId);
       const deliveryPrice = req.body.deliveryPrice;
       let totalprice = 0;
-      let activeOrderCount = await Order.countDocuments({ "customer.id": new mongoose.Types.ObjectId(req.userId), status: { $in: ['waiting', 'accepted', 'ready', "driverAccepted", "onWay"] } });
-      console.log("count: %d", activeOrderCount)
+      let activeOrderCount = await Order.countDocuments({
+        "customer.id": new mongoose.Types.ObjectId(req.userId),
+        status: {
+          $in: ["waiting", "accepted", "ready", "driverAccepted", "onWay"],
+        },
+      });
+      console.log("count: %d", activeOrderCount);
 
       if (activeOrderCount >= 3) {
         return res.status(500).json({
           error: true,
-          message: "لديك 3 طلبيات جارية بالفعل الرجاء الانتظار الى حين انتهاء احد الطلبيات",
+          message:
+            "لديك 3 طلبيات جارية بالفعل الرجاء الانتظار الى حين انتهاء احد الطلبيات",
         });
       }
       // Check for blocked status based on cancelOrderLimit
       if (user.cancelOrderLimit >= 5) {
         return res.status(500).json({
           error: true,
-          message: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
+          message: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
         });
       }
       if (store.city != getCityName(theAddress).englishName) {
@@ -540,7 +545,7 @@ router.post("/examineCode", auth, async (req, res) => {
     if (!orderId) {
       return res.status(400).json({
         success: false,
-        message: "يجب توفير معرف الطلب"
+        message: "يجب توفير معرف الطلب",
       });
     }
 
@@ -549,7 +554,7 @@ router.post("/examineCode", auth, async (req, res) => {
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: "الطلب غير موجود"
+        message: "الطلب غير موجود",
       });
     }
 
@@ -557,7 +562,7 @@ router.post("/examineCode", auth, async (req, res) => {
     if (order.status === "onWay") {
       return res.status(400).json({
         success: false,
-        message: "تم تحديث حالة الطلب مسبقًا"
+        message: "تم تحديث حالة الطلب مسبقًا",
       });
     }
 
@@ -565,7 +570,7 @@ router.post("/examineCode", auth, async (req, res) => {
     if (!order.store || !order.store.id || !order.driver || !order.driver.id) {
       return res.status(400).json({
         success: false,
-        message: "معلومات المتجر أو السائق غير مكتملة"
+        message: "معلومات المتجر أو السائق غير مكتملة",
       });
     }
 
@@ -596,10 +601,7 @@ router.post("/examineCode", auth, async (req, res) => {
         throw new Error("السائق غير موجود");
       }
 
-
-
       // إنشاء سجل معاملة جديد
-
 
       // تأكيد المعاملة
       await session.commitTransaction();
@@ -612,8 +614,8 @@ router.post("/examineCode", auth, async (req, res) => {
         data: {
           orderId: order.orderId,
           status: order.status,
-          transactionId: transaction._id
-        }
+          transactionId: transaction._id,
+        },
       });
     } catch (error) {
       // إلغاء المعاملة في حالة حدوث خطأ
@@ -626,7 +628,7 @@ router.post("/examineCode", auth, async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "حدث خطأ أثناء معالجة الطلب",
-      error: err.message
+      error: err.message,
     });
   }
 });
@@ -657,25 +659,27 @@ router.post("/confirmOrder", auth, async (req, res) => {
       /* 2) تحديث رصيد السائق */
       const incObj = {
         funds: order.companyFee,
-        balance: order.distenationPrice - order.companyFee
+        balance: order.distenationPrice - order.companyFee,
       };
       if (order.handcheck) incObj.funds += order.totalPrice;
 
       await Driver.updateOne(
         { _id: driver._id },
         { $inc: incObj },
-        { session }
+        { session, runValidators: false }
       );
 
       /* 3) إنشاء سجل التأكيد */
       await OrderRecord.create(
-        [{
-          ...order.toObject(),
-          status: "confirmed",
-          type: "confirmed",
-          canceledBy: null,
-          confirmedAt: new Date()
-        }],
+        [
+          {
+            ...order.toObject(),
+            status: "confirmed",
+            type: "confirmed",
+            canceledBy: null,
+            confirmedAt: new Date(),
+          },
+        ],
         { session }
       );
 
@@ -685,7 +689,7 @@ router.post("/confirmOrder", auth, async (req, res) => {
         User.updateOne(
           { _id: user._id },
           { $pull: { orders: order._id } }
-        ).session(session)
+        ).session(session),
       ]);
     });
 
@@ -694,21 +698,21 @@ router.post("/confirmOrder", auth, async (req, res) => {
       sendNotification({
         token: user.fcmToken,
         title: `تم تسليم طلبك رقم ${order.orderId}`,
-        body: "نتمنى أن الخدمة قد نالت رضاكم 🙏"
+        body: "نتمنى أن الخدمة قد نالت رضاكم 🙏",
       }),
       notification.create({
         id: user._id,
         userType: "user",
         title: `تم تسليم طلبك رقم ${order.orderId}`,
         body: "نتمنى أن الخدمة قد نالت رضاكم 🙏",
-        type: "success"
-      })
+        type: "success",
+      }),
     ]);
 
     res.json({
       error: false,
       message: "تم تأكيد الطلب بنجاح",
-      data: { orderId: order.orderId }
+      data: { orderId: order.orderId },
     });
   } catch (err) {
     console.error(err);
@@ -717,7 +721,6 @@ router.post("/confirmOrder", auth, async (req, res) => {
     session.endSession();
   }
 });
-
 
 router.post("/cancelOrderUser", auth, async (req, res) => {
   try {
@@ -736,19 +739,22 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
         // const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5").session(session);
 
         if (!order) throw new Error("الطلب غير موجود");
-        if (!order.customer.id.equals(req.userId)) throw new Error("صلاحيات غير كافية");
+        if (!order.customer.id.equals(req.userId))
+          throw new Error("صلاحيات غير كافية");
         if (!["waiting"].includes(order.status))
           throw new Error("لا يمكن إلغاء هذا الطلب حاليًا");
 
         /* 2) إنشاء سجل الإلغاء */
         await OrderRecord.create(
-          [{
-            ...order.toObject(),
-            status: "canceled",
-            type: "canceled",
-            canceledBy: "user",
-            canceledAt: new Date(),
-          }],
+          [
+            {
+              ...order.toObject(),
+              status: "canceled",
+              type: "canceled",
+              canceledBy: "user",
+              canceledAt: new Date(),
+            },
+          ],
           { session }
         );
 
@@ -762,7 +768,9 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
             $inc: { cancelOrderLimit: 1 },
             $pull: { orders: order._id },
             ...(user.cancelOrderLimit + 1 >= 5 && { status: "blocked" }),
-          }
+          },
+          { $set: { fcmToken } }, // الحقول المراد تعديلها
+          { runValidators: false } // تعطيل فحص location أو حقول أخرى
         ).session(session);
       });
 
@@ -790,11 +798,11 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
           body: "",
         }),
         orderObj.driver &&
-        sendNotification({
+          sendNotification({
             /* إلى السائق */ token: driver.fcmToken,
-          title: "تم الغاء الطلب رقم" + orderObj.orderId,
-          body: "",
-        }),
+            title: "تم الغاء الطلب رقم" + orderObj.orderId,
+            body: "",
+          }),
       ]);
 
       const user = await User.findById(req.user._id); // جلب السقف بعد التحديث
@@ -808,14 +816,12 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: true, message: err.message });
-
     } finally {
       session.endSession();
     }
   } catch (error) {
-    console.log("2", error)
+    console.log("2", error);
   }
-
 });
 
 router.post("/cancelOrderStore", auth, async (req, res) => {
@@ -849,7 +855,9 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       await Order.deleteOne({ _id: orderId }).session(session);
       await User.updateOne(
         { _id: order.customer.id },
-        { $pull: { orders: order._id } }
+        { $pull: { orders: order._id } },
+        { $set: { fcmToken } }, // الحقول المراد تعديلها
+        { runValidators: false } // تعطيل فحص location أو حقول أخرى
       ).session(session);
 
       // إشعارات
@@ -879,19 +887,23 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
       const driver = await Driver.findById(driverId).session(session);
       const order = await Order.findById(orderId).session(session);
       if (!order) throw new Error("الطلب غير موجود");
-      if (order.driver.id != driverId)
-        throw new Error("صلاحيات غير كافية");
+      if (order.driver.id != driverId) throw new Error("صلاحيات غير كافية");
 
       /* 2) منطق الإلغاء أو الإرجاع */
       if (order.status === "onWay") {
         // سجل الإلغاء
-        await OrderRecord.create([{
-          ...order.toObject(),
-          status: "canceled",
-          type: "canceled",
-          canceledBy: "driver",
-          canceledAt: new Date(),
-        }], { session });
+        await OrderRecord.create(
+          [
+            {
+              ...order.toObject(),
+              status: "canceled",
+              type: "canceled",
+              canceledBy: "driver",
+              canceledAt: new Date(),
+            },
+          ],
+          { session }
+        );
 
         // حذف الطلب
         await Order.deleteOne({ _id: orderId }).session(session);
@@ -908,9 +920,10 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         // إزالة الطلب من قائمة المستخدم
         await User.updateOne(
           { _id: order.customer.id },
-          { $pull: { orders: order._id } }
+          { $pull: { orders: order._id } },
+          { $set: { fcmToken } }, // الحقول المراد تعديلها
+          { runValidators: false } // تعطيل فحص location أو حقول أخرى
         ).session(session);
-
       } else if (["accepted", "waiting"].includes(order.status)) {
         // فقط إرجاعه إلى المتجر
         order.set({ status: "ready", type: "ready", driver: null });
@@ -975,6 +988,5 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
     session.endSession();
   }
 });
-
 
 module.exports = router;
