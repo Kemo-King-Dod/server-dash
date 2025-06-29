@@ -60,7 +60,7 @@ router.get("/getAllOrders", auth, async (req, res) => {
 // orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
   try {
-    if (req.userId !== "682e92122f76a6aadd90d682") {
+    if (req.userId !== "682e92122f76a6aadd90d682" || req.userId !=="67f7abaffd2b01381a293aa8") {
       return res.status(500).json({
         error: true,
         message: "سيتم الإطلاق قريباً",
