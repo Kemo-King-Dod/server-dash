@@ -28,6 +28,7 @@ let ordersNum;
 const admins = [
   "682e92122f76a6aadd90d682",
 "67f7abaffd2b01381a293aa8",
+"6861689248ad8925d7252301",
 
 ];
 
@@ -489,7 +490,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
     } else {
     }
 
-    if (req.user.userType !== "admin" && acceptedordersCount >= 3 && req.userId !== "6861689248ad8925d7252301") {
+    if (req.user.userType !== "admin" && acceptedordersCount >= 3 && !admins.includes(req.userId)) {
       return res.status(200).json({
         error: true,
         message: "لقد وصلت الى الحد الاقصى للطلبات",
