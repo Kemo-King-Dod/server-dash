@@ -752,7 +752,6 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
             $pull: { orders: order._id },
             ...(user.cancelOrderLimit + 1 >= 5 && { status: "blocked" }),
           },
-          { $set: { fcmToken } }, // الحقول المراد تعديلها
           { runValidators: false } // تعطيل فحص location أو حقول أخرى
         ).session(session);
       });
@@ -839,7 +838,6 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       await User.updateOne(
         { _id: order.customer.id },
         { $pull: { orders: order._id } },
-        { $set: { fcmToken } }, // الحقول المراد تعديلها
         { runValidators: false } // تعطيل فحص location أو حقول أخرى
       ).session(session);
 
@@ -904,8 +902,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         await User.updateOne(
           { _id: order.customer.id },
           { $pull: { orders: order._id } },
-          { $set: { fcmToken } }, // الحقول المراد تعديلها
-          { runValidators: false } // تعطيل فحص location أو حقول أخرى
+            { runValidators: false } // تعطيل فحص location أو حقول أخرى
         ).session(session);
       } else if (["accepted", "waiting"].includes(order.status)) {
         // فقط إرجاعه إلى المتجر
