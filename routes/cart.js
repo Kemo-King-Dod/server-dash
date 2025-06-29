@@ -243,7 +243,7 @@ router.patch("/deleteitemfromcart", auth, async (req, res) => {
     }
 
     const cartItemIndex = user.cart.findIndex(
-      (item) => item.id.toString() === id
+      (item) => item.id === id
     );
 
     if (cartItemIndex === -1) {
