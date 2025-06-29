@@ -186,13 +186,19 @@ router.get("/getDriversWithoutWithdrawalForDay", auth, async (req, res) => {
       ],
       // التأكد من أن لديهم رصيد للسحب
       funds: { $gt: 0 }
-    }).select('-password'); // استبعاد كلمة المرور من النتائج للأمان
+    }).select('-password').lean(); // Using lean() for better performance
     
+    // Format response to include cursor field
     res.status(200).json({
       error: false,
       message: "تم جلب السائقين بنجاح",
       count: drivers.length,
-      data: drivers
+      data: drivers,
+      cursor: {
+        firstBatch: drivers,
+        id: 0,
+        ns: 'drivers'
+      }
     });
   } catch (err) {
     console.log(err);
@@ -202,5 +208,4 @@ router.get("/getDriversWithoutWithdrawalForDay", auth, async (req, res) => {
     });
   }
 });
-
 module.exports = router;
