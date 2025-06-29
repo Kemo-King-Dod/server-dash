@@ -5,62 +5,44 @@ const Store = require("../database/store");
 const Admin = require("../database/admin");
 
 const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
-
 const auth = async (req, res, next) => {
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+    const raw = req.header("Authorization") || "";
+    const token = raw.replace(/^Bearer\s+/i, "");
+
     if (!token) {
-      return res.status(401).json({
-        error: true,
-        message: "يرجى تسجيل الدخول",
-      });
+      return res.status(401).json({ error: true, message: "يرجى تسجيل الدخول" });
     }
 
-    const decoded = await jwt.verify(token, JWT_SECRET);
+    const { id } = jwt.verify(token, JWT_SECRET);
 
-    // Try to find user in each collection and handle potential errors
-    let exist;
-    try {
-      exist = await User.findOne({ _id: decoded.id });
-      if (!exist) exist = await Driver.findOne({ _id: decoded.id });
-      if (!exist) exist = await Store.findOne({ _id: decoded.id });
-      if (!exist) exist = await Admin.findOne({ _id: decoded.id });
-    } catch (findError) {
-      console.error('Error finding user:', findError);
-      return res.status(401).json({
-        error: true,
-        message: "خطأ في العثور على المستخدم",
-      });
+    // دالة مساعد لجلب المستخدم من أي مجموعة
+    const findById = (model) => model.findById(id).lean ? model.findById(id) : null;
+
+    let user =
+      (await findById(User))   ||
+      (await findById(Driver)) ||
+      (await findById(Store))  ||
+      (await findById(Admin));
+
+    if (!user) {
+      return res.status(401).json({ error: true, message: "المستخدم غير موجود" });
     }
 
-    // Check if user exists in any collection
-    if (!exist) {
-      return res.status(401).json({
-        error: true,
-        message: "المستخدم غير موجود",
-      });
+    const fcmToken = req.headers["fcm_token"] || req.headers["fcm-token"];
+    if (fcmToken) {
+      user.fcmToken = fcmToken;
+      await user.save();            // لن يُنفّذ إلا إذا كانت الوثيقة موجودة فعلًا
     }
 
-    // Update FCM token safely
-    try {
-      exist.fcmToken = req.headers["fcm_token"];
-      await exist.save();
-    } catch (saveError) {
-      console.error('Error saving FCM token:', saveError);
-      // Continue execution even if FCM token update fails
-    }
-
-    req.userId = decoded.id;
-    req.user = exist;
+    req.userId = id;
+    req.user   = user;
     next();
-    
-  } catch (error) {
-    console.error('JWT verification error:', error);
-    res.status(401).json({
-      error: true,
-      message: "يرجى الدخول",
-    });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ error: true, message: "فشل التحقق من الهوية" });
   }
 };
+
 
 module.exports = { auth };
