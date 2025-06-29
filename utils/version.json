@@ -1,10 +1,10 @@
 {
-  "version": "1.0.13",
+  "version": "1.0.14",
   "build": "1",
-  "date": "2025-6-13",
+  "date": "2025-6-29",
   "author": "Kemo king",
   "description": "This is a description of the version",
   "url": "https://play.google.com/store/apps/details?id=com.fasto.ly",
   "image": "newUpdateNoBg.png",
-  "versions": ["1.0.11","1.0.12","1.0.13"]
+  "versions": ["1.0.11","1.0.12","1.0.13","1.0.14"]
 }
