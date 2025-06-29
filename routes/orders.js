@@ -631,96 +631,79 @@ router.post("/examineCode", auth, async (req, res) => {
       error: err.message,
     });
   }
-});
-router.post("/confirmOrder", auth, async (req, res) => {
+});router.post('/confirmOrder', auth, async (req, res) => {
   const { orderId } = req.body;
   if (!mongoose.Types.ObjectId.isValid(orderId))
-    return res.status(400).json({ error: true, message: "معرّف غير صالح" });
+    return res.status(400).json({ error: true, message: 'معرّف غير صالح' });
 
-  const session = await mongoose.startSession();
   try {
-    let order, driver, user;
+    /* جلب المستندات */
+    const order = await Order.findById(orderId);
+    if (!order) throw new Error('الطلب غير موجود');
 
-    await session.withTransaction(async () => {
-      /* 1) جلب الطلب والسائق والعميل */
-      order = await Order.findById(orderId).session(session);
-      if (!order) throw new Error("الطلب غير موجود");
+    if (String(order.driver.id) !== String(req.user._id))
+      throw new Error('صلاحيات غير كافية');
 
-      driver = await Driver.findById(order.driver.id).session(session);
-      if (!driver) throw new Error("السائق غير موجود");
+    const driver = await Driver.findById(order.driver.id);
+    const user   = await User.findById(order.customer.id);
+    if (!driver || !user) throw new Error('السائق أو المستخدم غير موجود');
 
-      user = await User.findById(order.customer.id).session(session);
-      if (!user) throw new Error("المستخدم غير موجود");
+    /* تحديثات مستقلة */
+    const incObj = {
+      funds: order.companyFee + (order.handcheck ? order.totalPrice : 0),
+      balance: order.distenationPrice - order.companyFee,
+    };
 
-      // تأكد أن السائق نفسه هو من يؤكد الطلب
-      if (!order.driver.id == req.user._id)
-        throw new Error("صلاحيات غير كافية");
+    await Driver.updateOne(
+      { _id: driver._id },
+      { $inc: incObj },
+      { runValidators: false }
+    );
 
-      /* 2) تحديث رصيد السائق */
-      const incObj = {
-        funds: order.companyFee,
-        balance: order.distenationPrice - order.companyFee,
-      };
-      if (order.handcheck) incObj.funds += order.totalPrice;
-
-      await Driver.updateOne(
-        { _id: driver._id },
-        { $inc: incObj },
-        { session, runValidators: false }
-      );
-
-      /* 3) إنشاء سجل التأكيد */
-      await OrderRecord.create(
-        [
-          {
-            ...order.toObject(),
-            status: "confirmed",
-            type: "confirmed",
-            canceledBy: null,
-            confirmedAt: new Date(),
-          },
-        ],
-        { session }
-      );
-
-      /* 4) حذف الطلب وتحديث قائمة الطلبات عند المستخدم */
-      await Promise.all([
-        Order.deleteOne({ _id: orderId }).session(session),
-        User.updateOne(
-          { _id: user._id },
-          { $pull: { orders: order._id } }
-        ).session(session),
-      ]);
+    await OrderRecord.create({
+      ...order.toObject(),
+      status: 'confirmed',
+      type: 'confirmed',
+      canceledBy: null,
+      confirmedAt: new Date(),
     });
 
-    /* --- إشعارات خارج الـ transaction --- */
+    await Promise.all([
+      Order.deleteOne({ _id: orderId }),
+      User.updateOne(
+        { _id: user._id },
+        { $pull: { orders: order._id } },
+        { runValidators: false }
+      ),
+    ]);
+
+    /* إشعارات */
     await Promise.all([
       sendNotification({
         token: user.fcmToken,
         title: `تم تسليم طلبك رقم ${order.orderId}`,
-        body: "نتمنى أن الخدمة قد نالت رضاكم 🙏",
+        body: 'نتمنى أن الخدمة قد نالت رضاكم 🙏',
       }),
       notification.create({
         id: user._id,
-        userType: "user",
+        userType: 'user',
         title: `تم تسليم طلبك رقم ${order.orderId}`,
-        body: "نتمنى أن الخدمة قد نالت رضاكم 🙏",
-        type: "success",
+        body: 'نتمنى أن الخدمة قد نالت رضاكم 🙏',
+        type: 'success',
       }),
     ]);
 
     res.json({
       error: false,
-      message: "تم تأكيد الطلب بنجاح",
+      message: 'تم تأكيد الطلب بنجاح',
       data: { orderId: order.orderId },
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: true, message: err.message });
-  } finally {
-    session.endSession();
   }
 });
+
 
 router.post("/cancelOrderUser", auth, async (req, res) => {
   try {
