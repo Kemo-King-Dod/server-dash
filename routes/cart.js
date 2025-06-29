@@ -261,6 +261,7 @@ router.patch("/deleteitemfromcart", auth, async (req, res) => {
       message: "تم حذف المنتج من السلة بنجاح",
     });
   } catch (error) {
+    console.log(error)
     res.status(500).json({
       error: true,
       message: "حدث خطأ أثناء حذف المنتج من السلة",
