@@ -593,41 +593,30 @@ router.post("/examineCode", auth, async (req, res) => {
         message: "معلومات المتجر أو السائق غير مكتملة",
       });
     }
-
-    // بدء معاملة قاعدة البيانات
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
-      // تحديث حالة الطلب
+      // Update order status
       order.status = "onWay";
       order.type = "onWay";
-      await order.save({ session });
+      await order.save();
 
-      // تحديث رصيد المتجر
-      const store = await Store.findById(order.store.id).session(session);
+      // Update store balance
+      const store = await Store.findById(order.store.id);
       if (!store) {
         throw new Error("المتجر غير موجود");
       }
 
-      // إضافة المبلغ إلى رصيد المتجر
+      // Add amount to store funds
       store.funds = store.funds || 0;
       store.funds += order.totalPrice;
-      await store.save({ session });
+      await store.save();
 
-      // تحديث رصيد السائق
-      const driver = await Driver.findById(order.driver.id).session(session);
+      // Update driver record
+      const driver = await Driver.findById(order.driver.id);
       if (!driver) {
         throw new Error("السائق غير موجود");
       }
 
-      // إنشاء سجل معاملة جديد
-
-      // تأكيد المعاملة
-      await session.commitTransaction();
-      session.endSession();
-
-      // إرسال استجابة نجاح
+      // Send success response
       return res.status(200).json({
         error: false,
         message: "تمت العملية بنجاح",
@@ -636,11 +625,14 @@ router.post("/examineCode", auth, async (req, res) => {
           status: order.status,
         },
       });
-    } catch (error) {
-      // إلغاء المعاملة في حالة حدوث خطأ
-      await session.abortTransaction();
-      session.endSession();
-      throw error;
+
+    } catch (err) {
+      console.error(`خطأ في فحص كود الطلب: ${err.message}`);
+      return res.status(500).json({
+        error: false,
+        message: "حدث خطأ أثناء معالجة الطلب", 
+        error: err.message,
+      });
     }
   } catch (err) {
     console.error(`خطأ في فحص كود الطلب: ${err.message}`);
@@ -723,220 +715,195 @@ router.post("/examineCode", auth, async (req, res) => {
   }
 });
 
-
 router.post("/cancelOrderUser", auth, async (req, res) => {
   try {
     const { orderId } = req.body;
-    let orderObj = await Order.findById(orderId);
-
-    if (!mongoose.Types.ObjectId.isValid(orderId))
+    
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
       return res.status(400).json({ error: true, message: "معرّف غير صالح" });
-
-    const session = await mongoose.startSession();
-    try {
-      await session.withTransaction(async () => {
-        /* 1) جلب المستندات - بالتتالي */
-        const user = await User.findById(req.userId).session(session);
-        const order = await Order.findById(orderId).session(session);
-        // const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5").session(session);
-
-        if (!order) throw new Error("الطلب غير موجود");
-        if (!order.customer.id.equals(req.userId))
-          throw new Error("صلاحيات غير كافية");
-        if (!["waiting"].includes(order.status))
-          throw new Error("لا يمكن إلغاء هذا الطلب حاليًا");
-
-        /* 2) إنشاء سجل الإلغاء */
-        await OrderRecord.create(
-          [
-            {
-              ...order.toObject(),
-              status: "canceled",
-              type: "canceled",
-              canceledBy: "user",
-              canceledAt: new Date(),
-            },
-          ],
-          { session }
-        );
-
-        /* 3) حذف الطلب */
-        await Order.deleteOne({ _id: orderId }).session(session);
-
-        /* 4) تحديث المستخدم */
-        await User.updateOne(
-          { _id: req.userId },
-          {
-            $inc: { cancelOrderLimit: 1 },
-            $pull: { orders: order._id },
-            ...(user.cancelOrderLimit + 1 >= 5 && { status: "blocked" }),
-          },
-          { runValidators: false } // تعطيل فحص location أو حقول أخرى
-        ).session(session);
-      });
-
-      const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5");
-      const store = await Store.findById(orderObj.store.id);
-
-      const driver = orderObj.driver
-        ? await Driver.findById(orderObj.driver.id)
-        : null;
-      // إشعارات بعد نجاح المعاملة
-      await Promise.all([
-        sendNotification({
-          token: admin.fcmToken,
-          title: "تم الغاء الطلب رقم" + orderObj.orderId,
-          body: ` قام زبون ما بالغاء طلبية من متجر ${orderObj.store.name}`,
-        }),
-        sendNotificationToTopic({
-          topic: "admins_" + req.headers.cityen,
-          title: "تم الغاء الطلب رقم" + orderObj.orderId,
-          body: ` قام زبون ما بالغاء طلبية من متجر ${orderObj.store.name}`,
-        }),
-        sendNotification({
-          /* إلى المتجر */ token: store.fcmToken,
-          title: "تم الغاء الطلب رقم" + orderObj.orderId,
-          body: "",
-        }),
-        orderObj.driver &&
-          sendNotification({
-            /* إلى السائق */ token: driver.fcmToken,
-            title: "تم الغاء الطلب رقم" + orderObj.orderId,
-            body: "",
-          }),
-      ]);
-
-      const user = await User.findById(req.user._id); // جلب السقف بعد التحديث
-      res.json({
-        error: false,
-        data: {
-          message: "تم إلغاء الطلب بنجاح",
-          remainingCancels: Math.max(0, 5 - user.cancelOrderLimit),
-        },
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: true, message: err.message });
-    } finally {
-      session.endSession();
     }
-  } catch (error) {
-    console.log("2", error);
-  }
-});
 
-router.post("/cancelOrderStore", auth, async (req, res) => {
-  const { orderId, reason = "", unavailableProducts = [] } = req.body;
-  let orderObj = await Order.findById(orderId);
+    /* 1) Get documents */
+    const orderObj = await Order.findById(orderId);
+    const user = await User.findById(req.userId);
+    const order = await Order.findById(orderId);
 
-  if (!mongoose.Types.ObjectId.isValid(orderId))
-    return res.status(400).json({ error: true, message: "معرّف غير صالح" });
+    if (!order) throw new Error("الطلب غير موجود");
+    if (!order.customer.id.equals(req.userId))
+      throw new Error("صلاحيات غير كافية");
+    if (!["waiting"].includes(order.status))
+      throw new Error("لا يمكن إلغاء هذا الطلب حاليًا");
 
-  const session = await mongoose.startSession();
-  try {
-    await session.withTransaction(async () => {
-      const order = await Order.findById(orderId).session(session);
-      if (!order) throw new Error("الطلب غير موجود");
-
-      // التحقق من ملكية المتجر
-      if (order.store.id !== req.user._id && req.user.userType != "Admin")
-        throw new Error("صلاحيات غير كافية");
-
-      await OrderRecord.create(
-        [
-          {
-            ...order.toObject(),
-            status: "canceled",
-            canceledAt: new Date(),
-            canceledBy: "store",
-          },
-        ],
-        { session }
-      );
-      await Order.deleteOne({ _id: orderId }).session(session);
-      await User.updateOne(
-        { _id: order.customer.id },
-        { $pull: { orders: order._id } },
-        { runValidators: false } // تعطيل فحص location أو حقول أخرى
-      ).session(session);
-
-      // إشعارات
-      await notifyStakeholders({ order, reason, unavailableProducts });
+    /* 2) Create cancellation record */
+    await OrderRecord.create({
+      ...order.toObject(),
+      status: "canceled",
+      type: "canceled", 
+      canceledBy: "user",
+      canceledAt: new Date()
     });
 
-    res.json({ error: false, message: "تم إلغاء الطلب بنجاح" });
+    /* 3) Delete order */
+    await Order.deleteOne({ _id: orderId });
+
+    /* 4) Update user */
+    await User.updateOne(
+      { _id: req.userId },
+      {
+        $inc: { cancelOrderLimit: 1 },
+        $pull: { orders: order._id },
+        ...(user.cancelOrderLimit + 1 >= 5 && { status: "blocked" })
+      },
+      { runValidators: false }
+    );
+
+    /* 5) Send notifications */
+    const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5");
+    const store = await Store.findById(orderObj.store.id);
+    const driver = orderObj.driver ? await Driver.findById(orderObj.driver.id) : null;
+
+    await Promise.all([
+      sendNotification({
+        token: admin.fcmToken,
+        title: "تم الغاء الطلب رقم" + orderObj.orderId,
+        body: ` قام زبون ما بالغاء طلبية من متجر ${orderObj.store.name}`
+      }),
+      sendNotificationToTopic({
+        topic: "admins_" + req.headers.cityen,
+        title: "تم الغاء الطلب رقم" + orderObj.orderId,
+        body: ` قام زبون ما بالغاء طلبية من متجر ${orderObj.store.name}`
+      }),
+      sendNotification({
+        token: store.fcmToken,
+        title: "تم الغاء الطلب رقم" + orderObj.orderId,
+        body: ""
+      }),
+      orderObj.driver && sendNotification({
+        token: driver.fcmToken,
+        title: "تم الغاء الطلب رقم" + orderObj.orderId,
+        body: ""
+      })
+    ]);
+
+    const updatedUser = await User.findById(req.user._id);
+    res.json({
+      error: false,
+      data: {
+        message: "تم إلغاء الطلب بنجاح",
+        remainingCancels: Math.max(0, 5 - updatedUser.cancelOrderLimit)
+      }
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: true, message: err.message });
-  } finally {
-    session.endSession();
+  }
+});
+router.post("/cancelOrderStore", auth, async (req, res) => {
+  const { orderId, reason = "", unavailableProducts = [] } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(orderId)) {
+    return res.status(400).json({ error: true, message: "معرّف غير صالح" });
+  }
+
+  try {
+    const order = await Order.findById(orderId);
+    if (!order) throw new Error("الطلب غير موجود");
+
+    // التحقق من ملكية المتجر
+    if (order.store.id !== req.user._id && req.user.userType != "Admin") {
+      throw new Error("صلاحيات غير كافية");
+    }
+
+    // Create order record
+    await OrderRecord.create({
+      ...order.toObject(),
+      status: "canceled",
+      canceledAt: new Date(),
+      canceledBy: "store",
+    });
+
+    // Delete order and update user
+    await Promise.all([
+      Order.deleteOne({ _id: orderId }),
+      User.updateOne(
+        { _id: order.customer.id },
+        { $pull: { orders: order._id } },
+        { runValidators: false }
+      )
+    ]);
+
+    // Send notifications
+    await notifyStakeholders({ order, reason, unavailableProducts });
+
+    res.json({ error: false, message: "تم إلغاء الطلب بنجاح" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: true, message: err.message });
   }
 });
 router.post("/cancelOrderDriver", auth, async (req, res) => {
   const { orderId } = req.body;
   if (!mongoose.Types.ObjectId.isValid(orderId))
     return res.status(400).json({ error: true, message: "معرّف غير صالح" });
-  let orderObj = await Order.findById(orderId);
-
-  const session = await mongoose.startSession();
+  
   try {
-    await session.withTransaction(async () => {
-      const driverId = req.user._id;
+    const driverId = req.user._id;
 
-      /* 1) جلب المستندات */
-      const driver = await Driver.findById(driverId).session(session);
-      const order = await Order.findById(orderId).session(session);
-      if (!order) throw new Error("الطلب غير موجود");
-      if (order.driver.id != driverId) throw new Error("صلاحيات غير كافية");
+    /* 1) جلب المستندات */
+    const driver = await Driver.findById(driverId);
+    const order = await Order.findById(orderId);
+    if (!order) throw new Error("الطلب غير موجود");
+    if (order.driver.id != driverId) throw new Error("صلاحيات غير كافية");
 
-      /* 2) منطق الإلغاء أو الإرجاع */
-      if (order.status === "onWay") {
-        // سجل الإلغاء
-        await OrderRecord.create(
-          [
-            {
-              ...order.toObject(),
-              status: "canceled",
-              type: "canceled",
-              canceledBy: "driver",
-              canceledAt: new Date(),
-            },
-          ],
-          { session }
-        );
+    let orderObj = order;
 
-        // حذف الطلب
-        await Order.deleteOne({ _id: orderId }).session(session);
+    /* 2) منطق الإلغاء أو الإرجاع */
+    if (order.status === "onWay") {
+      // سجل الإلغاء
+      await OrderRecord.create({
+        ...order.toObject(),
+        status: "canceled",
+        type: "canceled", 
+        canceledBy: "driver",
+        canceledAt: new Date(),
+      });
 
-        // حد الإلغاء للسائق
-        await Driver.updateOne(
-          { _id: driverId },
-          {
-            $inc: { cancelOrderLimit: 1 },
-            ...(driver.cancelOrderLimit + 1 >= 5 && { status: "blocked" }),
-          }
-        ).session(session);
+      // حذف الطلب
+      await Order.deleteOne({ _id: orderId });
 
-        // إزالة الطلب من قائمة المستخدم
-        await User.updateOne(
-          { _id: order.customer.id },
-          { $pull: { orders: order._id } },
-            { runValidators: false } // تعطيل فحص location أو حقول أخرى
-        ).session(session);
-      } else if (["accepted", "waiting"].includes(order.status)) {
-        // فقط إرجاعه إلى المتجر
-        order.set({ status: "ready", type: "ready", driver: null });
-        await order.save({ session });
-      } else {
-        throw new Error("لا يمكن إلغاء هذا الطلب حاليًا");
-      }
-    });
+      // حد الإلغاء للسائق
+      await Driver.updateOne(
+        { _id: driverId },
+        {
+          $inc: { cancelOrderLimit: 1 },
+          ...(driver.cancelOrderLimit + 1 >= 5 && { status: "blocked" }),
+        }
+      );
+
+      // إزالة الطلب من قائمة المستخدم
+      await User.updateOne(
+        { _id: order.customer.id },
+        { $pull: { orders: order._id } },
+        { runValidators: false }
+      );
+
+    } else if (["accepted", "waiting"].includes(order.status)) {
+      // فقط إرجاعه إلى المتجر
+      order.status = "ready";
+      order.type = "ready";
+      order.driver = null;
+      await order.save();
+    } else {
+      throw new Error("لا يمكن إلغاء هذا الطلب حاليًا");
+    }
 
     /* --- إشعارات بعد نجاح المعاملة --- */
-    const [admin, user, store, driver] = await Promise.all([
+    const [admin, user, store, driverto] = await Promise.all([
       Admin.findOne({ phone: "0910808060" }),
       User.findById(orderObj.customer.id),
-      Store.findById(orderObj.store.id || undefined), // أو order.store
+      Store.findById(orderObj.store.id || undefined),
       Driver.findById(req.user._id),
     ]);
 
@@ -957,7 +924,7 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         body: "السائق ألغى الطلب، الطلب متاح لسائق آخر.",
       }),
       sendNotification({
-        token: driver.fcmToken,
+        token: driverto.fcmToken,
         title: `تم إلغاء الطلبية`,
         body: `لقد ألغيت الطلبية رقم ${orderObj.orderId}`,
       }),
@@ -983,8 +950,6 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: true, message: err.message });
-  } finally {
-    session.endSession();
   }
 });
 
