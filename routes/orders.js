@@ -629,7 +629,6 @@ router.post("/examineCode", auth, async (req, res) => {
         data: {
           orderId: order.orderId,
           status: order.status,
-          transactionId: transaction._id,
         },
       });
     } catch (error) {
