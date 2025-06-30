@@ -89,7 +89,7 @@ router.post("/addOrder", auth, async (req, res) => {
       });
       console.log("count: %d", activeOrderCount);
 
-      if (activeOrderCount >= 3) {
+      if (activeOrderCount >= 3 && !admins.includes(req.userId)) {
         return res.status(500).json({
           error: true,
           message:
