@@ -559,7 +559,7 @@ router.post("/examineCode", auth, async (req, res) => {
     const { orderId } = req.body;
     if (!orderId) {
       return res.status(400).json({
-        success: false,
+        error: true,
         message: "يجب توفير معرف الطلب",
       });
     }
@@ -568,7 +568,7 @@ router.post("/examineCode", auth, async (req, res) => {
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({
-        success: false,
+        error: true,
         message: "الطلب غير موجود",
       });
     }
@@ -576,15 +576,16 @@ router.post("/examineCode", auth, async (req, res) => {
     // التحقق من حالة الطلب الحالية لتجنب التحديثات المتكررة
     if (order.status === "onWay") {
       return res.status(400).json({
-        success: false,
+        error: true,
         message: "تم تحديث حالة الطلب مسبقًا",
       });
     }
 
     // التحقق من وجود معلومات المتجر والسائق
     if (!order.store || !order.store.id || !order.driver || !order.driver.id) {
+      console.log(order)
       return res.status(400).json({
-        success: false,
+        error: true,
         message: "معلومات المتجر أو السائق غير مكتملة",
       });
     }
@@ -624,7 +625,7 @@ router.post("/examineCode", auth, async (req, res) => {
 
       // إرسال استجابة نجاح
       return res.status(200).json({
-        success: true,
+        error: true,
         message: "تمت العملية بنجاح",
         data: {
           orderId: order.orderId,
@@ -640,7 +641,7 @@ router.post("/examineCode", auth, async (req, res) => {
   } catch (err) {
     console.error(`خطأ في فحص كود الطلب: ${err.message}`);
     return res.status(500).json({
-      success: false,
+      error: false,
       message: "حدث خطأ أثناء معالجة الطلب",
       error: err.message,
     });
