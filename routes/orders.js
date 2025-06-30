@@ -554,6 +554,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
  */
 router.post("/examineCode", auth, async (req, res) => {
   try {
+    console.log(req.body);
     // التحقق من وجود معرف الطلب
     const { orderId } = req.body;
     if (!orderId) {
