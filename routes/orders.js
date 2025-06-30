@@ -558,6 +558,8 @@ router.post("/examineCode", auth, async (req, res) => {
     // التحقق من وجود معرف الطلب
     const { orderId } = req.body;
     if (!orderId) {
+      console.log("not id");
+      
       return res.status(400).json({
         error: true,
         message: "يجب توفير معرف الطلب",
@@ -567,6 +569,7 @@ router.post("/examineCode", auth, async (req, res) => {
     // البحث عن الطلب في قاعدة البيانات
     const order = await Order.findById(orderId);
     if (!order) {
+      console.log("not order");
       return res.status(404).json({
         error: true,
         message: "الطلب غير موجود",
@@ -575,6 +578,7 @@ router.post("/examineCode", auth, async (req, res) => {
 
     // التحقق من حالة الطلب الحالية لتجنب التحديثات المتكررة
     if (order.status === "onWay") {
+      console.log("not on way")
       return res.status(400).json({
         error: true,
         message: "تم تحديث حالة الطلب مسبقًا",
