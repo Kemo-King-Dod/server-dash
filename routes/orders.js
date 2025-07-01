@@ -114,6 +114,7 @@ router.post("/addOrder", auth, async (req, res) => {
     for (var i = 0; i < user.cart.length; i++) {
       if (user.cart[i].cartItem.storeID == StoreId) {
         const item = await Item.findById(user.cart[i].cartItem.id);
+        if(item.price != user.cart[i].cartItem.price)
         itemsdata.push({
           id: item._id,
           name: item.name,
@@ -808,6 +809,9 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
 
     // التحقق من ملكية المتجر
     if (order.store.id !== req.userId && req.user.userType != "Admin") {
+      console.log(order.store)
+      console.log(order.store)
+
       throw new Error("صلاحيات غير كافية");
     }
 
