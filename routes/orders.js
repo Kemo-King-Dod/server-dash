@@ -33,11 +33,6 @@ const admins = [
   "67f22942f90165d57806ecd3",
   "686168b148ad8925d7252302",
   "686168d048ad8925d7252303",
-
-
-
-
-
 ];
 
 // ***********************
@@ -114,7 +109,7 @@ router.post("/addOrder", auth, async (req, res) => {
     for (var i = 0; i < user.cart.length; i++) {
       if (user.cart[i].cartItem.storeID == StoreId) {
         const item = await Item.findById(user.cart[i].cartItem.id);
-        if(item.price != user.cart[i].cartItem.price){
+        if (item.price != user.cart[i].cartItem.price) {
           return res.status(500).json({
             error: true,
             message: "لقد تم تغيير سعر المنتج من قبل المتجر",
@@ -127,7 +122,7 @@ router.post("/addOrder", auth, async (req, res) => {
           options: user.cart[i].cartItem.options,
           addOns: user.cart[i].cartItem.addOns,
           quantity: 1, // update later
-          price:item.price,
+          price: item.price,
         });
         totalprice += user.cart[i].cartItem.price;
       }
@@ -172,11 +167,11 @@ router.post("/addOrder", auth, async (req, res) => {
         storeType: store.storeType,
         location: store.location,
         address: store.address,
-        isModfiy:store.isModfiy,
-        modfingPrice:store.modfingPrice
+        isModfiy: store.isModfiy,
+        modfingPrice: store.modfingPrice,
       },
       driver: null,
-      companyFee:store.isModfiy?0: store.companyFee,
+      companyFee: store.isModfiy ? 0 : store.companyFee,
       date: new Date(),
       items: itemsdata,
       totalPrice: totalprice,
@@ -263,7 +258,6 @@ router.post("/addOrder", auth, async (req, res) => {
       message: "Order added successfully",
       data: theorderId,
     });
-
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -500,7 +494,11 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
     } else {
     }
 
-    if (req.user.userType !== "admin" && acceptedordersCount >= 3 && !admins.includes(req.userId)) {
+    if (
+      req.user.userType !== "admin" &&
+      acceptedordersCount >= 3 &&
+      !admins.includes(req.userId)
+    ) {
       return res.status(200).json({
         error: true,
         message: "لقد وصلت الى الحد الاقصى للطلبات",
@@ -580,7 +578,7 @@ router.post("/examineCode", auth, async (req, res) => {
 
     // التحقق من حالة الطلب الحالية لتجنب التحديثات المتكررة
     if (order.status === "onWay") {
-      console.log("not on way")
+      console.log("not on way");
       return res.status(400).json({
         error: true,
         message: "تم تحديث حالة الطلب مسبقًا",
@@ -589,7 +587,7 @@ router.post("/examineCode", auth, async (req, res) => {
 
     // التحقق من وجود معلومات المتجر والسائق
     if (!order.store || !order.store.id || !order.driver || !order.driver.id) {
-      console.log(order)
+      console.log(order);
       return res.status(400).json({
         error: true,
         message: "معلومات المتجر أو السائق غير مكتملة",
@@ -627,7 +625,6 @@ router.post("/examineCode", auth, async (req, res) => {
           status: order.status,
         },
       });
-
     } catch (err) {
       console.error(`خطأ في فحص كود الطلب: ${err.message}`);
       return res.status(500).json({
@@ -644,22 +641,23 @@ router.post("/examineCode", auth, async (req, res) => {
       error: err.message,
     });
   }
-}); router.post('/confirmOrder', auth, async (req, res) => {
+});
+router.post("/confirmOrder", auth, async (req, res) => {
   const { orderId } = req.body;
   if (!mongoose.Types.ObjectId.isValid(orderId))
-    return res.status(400).json({ error: true, message: 'معرّف غير صالح' });
+    return res.status(400).json({ error: true, message: "معرّف غير صالح" });
 
   try {
     /* جلب المستندات */
     const order = await Order.findById(orderId);
-    if (!order) throw new Error('الطلب غير موجود');
+    if (!order) throw new Error("الطلب غير موجود");
 
     if (String(order.driver.id) !== String(req.user._id))
-      throw new Error('صلاحيات غير كافية');
+      throw new Error("صلاحيات غير كافية");
 
     const driver = await Driver.findById(order.driver.id);
     const user = await User.findById(order.customer.id);
-    if (!driver || !user) throw new Error('السائق أو المستخدم غير موجود');
+    if (!driver || !user) throw new Error("السائق أو المستخدم غير موجود");
 
     /* تحديثات مستقلة */
     const incObj = {
@@ -675,8 +673,8 @@ router.post("/examineCode", auth, async (req, res) => {
 
     await OrderRecord.create({
       ...order.toObject(),
-      status: 'confirmed',
-      type: 'confirmed',
+      status: "confirmed",
+      type: "confirmed",
       canceledBy: null,
       confirmedAt: new Date(),
     });
@@ -695,20 +693,20 @@ router.post("/examineCode", auth, async (req, res) => {
       sendNotification({
         token: user.fcmToken,
         title: `تم تسليم طلبك رقم ${order.orderId}`,
-        body: 'نتمنى أن الخدمة قد نالت رضاكم 🙏',
+        body: "نتمنى أن الخدمة قد نالت رضاكم 🙏",
       }),
       notification.create({
         id: user._id,
-        userType: 'user',
+        userType: "user",
         title: `تم تسليم طلبك رقم ${order.orderId}`,
-        body: 'نتمنى أن الخدمة قد نالت رضاكم 🙏',
-        type: 'success',
+        body: "نتمنى أن الخدمة قد نالت رضاكم 🙏",
+        type: "success",
       }),
     ]);
 
     res.json({
       error: false,
-      message: 'تم تأكيد الطلب بنجاح',
+      message: "تم تأكيد الطلب بنجاح",
       data: { orderId: order.orderId },
     });
   } catch (err) {
@@ -742,7 +740,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
       status: "canceled",
       type: "canceled",
       canceledBy: "user",
-      canceledAt: new Date()
+      canceledAt: new Date(),
     });
 
     /* 3) Delete order */
@@ -754,7 +752,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
       {
         $inc: { cancelOrderLimit: 1 },
         $pull: { orders: order._id },
-        ...(user.cancelOrderLimit + 1 >= 5 && { status: "blocked" })
+        ...(user.cancelOrderLimit + 1 >= 5 && { status: "blocked" }),
       },
       { runValidators: false }
     );
@@ -762,29 +760,32 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
     /* 5) Send notifications */
     const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5");
     const store = await Store.findById(orderObj.store.id);
-    const driver = orderObj.driver ? await Driver.findById(orderObj.driver.id) : null;
+    const driver = orderObj.driver
+      ? await Driver.findById(orderObj.driver.id)
+      : null;
 
     await Promise.all([
       sendNotification({
         token: admin.fcmToken,
         title: "تم الغاء الطلب رقم" + orderObj.orderId,
-        body: ` قام زبون ما بالغاء طلبية من متجر ${orderObj.store.name}`
+        body: ` قام زبون ما بالغاء طلبية من متجر ${orderObj.store.name}`,
       }),
       sendNotificationToTopic({
         topic: "admins_" + req.headers.cityen,
         title: "تم الغاء الطلب رقم" + orderObj.orderId,
-        body: ` قام زبون ما بالغاء طلبية من متجر ${orderObj.store.name}`
+        body: ` قام زبون ما بالغاء طلبية من متجر ${orderObj.store.name}`,
       }),
       sendNotification({
         token: store.fcmToken,
         title: "تم الغاء الطلب رقم" + orderObj.orderId,
-        body: ""
+        body: "",
       }),
-      orderObj.driver && sendNotification({
-        token: driver.fcmToken,
-        title: "تم الغاء الطلب رقم" + orderObj.orderId,
-        body: ""
-      })
+      orderObj.driver &&
+        sendNotification({
+          token: driver.fcmToken,
+          title: "تم الغاء الطلب رقم" + orderObj.orderId,
+          body: "",
+        }),
     ]);
 
     const updatedUser = await User.findById(req.user._id);
@@ -792,10 +793,9 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
       error: false,
       data: {
         message: "تم إلغاء الطلب بنجاح",
-        remainingCancels: Math.max(0, 5 - updatedUser.cancelOrderLimit)
-      }
+        remainingCancels: Math.max(0, 5 - updatedUser.cancelOrderLimit),
+      },
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: true, message: err.message });
@@ -813,9 +813,11 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
     if (!order) throw new Error("الطلب غير موجود");
 
     // التحقق من ملكية المتجر
-    if (order.store.id !== req.userId && req.user.userType != "Admin") {
-      console.log(order.store)
-      console.log(order.store)
+    if (
+      order.store.id.toString() !== req.userId &&
+      req.user.userType != "Admin"
+    ) {
+    
 
       throw new Error("صلاحيات غير كافية");
     }
@@ -835,14 +837,13 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
         { _id: order.customer.id },
         { $pull: { orders: order._id } },
         { runValidators: false }
-      )
+      ),
     ]);
 
     // Send notifications
     await notifyStakeholders({ order, reason, unavailableProducts });
 
     res.json({ error: false, message: "تم إلغاء الطلب بنجاح" });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: true, message: err.message });
@@ -893,7 +894,6 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
         { $pull: { orders: order._id } },
         { runValidators: false }
       );
-
     } else if (["accepted", "waiting"].includes(order.status)) {
       // فقط إرجاعه إلى المتجر
       order.status = "ready";
