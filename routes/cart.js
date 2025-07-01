@@ -68,6 +68,8 @@ router.get("/getfromcart", auth, async (req, res) => {
           deliveryFee: store.deliveryCostByKilo ,
           companyFee:store.companyFee,
           location: store.location,
+          isModfiy:store.isModfiy,
+          modfingPrice:store.modfingPrice,
           items: [
             {
               id: item._id,
@@ -107,6 +109,8 @@ router.get("/getfromcart", auth, async (req, res) => {
             deliveryFee: store.deliveryCostByKilo ,
             companyFee:store.companyFee,
           location: store.location,
+          isModfiy:store.isModfiy,
+          modfingPrice:store.modfingPrice,
 
             items: [
               {
