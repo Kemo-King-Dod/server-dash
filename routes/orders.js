@@ -807,7 +807,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
     if (!order) throw new Error("الطلب غير موجود");
 
     // التحقق من ملكية المتجر
-    if (order.store.id !== req.user._id && req.user.userType != "Admin") {
+    if (order.store.id !== req.userId && req.user.userType != "Admin") {
       throw new Error("صلاحيات غير كافية");
     }
 
