@@ -143,6 +143,7 @@ router.post("/addtocart", auth, async (req, res) => {
   try {
     const { cartItem } = req.body;
     const userId = req.userId;
+    const storeID = cartItem.storeID;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -150,6 +151,14 @@ router.post("/addtocart", auth, async (req, res) => {
         error: true,
         operation: "null",
         data: "المستخدم غير موجود",
+      });
+    }
+    const store = await Store.findById(storeID);
+    if (!store) {
+      return res.status(404).json({
+        error: true,
+        operation: "null",
+        data: "المتجر غير موجود",
       });
     }
 
@@ -161,6 +170,8 @@ router.post("/addtocart", auth, async (req, res) => {
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
       });
     }
+    cartItem.isModfiy = store.isModfiy;
+    cartItem.modfingPrice = store.modfingPrice;
 
     for (var i = 0; i < cartItem.options.length; i++) {
       if (cartItem.options[i].isSelected) {
@@ -172,6 +183,7 @@ router.post("/addtocart", auth, async (req, res) => {
         cartItem.price += cartItem.addOns[i].price;
       }
     }
+
 
     user.cart.push({ cartItem });
     await user.save();

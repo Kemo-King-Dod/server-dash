@@ -162,6 +162,14 @@ const stores = new Schema(
       type: Boolean,
       default: false,
     },
+    isModfiy:{
+      type:Boolean,
+      default:false,
+    },
+    modfingPrice:{
+      type:Number,
+      default:0.0,
+    }
   },
   {
     timestamps: true,

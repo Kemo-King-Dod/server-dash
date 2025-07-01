@@ -105,6 +105,36 @@ app.use(ads)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+// addIsModifyAndModfingPriceToAllStores();
+// async function addIsModifyAndModfingPriceToAllStores() {
+//   try {
+//       await Store.updateMany(
+//           {},
+//           {
+//               $set: {
+//                   isModfiy: false,
+//                   modfingPrice: 0.0
+//               }
+//           }
+//       );
+//       console.log('تم تحديث جميع المتاجر بنجاح');
+//   } catch (err) {
+//       console.error('حدث خطأ أثناء التحديث:', err);
+//   }
+// }
+
+
 // sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
 // دالة لتحديث جميع المستخدمين
 // async function addFieldsToAllUsers() {
