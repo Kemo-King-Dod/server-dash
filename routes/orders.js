@@ -167,7 +167,7 @@ router.post("/addOrder", auth, async (req, res) => {
         location: store.location,
         address: store.address,
         isModfiy:store.isModfiy,
-        modmodfingPrice:store.modfingPrice
+        modfingPrice:store.modfingPrice
       },
       driver: null,
       companyFee:store.isModfiy?0: store.companyFee,
