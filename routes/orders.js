@@ -114,7 +114,12 @@ router.post("/addOrder", auth, async (req, res) => {
     for (var i = 0; i < user.cart.length; i++) {
       if (user.cart[i].cartItem.storeID == StoreId) {
         const item = await Item.findById(user.cart[i].cartItem.id);
-        if(item.price != user.cart[i].cartItem.price)
+        if(item.price != user.cart[i].cartItem.price){
+          return res.status(500).json({
+            error: true,
+            message: "لقد تم تغيير سعر المنتج من قبل المتجر",
+          });
+        }
         itemsdata.push({
           id: item._id,
           name: item.name,
