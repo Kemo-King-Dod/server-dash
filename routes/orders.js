@@ -127,7 +127,7 @@ router.post("/addOrder", auth, async (req, res) => {
           options: user.cart[i].cartItem.options,
           addOns: user.cart[i].cartItem.addOns,
           quantity: 1, // update later
-          price: user.cart[i].cartItem.price,
+          price:item.price,
         });
         totalprice += user.cart[i].cartItem.price;
       }
