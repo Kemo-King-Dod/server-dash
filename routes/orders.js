@@ -231,6 +231,7 @@ router.post("/addOrder", auth, async (req, res) => {
         token: admin.fcmToken,
         title: "طلبية جديدة",
         body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+        isAdmin:true
       });
     } catch (e) {
       console.log("الادمن لم يستلم الاشعار");
@@ -240,6 +241,7 @@ router.post("/addOrder", auth, async (req, res) => {
         topic: "admins",
         title: "طلبية جديدة",
         body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+        isAdmin:true
       });
       sendNotificationToTopic({
         topic: "admins_" + req.headers.cityen,

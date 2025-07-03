@@ -39,7 +39,7 @@ async function sendNotification({ token, title, body }) {
     }
   }
 
-  async function sendNotificationToTopic({ topic, title, body }) {
+  async function sendNotificationToTopic({ topic, title, body,isAdmin }) {
       console.log("Sending notification to topic:", topic);
       if (!topic) {
         console.warn("No FCM topic provided for notification");
@@ -55,7 +55,7 @@ async function sendNotification({ token, title, body }) {
         android: {
           priority: "high",
           notification: {
-            sound: "default",
+            sound: isAdmin ? "custom_sound":"default",
             priority: "max",
             channelId: "default",
           },
