@@ -237,6 +237,11 @@ router.post("/addOrder", auth, async (req, res) => {
     }
     try {
       sendNotificationToTopic({
+        topic: "admins",
+        title: "طلبية جديدة",
+        body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+      });
+      sendNotificationToTopic({
         topic: "admins_" + req.headers.cityen,
         title: "طلبية جديدة",
         body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
