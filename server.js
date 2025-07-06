@@ -103,12 +103,12 @@ app.use(reports)
 const ads= require('./routes/ads.js');
 app.use(ads)
 
-   sendNotificationToTopic({
-        topic: "admins",
-        title: "طلبية جديدة",
-        body: ` قام زبون م`,   
-        isAdmin:true
-     });
+  //  sendNotificationToTopic({
+  //       topic: "admins",
+  //       title: "طلبية جديدة",
+  //       body: ` قام زبون م`,   
+  //       isAdmin:true
+  //    });
  
 
 

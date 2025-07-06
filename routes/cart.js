@@ -243,8 +243,6 @@ router.post("/addtocartfromstore", auth, async (req, res) => {
       user.cart.push({ cartitem });
     }
 
-  
-
     await user.save();
 
     res.status(200).json({
