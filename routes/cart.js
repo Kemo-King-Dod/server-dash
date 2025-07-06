@@ -21,7 +21,7 @@ router.get("/getfromcart", auth, async (req, res) => {
 
     // git shop discounts
     let discoundIds = [];
-
+console.log("1")
     for (let i = 0; i < user.cart.length; i++) {
       let the_item = await Item.findById(user.cart[i].cartItem.id);
       if (the_item.retrenchment_end < Date.now()) {
@@ -44,6 +44,7 @@ router.get("/getfromcart", auth, async (req, res) => {
           the_item.price * (1 - the_item.retrenchment_percent / 100);
       }
     }
+console.log("2")
 
     // delete if retrenchment_end is bigger than or equl now
     Retrenchments.deleteMany({
@@ -54,6 +55,7 @@ router.get("/getfromcart", auth, async (req, res) => {
 
     for (var i = 0; i < user.cart.length; i++) {
       const item = await Item.findById(user.cart[i].cartItem.id);
+console.log("3")
 
       // find shop
       const store = await Store.findById(item.storeID);
@@ -124,7 +126,9 @@ router.get("/getfromcart", auth, async (req, res) => {
           });
         }
       }
+
     }
+console.log("4")
 
     res.status(200).json({
       error: false,
