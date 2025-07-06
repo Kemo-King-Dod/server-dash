@@ -20,38 +20,35 @@ router.get("/getfromcart", auth, async (req, res) => {
     }
 
     // git shop discounts
-    let discoundIds = []
+    let discoundIds = [];
 
     for (let i = 0; i < user.cart.length; i++) {
       let the_item = await Item.findById(user.cart[i].cartItem.id);
       if (the_item.retrenchment_end < Date.now()) {
-        discoundIds.push(the_item._id)
-        the_item.retrenchment_end = null
-        the_item.retrenchment_percent = null
-        the_item.is_retrenchment = false
+        discoundIds.push(the_item._id);
+        the_item.retrenchment_end = null;
+        the_item.retrenchment_percent = null;
+        the_item.is_retrenchment = false;
         await Item.findByIdAndUpdate(the_item._id, {
           $set: {
             retrenchment_end: null,
             retrenchment_percent: null,
-            is_retrenchment: false
-          }
-        })
+            is_retrenchment: false,
+          },
+        });
       }
       if (!the_item.is_retrenchment) {
-        user.cart[i].cartItem.price = the_item.price
+        user.cart[i].cartItem.price = the_item.price;
       } else {
-        user.cart[i].cartItem.price = the_item.price * (1 - the_item.retrenchment_percent / 100)
+        user.cart[i].cartItem.price =
+          the_item.price * (1 - the_item.retrenchment_percent / 100);
       }
     }
 
     // delete if retrenchment_end is bigger than or equl now
-    Retrenchments.deleteMany(
-      {
-        retrenchment_end: { $lt: Date.now() },
-      }
-    )
-
-
+    Retrenchments.deleteMany({
+      retrenchment_end: { $lt: Date.now() },
+    });
 
     var thedata = [];
 
@@ -65,11 +62,11 @@ router.get("/getfromcart", auth, async (req, res) => {
           shopId: item.storeID,
           shopName: store.name,
           shopImage: store.picture,
-          deliveryFee: store.deliveryCostByKilo ,
-          companyFee:store.companyFee,
+          deliveryFee: store.deliveryCostByKilo,
+          companyFee: store.companyFee,
           location: store.location,
-          isModfiy:store.isModfiy,
-          modfingPrice:store.modfingPrice,
+          isModfiy: store.isModfiy,
+          modfingPrice: store.modfingPrice,
           items: [
             {
               id: item._id,
@@ -106,11 +103,11 @@ router.get("/getfromcart", auth, async (req, res) => {
             shopId: item.storeID,
             shopName: store.name,
             shopImage: store.picture,
-            deliveryFee: store.deliveryCostByKilo ,
-            companyFee:store.companyFee,
-          location: store.location,
-          isModfiy:store.isModfiy,
-          modfingPrice:store.modfingPrice,
+            deliveryFee: store.deliveryCostByKilo,
+            companyFee: store.companyFee,
+            location: store.location,
+            isModfiy: store.isModfiy,
+            modfingPrice: store.modfingPrice,
 
             items: [
               {
@@ -168,10 +165,9 @@ router.post("/addtocart", auth, async (req, res) => {
 
     // Check for blocked status based on cancelOrderLimit
     if (user.cancelOrderLimit >= 5) {
-
       return res.status(403).json({
         error: true,
-        data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات"
+        data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
       });
     }
     cartItem.isModfiy = store.isModfiy;
@@ -188,8 +184,67 @@ router.post("/addtocart", auth, async (req, res) => {
       }
     }
 
-
     user.cart.push({ cartItem });
+    await user.save();
+
+    res.status(200).json({
+      error: false,
+      data: {
+        message: "تمت إضافة المنتج إلى السلة بنجاح",
+        operation: "success",
+        cart: user.cart,
+      },
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      error: true,
+      operation: "null",
+      data: error.message,
+    });
+  }
+});
+// Add item to cart
+router.post("/addtocartfromstore", auth, async (req, res) => {
+  try {
+    const { cartItems, storeId } = req.body;
+    const userId = req.userId;
+    const storeID = storeId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        error: true,
+        operation: "null",
+        data: "المستخدم غير موجود",
+      });
+    }
+    const store = await Store.findById(storeID);
+    if (!store) {
+      return res.status(404).json({
+        error: true,
+        operation: "null",
+        data: "المتجر غير موجود",
+      });
+    }
+
+    // Check for blocked status based on cancelOrderLimit
+    if (user.cancelOrderLimit >= 5) {
+      return res.status(403).json({
+        error: true,
+        data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
+      });
+    }
+    for (let index = 0; index < cartItems.length; index++) {
+      const cartitem = cartItems[index];
+      cartitem.storeID = storeId;
+      cartitem.isModfiy = store.isModfiy;
+      cartitem.modfingPrice = store.modfingPrice;
+      user.cart.push({ cartitem });
+    }
+
+  
+
     await user.save();
 
     res.status(200).json({
@@ -261,9 +316,9 @@ router.patch("/deleteitemfromcart", auth, async (req, res) => {
     const cartItemIndex = user.cart.findIndex(
       (item) => item.cartItem && item.cartItem.id == id
     );
-    console.log("user cart" ,user.cart)
-    console.log("id" ,id)
-    console.log("cartItemIndex" ,cartItemIndex)
+    console.log("user cart", user.cart);
+    console.log("id", id);
+    console.log("cartItemIndex", cartItemIndex);
 
     if (cartItemIndex === -1) {
       return res.status(404).json({
@@ -280,7 +335,7 @@ router.patch("/deleteitemfromcart", auth, async (req, res) => {
       message: "تم حذف المنتج من السلة بنجاح",
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({
       error: true,
       message: "حدث خطأ أثناء حذف المنتج من السلة",
