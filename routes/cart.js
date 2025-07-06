@@ -240,11 +240,11 @@ router.post("/addtocartfromstore", auth, async (req, res) => {
       });
     }
     for (let index = 0; index < cartItems.length; index++) {
-      const cartitem = cartItems[index];
-      cartitem.storeID = storeId;
-      cartitem.isModfiy = store.isModfiy;
-      cartitem.modfingPrice = store.modfingPrice;
-      user.cart.push({ cartitem });
+      const cartItem = cartItems[index];
+      cartItem.storeID = storeId;
+      cartItem.isModfiy = store.isModfiy;
+      cartItem.modfingPrice = store.modfingPrice;
+      user.cart.push({ cartItem });
     }
 
     await user.save();
