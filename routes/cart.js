@@ -159,6 +159,7 @@ router.post("/addtocart", auth, async (req, res) => {
         data: "المستخدم غير موجود",
       });
     }
+
     const store = await Store.findById(storeID);
     if (!store) {
       return res.status(404).json({
@@ -168,49 +169,66 @@ router.post("/addtocart", auth, async (req, res) => {
       });
     }
 
-    // Check for blocked status based on cancelOrderLimit
+    // Check for blocked status
     if (user.cancelOrderLimit >= 5) {
       return res.status(403).json({
         error: true,
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
       });
     }
-    let IsElementExist = false
-    for (let s = 0; s < user.cart.length; s++) {
-      if (user.cart[s]._id == cartItem._id) {
-        user.cart[s].quantity++
-        for (var i = 0; i < cartItem.options.length; i++) {
-          if (cartItem.options[i].isSelected) {
-            user.cart[s].cartItem.price += cartItem.options[i].price;
-          }
-        }
-        for (var i = 0; i < cartItem.addOns.length; i++) {
-          if (cartItem.addOns[i].isSelected) {
-            user.cart[s].cartItem.price += cartItem.addOns[i].price;
-          }
-        }
-        IsElementExist = true
-      }
 
+    // Calculate additional price from options and addOns
+    let additionalPrice = 0;
+    
+    if (cartItem.options) {
+      for (let option of cartItem.options) {
+        if (option.isSelected) {
+          additionalPrice += option.price || 0;
+        }
+      }
     }
-    if (!IsElementExist) {
-      cartItem.isModfiy = store.isModfiy;
-      cartItem.modfingPrice = store.modfingPrice;
-      cartItem.quantity = 1;
-
-      for (var i = 0; i < cartItem.options.length; i++) {
-        if (cartItem.options[i].isSelected) {
-          cartItem.price += cartItem.options[i].price;
+    
+    if (cartItem.addOns) {
+      for (let addOn of cartItem.addOns) {
+        if (addOn.isSelected) {
+          additionalPrice += addOn.price || 0;
         }
       }
-      for (var i = 0; i < cartItem.addOns.length; i++) {
-        if (cartItem.addOns[i].isSelected) {
-          cartItem.price += cartItem.addOns[i].price;
-        }
-      }
-
-      user.cart.push({ cartItem });
     }
+
+    // Check if item with same options/addOns already exists
+    let existingItemIndex = -1;
+    for (let i = 0; i < user.cart.length; i++) {
+      const cartItemData = user.cart[i].cartItem;
+      if (
+        cartItemData.id === cartItem.id &&
+        cartItemData.storeID === cartItem.storeID &&
+        JSON.stringify(cartItemData.options) === JSON.stringify(cartItem.options) &&
+        JSON.stringify(cartItemData.addOns) === JSON.stringify(cartItem.addOns)
+      ) {
+        existingItemIndex = i;
+        break;
+      }
+    }
+
+    if (existingItemIndex !== -1) {
+      // Update existing item quantity and price
+      user.cart[existingItemIndex].cartItem.quantity += 1;
+      user.cart[existingItemIndex].cartItem.price += (cartItem.price + additionalPrice);
+    } else {
+      // Add new item to cart
+      const newCartItem = {
+        ...cartItem,
+        price: cartItem.price + additionalPrice,
+        quantity: 1,
+        isModfiy: store.isModfiy,
+        modfingPrice: store.modfingPrice,
+        storeID: storeID
+      };
+
+      user.cart.push({ cartItem: newCartItem });
+    }
+
     await user.save();
 
     res.status(200).json({
@@ -221,6 +239,7 @@ router.post("/addtocart", auth, async (req, res) => {
         cart: user.cart,
       },
     });
+
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
