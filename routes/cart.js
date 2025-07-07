@@ -21,7 +21,7 @@ router.get("/getfromcart", auth, async (req, res) => {
 
     // git shop discounts
     let discoundIds = [];
-console.log("1")
+    console.log("1")
     for (let i = 0; i < user.cart.length; i++) {
       let the_item = await Item.findById(user.cart[i].cartItem.id);
       if (the_item.retrenchment_end < Date.now()) {
@@ -44,8 +44,6 @@ console.log("1")
           the_item.price * (1 - the_item.retrenchment_percent / 100);
       }
     }
-console.log("2")
-
     // delete if retrenchment_end is bigger than or equl now
     Retrenchments.deleteMany({
       retrenchment_end: { $lt: Date.now() },
@@ -55,7 +53,6 @@ console.log("2")
 
     for (var i = 0; i < user.cart.length; i++) {
       const item = await Item.findById(user.cart[i].cartItem.id);
-console.log("3")
 
       // find shop
       const store = await Store.findById(item.storeID);
@@ -78,7 +75,7 @@ console.log("3")
               quantity: 1,
               options: user.cart[i].cartItem.options,
               addOns: user.cart[i].cartItem.addOns,
-              quantity:user.cart[i].cartItem.quantity,
+              quantity: user.cart[i].cartItem.quantity,
               shopId: item.storeID,
             },
           ],
@@ -96,7 +93,7 @@ console.log("3")
               options: user.cart[i].cartItem.options,
               addOns: user.cart[i].cartItem.addOns,
               shopId: item.storeID,
-              quantity:user.cart[i].cartItem.quantity
+              quantity: user.cart[i].cartItem.quantity
             });
             found = true;
             break;
@@ -123,7 +120,7 @@ console.log("3")
                 options: user.cart[i].cartItem.options,
                 addOns: user.cart[i].cartItem.addOns,
                 shopId: item.storeID,
-              quantity:user.cart[i].cartItem.quantity
+                quantity: user.cart[i].cartItem.quantity
 
               },
             ],
@@ -132,7 +129,7 @@ console.log("3")
       }
 
     }
-console.log("4")
+    console.log("4")
 
     res.status(200).json({
       error: false,
@@ -178,22 +175,42 @@ router.post("/addtocart", auth, async (req, res) => {
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
       });
     }
-    cartItem.isModfiy = store.isModfiy;
-    cartItem.modfingPrice = store.modfingPrice;
-    cartItem.quantity =1;
-
-    for (var i = 0; i < cartItem.options.length; i++) {
-      if (cartItem.options[i].isSelected) {
-        cartItem.price += cartItem.options[i].price;
+    let IsElementExist = false
+    for (let s = 0; s < user.cart.length; s++) {
+      if (user.cart[s]._id == cartItem._id) {
+        user.cart[s].quantity++
+        for (var i = 0; i < cartItem.options.length; i++) {
+          if (cartItem.options[i].isSelected) {
+            user.cart[s].cartItem.price += cartItem.options[i].price;
+          }
+        }
+        for (var i = 0; i < cartItem.addOns.length; i++) {
+          if (cartItem.addOns[i].isSelected) {
+            user.cart[s].cartItem.price += cartItem.addOns[i].price;
+          }
+        }
+        IsElementExist = true
       }
-    }
-    for (var i = 0; i < cartItem.addOns.length; i++) {
-      if (cartItem.addOns[i].isSelected) {
-        cartItem.price += cartItem.addOns[i].price;
-      }
-    }
 
-    user.cart.push({ cartItem });
+    }
+    if (!IsElementExist) {
+      cartItem.isModfiy = store.isModfiy;
+      cartItem.modfingPrice = store.modfingPrice;
+      cartItem.quantity = 1;
+
+      for (var i = 0; i < cartItem.options.length; i++) {
+        if (cartItem.options[i].isSelected) {
+          cartItem.price += cartItem.options[i].price;
+        }
+      }
+      for (var i = 0; i < cartItem.addOns.length; i++) {
+        if (cartItem.addOns[i].isSelected) {
+          cartItem.price += cartItem.addOns[i].price;
+        }
+      }
+
+      user.cart.push({ cartItem });
+    }
     await user.save();
 
     res.status(200).json({

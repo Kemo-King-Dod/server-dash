@@ -966,3 +966,78 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
 });
 
 module.exports = router;
+router.post("/updateOrder", auth, async (req, res) => {
+  try {
+    const {
+      orderId,
+      status,
+      type,
+      totalPrice,
+      distenationPrice,
+      companyFee,
+      items,
+      address,
+      chat,
+      driver,
+      store,
+      customer
+    } = req.body;
+
+    // Check if user is admin
+    if (!admins.includes(req.userId) && req.user.userType !== "admin") {
+      return res.status(403).json({
+        error: true,
+        operation: "updateOrder",
+        message: "ليس لديك صلاحية لتعديل الطلبات - المسؤولون فقط",
+      });
+    }
+
+    // Find the order first
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        error: true,
+        operation: "updateOrder",
+        message: "الطلب غير موجود",
+      });
+    }
+
+    // Prepare update object with only provided fields
+    const updateData = {};
+    
+    if (status !== undefined) updateData.status = status;
+    if (type !== undefined) updateData.type = type;
+    if (totalPrice !== undefined) updateData.totalPrice = totalPrice;
+    if (distenationPrice !== undefined) updateData.distenationPrice = distenationPrice;
+    if (companyFee !== undefined) updateData.companyFee = companyFee;
+    if (items !== undefined) updateData.items = items;
+    if (address !== undefined) updateData.address = address;
+    if (chat !== undefined) updateData.chat = chat;
+    if (driver !== undefined) updateData.driver = driver;
+    if (store !== undefined) updateData.store = store;
+    if (customer !== undefined) updateData.customer = customer;
+
+    // Update the order
+    await Order.findByIdAndUpdate(orderId, {
+      $set: updateData
+    });
+
+    // Get updated order
+    const updatedOrder = await Order.findById(orderId);
+
+    res.status(200).json({
+      error: false,
+      operation: "updateOrder",
+      message: "تم تحديث الطلب بنجاح",
+      data: updatedOrder
+    });
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      error: true,
+      operation: "updateOrder",
+      message: error.message,
+    });
+  }
+});
