@@ -180,6 +180,7 @@ router.post("/addtocart", auth, async (req, res) => {
     }
     cartItem.isModfiy = store.isModfiy;
     cartItem.modfingPrice = store.modfingPrice;
+    cartItem.quantity =1;
 
     for (var i = 0; i < cartItem.options.length; i++) {
       if (cartItem.options[i].isSelected) {
