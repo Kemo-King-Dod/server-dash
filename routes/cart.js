@@ -123,6 +123,8 @@ console.log("3")
                 options: user.cart[i].cartItem.options,
                 addOns: user.cart[i].cartItem.addOns,
                 shopId: item.storeID,
+              quantity:user.cart[i].cartItem.quantity
+
               },
             ],
           });
