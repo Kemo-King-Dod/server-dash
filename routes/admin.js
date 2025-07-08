@@ -300,6 +300,43 @@ router.get(
     }
   }
 ),
+
+
+router.post("/getStoreItemsForAdmin", auth,async (req, res) => {
+  try {
+    
+    var id = req.body.shopId;
+
+
+    const allItems = [];
+
+    // Get Store
+    const store = await Store.findOne({ _id: id });
+
+    // Get all store items
+    const theitems = [];
+    for (let i = 0; i < store.items.length; i++) {
+      theitems[i] = await items.findOne({ _id: store.items[i].toString() });
+    }
+
+    for (let i = 0; i < theitems.length; i++) {
+      if (theitems[i]) allItems.push(theitems[i]);
+    }
+
+      res.json({ error: false, data: allItems });
+      return;
+    
+
+  } catch (error) {
+    console.log(error);
+    res.status(401).json({
+      error: true,
+      message: error.message,
+    });
+  }
+});
+
+
   (module.exports = router);
 
 /* 
