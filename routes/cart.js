@@ -144,6 +144,7 @@ router.get("/getfromcart", auth, async (req, res) => {
   }
 });
 
+// Add item to cart
 router.post("/addtocart", auth, async (req, res) => {
   try {
     const { cartItem } = req.body;
@@ -174,42 +175,21 @@ router.post("/addtocart", auth, async (req, res) => {
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
       });
     }
-    let IsElementExist = false
-    for (let s = 0; s < user.cart.length; s++) {
-      if (user.cart[s]._id == cartItem._id) {
-        user.cart[s].quantity++
-        for (var i = 0; i < cartItem.options.length; i++) {
-          if (cartItem.options[i].isSelected) {
-            user.cart[s].cartItem.price += cartItem.options[i].price;
-          }
-        }
-        for (var i = 0; i < cartItem.addOns.length; i++) {
-          if (cartItem.addOns[i].isSelected) {
-            user.cart[s].cartItem.price += cartItem.addOns[i].price;
-          }
-        }
-        IsElementExist = true
-      }
+    cartItem.isModfiy = store.isModfiy;
+    cartItem.modfingPrice = store.modfingPrice;
 
+    for (var i = 0; i < cartItem.options.length; i++) {
+      if (cartItem.options[i].isSelected) {
+        cartItem.price += cartItem.options[i].price;
+      }
     }
-    if (!IsElementExist) {
-      cartItem.isModfiy = store.isModfiy;
-      cartItem.modfingPrice = store.modfingPrice;
-      cartItem.quantity = 1;
-
-      for (var i = 0; i < cartItem.options.length; i++) {
-        if (cartItem.options[i].isSelected) {
-          cartItem.price += cartItem.options[i].price;
-        }
+    for (var i = 0; i < cartItem.addOns.length; i++) {
+      if (cartItem.addOns[i].isSelected) {
+        cartItem.price += cartItem.addOns[i].price;
       }
-      for (var i = 0; i < cartItem.addOns.length; i++) {
-        if (cartItem.addOns[i].isSelected) {
-          cartItem.price += cartItem.addOns[i].price;
-        }
-      }
-
-      user.cart.push({ cartItem });
     }
+
+    user.cart.push({ cartItem });
     await user.save();
 
     res.status(200).json({
