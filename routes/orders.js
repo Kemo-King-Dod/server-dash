@@ -984,7 +984,7 @@ router.post("/updateOrder", auth, async (req, res) => {
     } = req.body;
 
     // Check if user is admin
-    if (!admins.includes(req.userId) && req.user.userType !== "admin") {
+    if (!admins.includes(req.userId) && req.user.userType !== "Admin") {
       return res.status(403).json({
         error: true,
         operation: "updateOrder",
