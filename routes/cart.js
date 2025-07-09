@@ -21,7 +21,6 @@ router.get("/getfromcart", auth, async (req, res) => {
 
     // git shop discounts
     let discoundIds = [];
-    console.log("1")
     for (let i = 0; i < user.cart.length; i++) {
       let the_item = await Item.findById(user.cart[i].cartItem.id);
       if (the_item.retrenchment_end < Date.now()) {
@@ -72,7 +71,7 @@ router.get("/getfromcart", auth, async (req, res) => {
               image: item.imageUrl,
               name: item.name,
               price: user.cart[i].cartItem.price,
-              quantity: 1,
+              quantity: user.cart[i].cartItem.quantity,
               options: user.cart[i].cartItem.options,
               addOns: user.cart[i].cartItem.addOns,
               quantity: user.cart[i].cartItem.quantity,
@@ -89,7 +88,7 @@ router.get("/getfromcart", auth, async (req, res) => {
               image: item.imageUrl,
               name: item.name,
               price: user.cart[i].cartItem.price,
-              quantity: 1,
+              quantity: user.cart[i].cartItem.quantity,
               options: user.cart[i].cartItem.options,
               addOns: user.cart[i].cartItem.addOns,
               shopId: item.storeID,
@@ -116,7 +115,7 @@ router.get("/getfromcart", auth, async (req, res) => {
                 image: item.imageUrl,
                 name: item.name,
                 price: user.cart[i].cartItem.price,
-                quantity: 1,
+                quantity: user.cart[i].quantity,
                 options: user.cart[i].cartItem.options,
                 addOns: user.cart[i].cartItem.addOns,
                 shopId: item.storeID,
@@ -129,7 +128,6 @@ router.get("/getfromcart", auth, async (req, res) => {
       }
 
     }
-    console.log("4")
 
     res.status(200).json({
       error: false,
@@ -143,7 +141,6 @@ router.get("/getfromcart", auth, async (req, res) => {
     });
   }
 });
-
 // Add item to cart
 router.post("/addtocart", auth, async (req, res) => {
   try {
@@ -175,30 +172,83 @@ router.post("/addtocart", auth, async (req, res) => {
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
       });
     }
-    cartItem.isModfiy = store.isModfiy;
-    cartItem.modfingPrice = store.modfingPrice;
-    cartItem.quantity =1;
 
-    for (var i = 0; i < cartItem.options.length; i++) {
-      if (cartItem.options[i].isSelected) {
-        cartItem.price += cartItem.options[i].price;
+    // Set initial cart item properties
+    const newCartItem = {
+      storeID: cartItem.storeID,
+      id: cartItem.id,
+      options: cartItem.options || [],
+      addOns: cartItem.addOns || [],
+      price: Number(cartItem.price), // تأكد من أن السعر رقم
+      isModfiy: store.isModfiy,
+      modfingPrice: store.modfingPrice,
+      quantity: 1 // تأكد من أن الكمية رقم
+    };
+    
+
+    // Calculate total price including options and addons
+    for (const option of newCartItem.options) {
+      if (option.isSelected) {
+        newCartItem.price += option.price;
       }
     }
-    for (var i = 0; i < cartItem.addOns.length; i++) {
-      if (cartItem.addOns[i].isSelected) {
-        cartItem.price += cartItem.addOns[i].price;
+    for (const addon of newCartItem.addOns) {
+      if (addon.isSelected) {
+        newCartItem.price += addon.price;
       }
     }
 
-    user.cart.push({ cartItem });
-    await user.save();
+    // نسخ السلة الحالية للمستخدم
+    let updatedCart = [...user.cart];
+
+    // التحقق من وجود المنتج في السلة
+    const existingItemIndex = updatedCart.findIndex(
+      (item) => 
+        item.cartItem.id === newCartItem.id && 
+        item.cartItem.storeID === newCartItem.storeID &&
+        JSON.stringify(item.cartItem.options) === JSON.stringify(newCartItem.options) &&
+        JSON.stringify(item.cartItem.addOns) === JSON.stringify(newCartItem.addOns)
+    );
+
+    if (existingItemIndex !== -1) {
+        // حساب السعر الأساسي للمنتج الواحد (قبل زيادة الكمية)
+        const currentQuantity = Number(updatedCart[existingItemIndex].cartItem.quantity);
+        const currentPrice = Number(updatedCart[existingItemIndex].cartItem.price);
+        const basePrice = currentPrice / currentQuantity;
+        
+        // زيادة الكمية (تأكد من أنها رقم)
+        updatedCart[existingItemIndex].cartItem.quantity = currentQuantity + 1;
+        
+        // تحديث السعر الإجمالي للمنتج بناءً على الكمية الجديدة
+        updatedCart[existingItemIndex].cartItem.price = basePrice * updatedCart[existingItemIndex].cartItem.quantity;
+        
+    } else {
+      // إضافة منتج جديد (تأكد من أن الكمية رقم)
+      newCartItem.quantity = Number(newCartItem.quantity);
+      newCartItem.price = Number(newCartItem.price);
+      updatedCart.push({ cartItem: newCartItem });
+    }
+
+    // تحديث السلة باستخدام updateOne
+    const result = await User.updateOne(
+      { _id: userId },
+      { $set: { cart: updatedCart } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(500).json({
+        error: true,
+        operation: "null",
+        data: "فشل تحديث السلة"
+      });
+    }
 
     res.status(200).json({
       error: false,
       data: {
         message: "تمت إضافة المنتج إلى السلة بنجاح",
         operation: "success",
-        cart: user.cart,
+        cart: updatedCart,
       },
     });
   } catch (error) {
@@ -210,13 +260,14 @@ router.post("/addtocart", auth, async (req, res) => {
     });
   }
 });
-// Add item to cart
+// Add item to cart 
 router.post("/addtocartfromstore", auth, async (req, res) => {
   try {
     const { cartItems, storeId } = req.body;
     const userId = req.userId;
     const storeID = storeId;
 
+    // Check if user exists
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -225,6 +276,8 @@ router.post("/addtocartfromstore", auth, async (req, res) => {
         data: "المستخدم غير موجود",
       });
     }
+
+    // Check if store exists
     const store = await Store.findById(storeID);
     if (!store) {
       return res.status(404).json({
@@ -241,34 +294,91 @@ router.post("/addtocartfromstore", auth, async (req, res) => {
         data: "تم حظر حسابك بسبب كثرة إلغاء الطلبات",
       });
     }
-    for (let index = 0; index < cartItems.length; index++) {
-      const cartItem = cartItems[index];
-      cartItem.storeID = storeId;
-      cartItem.isModfiy = store.isModfiy;
-      cartItem.modfingPrice = store.modfingPrice;
-      user.cart.push({ cartItem });
+
+    let updatedCart = [...user.cart];
+
+    // Process each cart item
+    for (const cartItem of cartItems) {
+      const newCartItem = {
+        storeID: storeId,
+        id: cartItem.id,
+        options: cartItem.options || [],
+        addOns: cartItem.addOns || [],
+        price: Number(cartItem.price),
+        isModfiy: store.isModfiy,
+        modfingPrice: store.modfingPrice,
+        quantity: Number(cartItem.quantity)
+      };
+
+      // Calculate total price including options and addons
+      for (const option of newCartItem.options) {
+        if (option.isSelected) {
+          newCartItem.price += option.price;
+        }
+      }
+      for (const addon of newCartItem.addOns) {
+        if (addon.isSelected) {
+          newCartItem.price += addon.price;
+        }
+      }
+
+      // Find existing item index
+      const existingItemIndex = updatedCart.findIndex(
+        (item) => 
+          item.cartItem.id === newCartItem.id && 
+          item.cartItem.storeID === newCartItem.storeID &&
+          JSON.stringify(item.cartItem.options) === JSON.stringify(newCartItem.options) &&
+          JSON.stringify(item.cartItem.addOns) === JSON.stringify(newCartItem.addOns)
+      );
+
+      if (existingItemIndex !== -1) {
+        // Update existing item
+        const currentQuantity = Number(updatedCart[existingItemIndex].cartItem.quantity);
+        const currentPrice = Number(updatedCart[existingItemIndex].cartItem.price);
+        const basePrice = currentPrice / currentQuantity;
+        
+        updatedCart[existingItemIndex].cartItem.quantity = currentQuantity + newCartItem.quantity;
+        updatedCart[existingItemIndex].cartItem.price = basePrice * updatedCart[existingItemIndex].cartItem.quantity;
+      } else {
+        // Add new item
+        newCartItem.quantity = Number(newCartItem.quantity);
+        newCartItem.price = Number(newCartItem.price);
+        updatedCart.push({ cartItem: newCartItem });
+      }
     }
 
-    await user.save();
+    // Update user cart using updateOne
+    const result = await User.updateOne(
+      { _id: userId },
+      { $set: { cart: updatedCart } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(500).json({
+        error: true,
+        operation: "null",
+        data: "فشل تحديث السلة"
+      });
+    }
 
     res.status(200).json({
       error: false,
       data: {
         message: "تمت إضافة المنتج إلى السلة بنجاح",
         operation: "success",
-        cart: user.cart,
-      },
+        cart: updatedCart
+      }
     });
+
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
       error: true,
       operation: "null",
-      data: error.message,
+      data: error.message
     });
   }
 });
-
 // Remove item from cart
 router.patch("/deletestorefromcart", auth, async (req, res) => {
   try {
@@ -283,13 +393,21 @@ router.patch("/deletestorefromcart", auth, async (req, res) => {
       });
     }
 
-    for (var i = 0; i < user.cart.length; i++) {
-      if (user.cart[i].cartItem.storeID == id) {
-        user.cart.splice(i--, 1);
-      }
-    }
+    let updatedCart = [...user.cart];
+    updatedCart = updatedCart.filter(item => item.cartItem.storeID != id);
 
-    await user.save();
+    // تحديث السلة باستخدام updateOne
+    const result = await User.updateOne(
+      { _id: userId },
+      { $set: { cart: updatedCart } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(500).json({
+        error: true,
+        message: "فشل تحديث السلة",
+      });
+    }
 
     res.status(200).json({
       error: false,
@@ -317,12 +435,11 @@ router.patch("/deleteitemfromcart", auth, async (req, res) => {
       });
     }
 
-    const cartItemIndex = user.cart.findIndex(
+    let updatedCart = [...user.cart];
+    const cartItemIndex = updatedCart.findIndex(
       (item) => item.cartItem && item.cartItem.id == id
     );
-    console.log("user cart", user.cart);
-    console.log("id", id);
-    console.log("cartItemIndex", cartItemIndex);
+ 
 
     if (cartItemIndex === -1) {
       return res.status(404).json({
@@ -331,8 +448,20 @@ router.patch("/deleteitemfromcart", auth, async (req, res) => {
       });
     }
 
-    user.cart.splice(cartItemIndex, 1);
-    await user.save();
+    updatedCart.splice(cartItemIndex, 1);
+    
+    // تحديث السلة باستخدام updateOne
+    const result = await User.updateOne(
+      { _id: userId },
+      { $set: { cart: updatedCart } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(500).json({
+        error: true,
+        message: "فشل تحديث السلة",
+      });
+    }
 
     res.status(200).json({
       error: false,

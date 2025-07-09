@@ -101,7 +101,25 @@ const product = require('./database/items.js');
 app.use(reports)
 
 const ads= require('./routes/ads.js');
+const User = require("./database/users.js");
 app.use(ads)
+
+
+
+// findCartLengthInUsers();
+// async function findCartLengthInUsers() {
+//   try {
+//     // Update all users to have an empty cart
+//     const result = await User.updateMany(
+//       {},
+//       { $set: { cart: [] } }
+//     );
+
+//     console.log(`Successfully cleared cart for ${result.modifiedCount} users`);
+//   } catch (err) {
+//     console.error('Error clearing user carts:', err);
+//   }
+// }
 
   //  sendNotificationToTopic({
   //       topic: "admins",
