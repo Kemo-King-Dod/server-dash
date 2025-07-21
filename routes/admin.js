@@ -210,9 +210,13 @@ router.get(
   /* auth, */ async (req, res) => {
     try {
       const users = await User.find({}, { password: false });
+      const count = await User.countDocuments();
       res.status(200).json({
         error: false,
-        data: users,
+        data: {
+          users,
+          count: count,
+        },
       });
     } catch (error) {
       console.log(error.message);

@@ -214,18 +214,15 @@ router.post("/addtocart", auth, async (req, res) => {
         // حساب السعر الأساسي للمنتج الواحد (قبل زيادة الكمية)
         const currentQuantity = Number(updatedCart[existingItemIndex].cartItem.quantity);
         const currentPrice = Number(updatedCart[existingItemIndex].cartItem.price);
-        const basePrice = currentPrice / currentQuantity;
         
         // زيادة الكمية (تأكد من أنها رقم)
         updatedCart[existingItemIndex].cartItem.quantity = currentQuantity + 1;
         
         // تحديث السعر الإجمالي للمنتج بناءً على الكمية الجديدة
-        updatedCart[existingItemIndex].cartItem.price = basePrice * updatedCart[existingItemIndex].cartItem.quantity;
         
     } else {
       // إضافة منتج جديد (تأكد من أن الكمية رقم)
       newCartItem.quantity = Number(newCartItem.quantity);
-      newCartItem.price = Number(newCartItem.price);
       updatedCart.push({ cartItem: newCartItem });
     }
 
@@ -475,5 +472,71 @@ router.patch("/deleteitemfromcart", auth, async (req, res) => {
     });
   }
 });
+router.patch("/editeQuantity", auth, async (req, res) => {
+  try {
+    const { itemId, quantity } = req.body;
+    const userId = req.userId;
+
+    // Find user and validate
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        error: true,
+        data: "المستخدم غير موجود"
+      });
+    }
+
+    // Create updated cart array
+    let updatedCart = [...user.cart];
+    
+    // Find item index in cart
+    const itemIndex = updatedCart.findIndex(item => item.cartItem.id === itemId);
+    
+    if (itemIndex === -1) {
+      return res.status(404).json({
+        error: true,
+        data: "المنتج غير موجود في السلة"
+      });
+    }
+
+    // Calculate new price based on quantity
+    const currentItem = updatedCart[itemIndex];
+    // const basePrice = currentItem.cartItem.price / currentItem.cartItem.quantity;
+    
+    // Update quantity and recalculate total price
+    updatedCart[itemIndex].cartItem.quantity = Number(quantity);
+    // updatedCart[itemIndex].cartItem.price = basePrice * Number(quantity);
+
+    // Update cart in database
+    const result = await User.updateOne(
+      { _id: userId },
+      { $set: { cart: updatedCart } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(500).json({
+        error: true,
+        data: "فشل تحديث السلة"
+      });
+    }
+    console.log("success")
+
+    res.status(200).json({
+      error: false,
+      data: {
+        message: "تم تحديث الكمية بنجاح",
+        cart: updatedCart
+      }
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: true,
+      data: "حدث خطأ أثناء تحديث الكمية"
+    });
+  }
+});
+
 
 module.exports = router;

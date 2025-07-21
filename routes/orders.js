@@ -58,10 +58,12 @@ async function read() {
 
 router.get("/getAllOrders", auth, async (req, res) => {
   var Orders = await orders.find({});
+  var compOrders = await OrderRecord.find({})
+  
   return res.status(200).json({
     error: false,
     data: {
-      orders: Orders,
+      orders: [...Orders,...compOrders],
     },
   });
 });
@@ -69,10 +71,16 @@ router.get("/getAllOrders", auth, async (req, res) => {
 // orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
   try {
+    console.log(req.body)
     const itemsdata = [];
     const userId = req.userId;
     const StoreId = req.body.storeId;
-    const theAddress = await Address.findById(req.body.addressId);
+    
+
+
+       const theAddress =req.body.addressId == 'current_location'?req.body.address: await Address.findById(req.body.addressId);
+    
+   
     const store = await Store.findById(StoreId);
     const admin = await Admin.findOne({ phone: "0910808060" });
     const user = await User.findById(userId);
@@ -121,10 +129,10 @@ router.post("/addOrder", auth, async (req, res) => {
           image: item.imageUrl,
           options: user.cart[i].cartItem.options,
           addOns: user.cart[i].cartItem.addOns,
-          quantity: 1, // update later
+          quantity: user.cart[i].cartItem.quantity, // update later
           price: item.price,
         });
-        totalprice += user.cart[i].cartItem.price;
+        totalprice += user.cart[i].cartItem.price*user.cart[i].cartItem.quantity;
       }
     }
 
