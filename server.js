@@ -102,25 +102,53 @@ app.use(reports)
 
 const ads= require('./routes/ads.js');
 const User = require("./database/users.js");
+const Notification = require("./database/notification.js");
 app.use(ads)
 
 
+// ...existing code...
 
 // findCartLengthInUsers();
-// async function findCartLengthInUsers() {
-//   try {
-//     // Update all users to have an empty cart
-//     const result = await User.updateMany(
-//       {},
-//       { $set: { cart: [] } }
-//     );
+async function findCartLengthInUsers() {
+  try {
+    // جلب المستخدمين الذين لديهم عناصر في السلة
+    const usersWithCart = await User.find({ cart: { $exists: true, $not: { $size: 0 } } });
 
-//     console.log(`Successfully cleared cart for ${result.modifiedCount} users`);
-//   } catch (err) {
-//     console.error('Error clearing user carts:', err);
-//   }
-// }
+    // إذا لم يوجد مستخدمون، اطبع رسالة وانتهِ
+    if (usersWithCart.length === 0) {
+      console.log("لا يوجد مستخدمون لديهم عناصر في السلة.");
+      return;
+    }
 
+    // تفريغ السلات
+    await User.updateMany(
+      { cart: { $exists: true, $not: { $size: 0 } } },
+      { $set: { cart: [] } }
+    );
+
+    // إرسال إشعار وكتابة بيانات كل مستخدم
+    for (const user of usersWithCart) {
+      console.log(`تم تفريغ سلة المستخدم: ${user._id}, الاسم: ${user.name}, رقم الجوال: ${user.phone}`);
+      if (user.fcmToken) {
+        await sendNotification({
+          token: user.fcmToken,
+          title: "تم مسح السلة",
+          body: "نعتذر عن الازعاج، تم مسح السلة الخاصة بك لغرض الصيانة والتطوير"
+        });
+      }
+      await Notification.create({
+        userType: "user",
+        userId: user._id,
+        title: "تم مسح السلة",
+        body: "نعتذر عن الازعاج، تم مسح السلة الخاصة بك لغرض الصيانة والتطوير"
+      });
+    }
+
+    console.log(`Successfully cleared cart for ${usersWithCart.length} users`);
+  } catch (err) {
+    console.error('Error clearing user carts:', err);
+  }
+}
   //  sendNotificationToTopic({
   //       topic: "admins",
   //       title: "طلبية جديدة",
