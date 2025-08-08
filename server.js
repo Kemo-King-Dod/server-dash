@@ -138,7 +138,7 @@ async function findCartLengthInUsers() {
       }
       await Notification.create({
         userType: "user",
-        userId: user._id,
+        id: user._id,
         title: "تم مسح السلة",
         body: "نعتذر عن الازعاج، تم مسح السلة الخاصة بك لغرض الصيانة والتطوير"
       });
@@ -157,8 +157,31 @@ async function findCartLengthInUsers() {
   //    });
  
 
+fixNotificationsWithoutId()
+   async function fixNotificationsWithoutId() {
+  try {
+    let notfiList=["682e92122f76a6aadd90d682",
+"68385d282a4f51e332f9a669",
+"6864123a3a52e8fbfd5488c1",
+"68777f78284844835e07da25",
+"687c016c284844835e08017d",
+"687e3950284844835e080deb",
+"687f64d66f92cc2d360e7282",]
+    const notifications = await Notification.find({ id: { $exists: false },});
+      let i=0
 
-   
+    for (const notif of notifications) {
+
+      notif.id = notfiList[i];
+      await notif.save();
+      console.log(`تم تحديث إشعار ${notif._id} بإضافة id: ${notif.userId}`);
+      i++;
+    }
+    console.log(`تم تحديث ${notifications.length} إشعارًا.`);
+  } catch (err) {
+    console.error("خطأ أثناء تحديث الإشعارات:", err);
+  }
+} 
  
 
   
