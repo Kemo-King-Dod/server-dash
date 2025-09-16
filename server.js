@@ -207,9 +207,9 @@ async function findCartLengthInUsers() {
 //       console.error('حدث خطأ أثناء التحديث:', err);
 //   }
 // }
+ 
 
-
-// sendNotification({token:"fdpKPZE7THW8ezJMF5ohkW:APA91bE96fqDdDBef5KOfknWGs-WgERfmu-uVyWRp8vAs9hDqNwHaELG42utZ2yCbhPi319vg0FLHSXFhj_b7is8-CfY6dHlloozbLxoobq3oMhunqUUV2Y",title:"تجربة", body:"اول رسالة"})
+// sendNotification({token:"cvGkvF70RuuC9YrQHKw5wQ:APA91bFIgNdweGgxseHv-OvRMk7Fy48VU0FRtcWRcASbEbiKQsWR5ADRHvWbz3ThMmHjIXyV6Qs6iWTK3NiAkciivaBTFVlTL_gK14oaZq0UGJio7y6jMrk",title:"تجربة", body:"اول رسالة"})
 // دالة لتحديث جميع المستخدمين
 // async function addFieldsToAllUsers() {
 //     try {
@@ -220,7 +220,7 @@ async function findCartLengthInUsers() {
 //                 $set: {
 //                   city : 
 //                     // يمكنك استخدام new Date(0) إذا أردت قيمة وقت صفرية
-//                 }
+//                 } 
 //             }
 //         );
 
