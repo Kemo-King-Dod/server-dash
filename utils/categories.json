@@ -50,6 +50,18 @@
     }
   ],
   "avilableCat": [
+      {
+      "name": "جزار",
+      "image": "uploads/pictures/fruitsAndVegtabls.png"
+    },
+      {
+      "name": "خضروات وفواكه",
+      "image": "uploads/pictures/fruitsAndVegtabls.png"
+    },
+     {
+      "name": "مواد غذائية",
+      "image": "uploads/pictures/material.png"
+    },
     {
       "name": "مطاعم",
       "image": "uploads/pictures/burger.png"

@@ -57,8 +57,16 @@ async function read() {
 // ***********************
 
 router.get("/getAllOrders", auth, async (req, res) => {
-  var Orders = await orders.find({});
-  var compOrders = await OrderRecord.find({})
+   var Orders ;
+    var compOrders 
+  if(req.user.city == "all"){
+   Orders = await orders.find({});
+     compOrders = await OrderRecord.find({})
+  }
+  else{
+     Orders = await orders.find({city:req.user.city});
+     compOrders = await OrderRecord.find({city:req.user.city})
+  }
   
   return res.status(200).json({
     error: false,
