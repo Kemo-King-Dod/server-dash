@@ -59,7 +59,7 @@ async function read() {
 router.get("/getAllOrders", auth, async (req, res) => {
    var Orders ;
     var compOrders 
-  if(req.user.city == "all"){
+  if(req.user.city == "All"){
    Orders = await orders.find({});
      compOrders = await OrderRecord.find({})
   }
