@@ -61,7 +61,7 @@ router.get("/getAllOrders", auth, async (req, res) => {
     var compOrders 
   if(req.user.city == "All"){
    Orders = await orders.find({});
-     compOrders = await OrderRecord.find({})
+  compOrders = await OrderRecord.find({})
   }
   else{
      Orders = await orders.find({city:req.user.city});

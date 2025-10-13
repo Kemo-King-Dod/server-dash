@@ -103,10 +103,34 @@ app.use(reports)
 const ads= require('./routes/ads.js');
 const User = require("./database/users.js");
 const Notification = require("./database/notification.js");
+const OrderRecord = require("./database/orders_record.js");
+const getCityName = require("./utils/getCityName.js");
 app.use(ads)
-
+setCitiesforOrderRecord();
 
 // ...existing code...
+// setCitiesforOrderRecord();
+async function setCitiesforOrderRecord() {
+  try {
+    const records = await OrderRecord.find({ city: { $exists: false } });
+
+    for (const record of records) {
+      if (record.store.location && record.store.location.latitude && record.store.location.longitude) {
+        const cityName = await getCityName(record.store.location).englishName;
+        if (cityName) {
+          record.city = cityName;
+          await record.save();
+          console.log(`Updated orderRecord ${record._id} with city: ${cityName}`);
+        }
+      }
+    }
+
+    console.log("Finished updating orderRecord cities.");
+  } catch (err) {
+    console.error("Error updating orderRecord cities:", err);
+  }
+}
+
 
 // findCartLengthInUsers();
 async function findCartLengthInUsers() {

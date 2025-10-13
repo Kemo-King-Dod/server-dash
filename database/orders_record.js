@@ -48,6 +48,10 @@ const orders_record = new Schema({
   companyFee: {
     type: Number
   },
+  city: {
+    type: String,
+    default: "all",
+  },
 });
 
 const OrderRecord = mongoose.model("OrderRecodr", orders_record);

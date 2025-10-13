@@ -98,88 +98,70 @@ router.post('/user', async (req, res) => {
 
 // Driver Signup
 router.post('/driver', async (req, res) => {
-    try {
-         
-        const { name, phone, age, gender, vehicleType, licenseNumber, licenseImage, passportImage, carBookImage, carImage } = req.body.driver;
-        const password = req.body.password
+  try {
+    console.log(req.body)
+    const { driver, password } = req.body;
+    const { name, phone, age, gender, vehicleType, licenseNumber, licenseImage, passportImage, carBookImage, carImage } = driver || {};
 
-        if (!name || !phone || !password || !age || !gender || !vehicleType || !licenseNumber || !licenseImage || !passportImage || !carBookImage || !carImage) {
-            await deleteUploadedFile(licenseImage);
-            await deleteUploadedFile(passportImage);
-            await deleteUploadedFile(carBookImage);
-            await deleteUploadedFile(carImage);
-            res.status(400).json({
-                error: true,
-                message: 'جميع الحقول مطلوبة'
-            });
-            return
-        }
+    const cleanup = async () => {
+      await deleteUploadedFile(licenseImage);
+      await deleteUploadedFile(passportImage);
+      await deleteUploadedFile(carBookImage);
+      await deleteUploadedFile(carImage);
+    };
 
-        const existingDriver = await Driver.findOne({ phone });
-        if (existingDriver) {
-            await deleteUploadedFile(licenseImage);
-            await deleteUploadedFile(passportImage);
-            await deleteUploadedFile(carBookImage);
-            await deleteUploadedFile(carImage);
-            res.status(400).json({
-                error: true,
-                message: 'رقم الهاتف مسجل مسبقاً'
-            });
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const newDriver = new Driver({
-            name,
-            phone,
-            password: hashedPassword,
-            age,
-            gender,
-            vehicleType,
-            licenseNumber,
-            licenseImage,
-            passportImage,
-            carBookImage,
-            carImage,
-            connection: false,
-            connectionId: null,
-            moneyRecord: [],
-            orders: [],
-            joinDate: new Date(),
-            currentOrder: {},
-            funds: 0,
-            userType: "Driver",
-            fcmToken: "kamal"
-        });
-
-        await newDriver.save();
-        const token = sign(newDriver._id, "Driver");
-
-        res.status(201).json({
-            error: false,
-            data: {
-                token,
-                user: {
-                    id: newDriver._id,
-                    name: newDriver.name,
-                    phone: newDriver.phone,
-                    userType: "Driver",
-                    registerCondition: newDriver.registerCondition
-                }
-            }
-        });
-    } catch (error) {
-        await deleteUploadedFile(req.body.licenseImage);
-        await deleteUploadedFile(req.body.passportImage);
-        await deleteUploadedFile(req.body.carBookImage);
-        await deleteUploadedFile(req.body.carImage);
-        console.log(error)
-        res.status(500).json({
-            error: true,
-            message: error
-        });
+    if (!name || !phone || !password || !age || !gender || !vehicleType || !licenseNumber || !licenseImage || !passportImage || !carBookImage || !carImage) {
+      await cleanup();
+      return res.status(400).json({ error: true, message: 'جميع الحقول مطلوبة' });
     }
+
+    const existingDriver = await Driver.findOne({ phone });
+    if (existingDriver) {
+      await cleanup();
+      return res.status(400).json({ error: true, message: 'رقم الهاتف مسجل مسبقاً' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newDriver = new Driver({
+      ...driver,
+      password: hashedPassword,
+      connection: false,
+      connectionId: null,
+      moneyRecord: [],
+      orders: [],
+      joinDate: new Date(),
+      currentOrder: {},
+      funds: 0,
+      userType: "Driver",
+      fcmToken: "kamal"
+    });
+
+    await newDriver.save();
+    const token = sign(newDriver._id, "Driver");
+
+    res.status(201).json({
+      error: false,
+      data: {
+        token,
+        user: {
+          id: newDriver._id,
+          name: newDriver.name,
+          phone: newDriver.phone,
+          userType: "Driver",
+          registerCondition: newDriver.registerCondition
+        } 
+      }
+    });
+
+  } catch (error) {
+    console.error(error);
+    await deleteUploadedFile(req.body.driver?.licenseImage);
+    await deleteUploadedFile(req.body.driver?.passportImage);
+    await deleteUploadedFile(req.body.driver?.carBookImage);
+    await deleteUploadedFile(req.body.driver?.carImage);
+    res.status(500).json({ error: true, message: error.message || error });
+  }
 });
 
 // Store Signup

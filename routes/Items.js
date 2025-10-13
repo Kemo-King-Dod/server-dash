@@ -28,7 +28,13 @@ const deleteUploadedFile = async (filePath) => {
 
 route.post("/additems", auth, async (req, res) => {
   try {
-    const userId = req.userId
+    console.log("the body : ",req.body)
+    console.log("the user : ",req.user)
+        var userId = req.userId
+
+    if(req.user.userType == "Admin"){
+      userId = req.body.shopId
+    }
     const {
       name,
       price,
@@ -43,8 +49,8 @@ route.post("/additems", auth, async (req, res) => {
 
     const the_store = await Store.findById(userId)
 
-    if (!the_store || the_store.registerCondition !== "accepted") {
-      await deleteUploadedFile(imageUrl);
+    if (!the_store || the_store.registerCondition !== "accepted") { 
+      await deleteUploadedFile(imageUrl); 
       console.log("غير مصرح");
       return res.status(403).json({
         error: true,
@@ -319,7 +325,8 @@ route.get("/getAllItems", async (req, res) => {
 
 route.post("/getStoreItems", async (req, res) => {
   try {
-    3
+    
+    
     var id = req.body.shopId;
     var userid = null;
 
@@ -328,8 +335,10 @@ route.post("/getStoreItems", async (req, res) => {
       const JWT_SECRET = "Our_Electronic_app_In_#Sebha2024_Kamal_&_Sliman";
       const decoded = await jwt.verify(token, JWT_SECRET);
       userid = decoded.id;
+      req.user = decoded;
     }
-
+  console.log( req.user);
+  
     const allItems = [];
 
     // Get Store
@@ -345,7 +354,7 @@ route.post("/getStoreItems", async (req, res) => {
       if (theitems[i]) allItems.push(theitems[i]);
     }
 
-    if (req.headers.isvisiter && req.headers.isvisiter == "true") {
+    if ((req.headers.isvisiter && req.headers.isvisiter == "true") || req.user.type == "Admin") {
       res.json({ error: false, data: allItems });
       return;
     }
@@ -400,7 +409,9 @@ route.post("/getStoreItems", async (req, res) => {
 
 route.get("/storeItems", auth, async (req, res) => {
   try {
-    const userId = req.userId;
+
+  var  userId = req.userId;
+  
     const allItems = [];
 
     // Get Store

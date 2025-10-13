@@ -6,7 +6,7 @@ const Transaction = require("../database/transactions");
 const Admin = require("../database/admin");
 const { default: mongoose } = require("mongoose");
  
-
+ 
 router.get("/getDriver", auth, async (req, res) => {
   try {
     const driver = await Driver.findById(req.userId, { password: false });
@@ -208,4 +208,42 @@ router.get("/getDriversWithoutWithdrawalForDay", auth, async (req, res) => {
     });
   }
 });
+
+router.post("/acceptDriver", auth, async (req, res) => {
+  try {
+    const { driverId } = req.body;
+    if (!driverId) {
+      return res.status(400).json({
+        error: true,
+        message: "driverId is required"
+      });
+    }
+
+    const driver = await Driver.findByIdAndUpdate(
+      driverId,
+      { status: "active" },
+      { new: true }
+    ).select("-password");
+
+    if (!driver) {
+      return res.status(404).json({
+        error: true,
+        message: "Driver not found"
+      });
+    }
+
+    res.status(200).json({
+      error: false,
+      message: "Driver accepted successfully",
+      data: driver
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      error: true,
+      message: err.message || "Server error"
+    });
+  }
+});
+
 module.exports = router;
