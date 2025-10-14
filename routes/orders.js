@@ -672,9 +672,9 @@ router.post("/confirmOrder", auth, async (req, res) => {
 
   try {
     /* جلب المستندات */
-    const order = await Order.findById(orderId);
+    var order = await Order.findById(orderId);
     if (!order) throw new Error("الطلب غير موجود");
-
+    order.city = order.city.englishName;
     if (String(order.driver.id) !== String(req.user._id))
       throw new Error("صلاحيات غير كافية");
 
@@ -747,10 +747,9 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
     }
 
     /* 1) Get documents */
-    const orderObj = await Order.findById(orderId);
     const user = await User.findById(req.userId);
-    const order = await Order.findById(orderId);
-
+    var order = await Order.findById(orderId);
+    order.city = order.city.englishName;
     if (!order) throw new Error("الطلب غير موجود");
     if (!order.customer.id.equals(req.userId))
       throw new Error("صلاحيات غير كافية");
@@ -782,31 +781,31 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
 
     /* 5) Send notifications */
     const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5");
-    const store = await Store.findById(orderObj.store.id);
-    const driver = orderObj.driver
-      ? await Driver.findById(orderObj.driver.id)
+    const store = await Store.findById(order.store.id);
+    const driver = order.driver
+        ? await Driver.findById(order.driver.id)
       : null;
 
     await Promise.all([
       sendNotification({
         token: admin.fcmToken,
-        title: "تم الغاء الطلب رقم" + orderObj.orderId,
-        body: ` قام زبون ما بالغاء طلبية من متجر ${orderObj.store.name}`,
+        title: "تم الغاء الطلب رقم" + order.orderId,
+        body: ` قام زبون ما بالغاء طلبية من متجر ${order.store.name}`,
       }),
       sendNotificationToTopic({
         topic: "admins_" + req.headers.cityen,
-        title: "تم الغاء الطلب رقم" + orderObj.orderId,
-        body: ` قام زبون ما بالغاء طلبية من متجر ${orderObj.store.name}`,
+        title: "تم الغاء الطلب رقم" + order.orderId,
+        body: ` قام زبون ما بالغاء طلبية من متجر ${order.store.name}`,
       }),
       sendNotification({
         token: store.fcmToken,
-        title: "تم الغاء الطلب رقم" + orderObj.orderId,
+        title: "تم الغاء الطلب رقم" + order.orderId,
         body: "",
       }),
-      orderObj.driver &&
+      order.driver &&
         sendNotification({
           token: driver.fcmToken,
-          title: "تم الغاء الطلب رقم" + orderObj.orderId,
+          title: "تم الغاء الطلب رقم" + order.orderId,
           body: "",
         }),
     ]);
@@ -832,7 +831,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
   }
 
   try {
-    const order = await Order.findById(orderId);
+    var order = await Order.findById(orderId);
     if (!order) throw new Error("الطلب غير موجود");
 
     // التحقق من ملكية المتجر
@@ -844,7 +843,7 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
 
       throw new Error("صلاحيات غير كافية");
     }
-
+   order.city = order.city.englishName;
     // Create order record
     await OrderRecord.create({
       ...order.toObject(),
@@ -882,17 +881,18 @@ router.post("/cancelOrderDriver", auth, async (req, res) => {
 
     /* 1) جلب المستندات */
     const driver = await Driver.findById(driverId);
-    const order = await Order.findById(orderId);
+    var order = await Order.findById(orderId);
     if (!order) throw new Error("الطلب غير موجود");
     if (order.driver.id != driverId) throw new Error("صلاحيات غير كافية");
 
     let orderObj = order;
+    orderObj.city = orderObj.city.englishName;
 
     /* 2) منطق الإلغاء أو الإرجاع */
     if (order.status === "onWay") {
       // سجل الإلغاء
       await OrderRecord.create({
-        ...order.toObject(),
+        ...orderObj.toObject(),
         status: "canceled",
         type: "canceled",
         canceledBy: "driver",
