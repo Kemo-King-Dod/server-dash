@@ -5,7 +5,8 @@ const { auth } = require("../middleware/auth");
 const Transaction = require("../database/transactions");
 const Admin = require("../database/admin");
 const { default: mongoose } = require("mongoose");
- 
+const fs = require("fs");
+const path = require("path");
  
 router.get("/getDriver", auth, async (req, res) => {
   try {
@@ -245,5 +246,78 @@ router.post("/acceptDriver", auth, async (req, res) => {
     });
   }
 });
+
+
+
+
+router.post("/updateDriverLocation", auth, async (req, res) => {
+  try {
+    const { location, driverId, name, phone } = req.body;
+
+    // التحقق من صحة البيانات
+    if (!driverId || !location) {
+      return res.status(400).json({
+        error: true,
+        message: "الرجاء إرسال بيانات السائق والموقع بشكل صحيح",
+      });
+    }
+
+    const filePath = path.join(__dirname, "../utils/driversLocations.json");
+
+    // قراءة الملف إذا كان موجودًا، أو إنشاء كائن فارغ
+    let driversData = { drivers: [] };
+    if (fs.existsSync(filePath)) {
+      try {
+        const fileData = fs.readFileSync(filePath, "utf8");
+        driversData = JSON.parse(fileData);
+      } catch (error) {
+        console.error("❌ خطأ في قراءة ملف المواقع:", error);
+      }
+    }
+
+    // التحقق من وجود السائق مسبقًا
+    const existingIndex = driversData.drivers.findIndex(
+      (d) => d.id === driverId
+    );
+
+    if (existingIndex !== -1) {
+      // ✅ تحديث موقع السائق
+      driversData.drivers[existingIndex].location = location;
+      driversData.drivers[existingIndex].name = name || driversData.drivers[existingIndex].name;
+      driversData.drivers[existingIndex].phone = phone || driversData.drivers[existingIndex].phone;
+      driversData.drivers[existingIndex].updatedAt = new Date().toISOString();
+    } else {
+      // ✅ إضافة سائق جديد
+      driversData.drivers.push({
+        id: driverId,
+        name: name || "غير معروف",
+        phone: phone || "غير متوفر",
+        location: location,
+        updatedAt: new Date().toISOString(),
+      });
+    }
+
+    // حفظ البيانات في الملف
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(driversData, null, 2),
+      "utf8"
+    );
+
+    res.status(200).json({
+      error: false,
+      message: "✅ تم تحديث موقع السائق بنجاح",
+    });
+  } catch (err) {
+    console.error("⚠️ Server Error:", err);
+    res.status(500).json({
+      error: true,
+      message: err.message || "حدث خطأ في الخادم",
+    });
+  }
+});
+
+module.exports = router;
+
 
 module.exports = router;
