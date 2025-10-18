@@ -466,6 +466,10 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
       },
     ]);
     console.log(order);
+    console.log("city.englishName", req.headers.cityen);
+    console.log("status", "ready");
+    console.log("acceptedorders", acceptedorders);
+    
 
     if (order.length == 0 && acceptedorders.length == 0) {
       return res.status(200).json({
