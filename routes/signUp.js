@@ -205,7 +205,7 @@ router.post('/store', async (req, res) => {
             address,
             picture,
             description: '',
-            registerCondition: "accepted",
+            registerCondition: "waiting",
             items: [],
             connection: false,
             connectionId: null,

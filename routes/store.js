@@ -213,4 +213,40 @@ router.post('/changeOpenTime', auth, async (req, res) => {
     }
 })
 
+router.post('/adminStoreState', auth, async (req, res) => {
+    try {
+        const { targetUserId, state } = req.body;
+        
+        // Find the store by ID
+        const store = await Store.findById(targetUserId);
+        
+        if (!store) {
+            return res.status(404).json({
+                error: true,
+                message: "المتجر غير موجود"
+            });
+        }
+        
+        // Update the store's registration condition
+        store.registerCondition = state;
+        await store.save();
+        
+        res.status(200).json({
+            error: false,
+            message: "تم تحديث حالة المتجر بنجاح",
+            data: {
+                storeId: targetUserId,
+                state: state
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: true,
+            message: err.message
+        });
+    }
+});
+
+
 module.exports = router
