@@ -465,6 +465,7 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
         $sample: { size: 10 },
       },
     ]);
+    console.log(order);
 
     if (order.length == 0 && acceptedorders.length == 0) {
       return res.status(200).json({

@@ -546,14 +546,18 @@ router.post ("/getPriceForCart",auth,async(req,res)=>{
     const {point,storePoint,isModfiy,distance}=req.body;
     
     let price = 0;
-   if( getCityName(point).englishName != getCityName(storePoint).englishName){
+   if( getCityName(point).englishName != getCityName(storePoint).englishName 
+   && getCityName(point).englishName != "Outside the scope" 
+   && !(getCityName(storePoint).englishName.includes("Alshaty") && getCityName(point).englishName.includes("Alshaty")) ){
     return res.status(200).json({
       error: true,
       message: "لا يمكن الطلب من مدن مختلفة",
     });
    }
     if(!isModfiy){
-      if(distance<=4){
+      if((getCityName(point).englishName =="Alshaty" && getCityName(storePoint).englishName =="East Alshaty") || (getCityName(point).englishName =="East Alshaty" && getCityName(storePoint).englishName =="Alshaty")){
+        price = 25;
+      }else if(distance<=4){
         price = 10;
       }else if(distance<=13){
         price = 15;
