@@ -5,6 +5,7 @@ const User = require("../database/users");
 const Item = require("../database/items");
 const Store = require("../database/store");
 const Retrenchments = require("../database/Retrenchments");
+const getCityName = require("../utils/getCityName");
 
 // Get all cart items
 router.get("/getfromcart", auth, async (req, res) => {
@@ -537,6 +538,54 @@ router.patch("/editeQuantity", auth, async (req, res) => {
     });
   }
 });
+
+
+router.post ("/getPriceForCart",auth,async(req,res)=>{
+  try {
+    const {point,storePoint,isModfiy,distance}=req.body;
+    let price = 0;
+   if( getCityName(point).englishName != getCityName(storePoint).englishName){
+    return res.status(200).json({
+      error: true,
+      message: "لا يمكن الطلب من مدن مختلفة",
+    });
+   }
+    if(!isModfiy){
+      if(distance<=4){
+        price = 10;
+      }else if(distance<=13){
+        price = 15;
+      }else if(distance<=23){
+        price = 20;
+      }else if(distance<=35){
+        price = 25;
+      }else if(distance<=65){
+        price = 30;
+      }else if(distance<=95){
+        price = 35;
+      }else if(distance<=125){
+        price = 40;
+
+      }
+    }
+
+    return res.status(200).json({
+      error: false,
+      data: {
+        price: price
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "حدث خطأ أثناء حساب السعر",
+    });
+    
+  }
+
+
+})
 
 
 module.exports = router;
