@@ -1,6 +1,21 @@
  [
     {
         "center": {
+            "latitude": 27.5656307,
+            "longitude": 14.3866644
+        },
+        "Arabicname": "شرق الشاطي",
+        "Englishname": "East Alshaty",
+        "boundary": [
+            {"latitude": 27.6199789, "longitude": 14.3377929},
+            {"latitude": 27.5296572, "longitude": 14.3377490},
+               {"latitude": 27.5546982, "longitude": 14.4738848},
+               {"latitude": 27.6452619, "longitude": 14.4140089}
+           
+        ]
+    },
+    {
+        "center": {
             "latitude": 27.55183,
             "longitude": 14.26812
         },
