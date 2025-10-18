@@ -542,7 +542,9 @@ router.patch("/editeQuantity", auth, async (req, res) => {
 
 router.post ("/getPriceForCart",auth,async(req,res)=>{
   try {
+    console.log(req.body);
     const {point,storePoint,isModfiy,distance}=req.body;
+    
     let price = 0;
    if( getCityName(point).englishName != getCityName(storePoint).englishName){
     return res.status(200).json({
