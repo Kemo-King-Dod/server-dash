@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server"
+    "start": "nodemon server",
+    "sliman": "node server"
+  },
+  "nodemonConfig": {
   },
   "keywords": [],
   "author": "",

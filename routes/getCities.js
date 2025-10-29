@@ -2,12 +2,24 @@ const express = require("express");
 const getCityName = require("../utils/getCityName");
 const router = express.Router();
 const Order = require("../database/orders");
+let DriversLocations = require("../utils/driversLocations.json");
+const { auth } = require("../middleware/auth");
 
-router.post("/getCity", async (req, res) => {
+router.post("/getCity",auth, async (req, res) => {
     try {
-
+        const userId=req.userId;
         const { point } = req.body
         console.log(point)
+        
+        if(DriversLocations.drivers.find(driver => driver.id == userId)){
+            return res.status(200).json({
+                error: false,
+                data: {
+                    city: DriversLocations.drivers.find(driver => driver.id == userId).city
+                }
+            })
+        }
+
         const city = getCityName(point)
         return res.status(200).json({
             error: false,

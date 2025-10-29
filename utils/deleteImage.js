@@ -14,7 +14,7 @@ async function deleteUploadedFile(filePath) {
     await fs.unlink(absolutePath);
   } catch (error) {
     console.error("حدث خطأ أثناء حذف الملف:", error);
-  }
+  } 
 }
 
 module.exports = deleteUploadedFile;

@@ -93,7 +93,7 @@ router.get("/getfromcart", auth, async (req, res) => {
               options: user.cart[i].cartItem.options,
               addOns: user.cart[i].cartItem.addOns,
               shopId: item.storeID,
-              quantity: user.cart[i].cartItem.quantity
+              quantity: user.cart[i].cartItem.quantity,
             });
             found = true;
             break;
@@ -120,14 +120,12 @@ router.get("/getfromcart", auth, async (req, res) => {
                 options: user.cart[i].cartItem.options,
                 addOns: user.cart[i].cartItem.addOns,
                 shopId: item.storeID,
-                quantity: user.cart[i].cartItem.quantity
-
+                quantity: user.cart[i].cartItem.quantity,
               },
             ],
           });
         }
       }
-
     }
 
     res.status(200).json({
@@ -183,9 +181,8 @@ router.post("/addtocart", auth, async (req, res) => {
       price: Number(cartItem.price), // تأكد من أن السعر رقم
       isModfiy: store.isModfiy,
       modfingPrice: store.modfingPrice,
-      quantity: 1 // تأكد من أن الكمية رقم
+      quantity: 1, // تأكد من أن الكمية رقم
     };
-    
 
     // Calculate total price including options and addons
     for (const option of newCartItem.options) {
@@ -204,23 +201,28 @@ router.post("/addtocart", auth, async (req, res) => {
 
     // التحقق من وجود المنتج في السلة
     const existingItemIndex = updatedCart.findIndex(
-      (item) => 
-        item.cartItem.id === newCartItem.id && 
+      (item) =>
+        item.cartItem.id === newCartItem.id &&
         item.cartItem.storeID === newCartItem.storeID &&
-        JSON.stringify(item.cartItem.options) === JSON.stringify(newCartItem.options) &&
-        JSON.stringify(item.cartItem.addOns) === JSON.stringify(newCartItem.addOns)
+        JSON.stringify(item.cartItem.options) ===
+          JSON.stringify(newCartItem.options) &&
+        JSON.stringify(item.cartItem.addOns) ===
+          JSON.stringify(newCartItem.addOns)
     );
 
     if (existingItemIndex !== -1) {
-        // حساب السعر الأساسي للمنتج الواحد (قبل زيادة الكمية)
-        const currentQuantity = Number(updatedCart[existingItemIndex].cartItem.quantity);
-        const currentPrice = Number(updatedCart[existingItemIndex].cartItem.price);
-        
-        // زيادة الكمية (تأكد من أنها رقم)
-        updatedCart[existingItemIndex].cartItem.quantity = currentQuantity + 1;
-        
-        // تحديث السعر الإجمالي للمنتج بناءً على الكمية الجديدة
-        
+      // حساب السعر الأساسي للمنتج الواحد (قبل زيادة الكمية)
+      const currentQuantity = Number(
+        updatedCart[existingItemIndex].cartItem.quantity
+      );
+      const currentPrice = Number(
+        updatedCart[existingItemIndex].cartItem.price
+      );
+
+      // زيادة الكمية (تأكد من أنها رقم)
+      updatedCart[existingItemIndex].cartItem.quantity = currentQuantity + 1;
+
+      // تحديث السعر الإجمالي للمنتج بناءً على الكمية الجديدة
     } else {
       // إضافة منتج جديد (تأكد من أن الكمية رقم)
       newCartItem.quantity = Number(newCartItem.quantity);
@@ -237,7 +239,7 @@ router.post("/addtocart", auth, async (req, res) => {
       return res.status(500).json({
         error: true,
         operation: "null",
-        data: "فشل تحديث السلة"
+        data: "فشل تحديث السلة",
       });
     }
 
@@ -258,7 +260,7 @@ router.post("/addtocart", auth, async (req, res) => {
     });
   }
 });
-// Add item to cart 
+// Add item to cart
 router.post("/addtocartfromstore", auth, async (req, res) => {
   try {
     const { cartItems, storeId } = req.body;
@@ -305,7 +307,7 @@ router.post("/addtocartfromstore", auth, async (req, res) => {
         price: Number(cartItem.price),
         isModfiy: store.isModfiy,
         modfingPrice: store.modfingPrice,
-        quantity: Number(cartItem.quantity)
+        quantity: Number(cartItem.quantity),
       };
 
       // Calculate total price including options and addons
@@ -322,21 +324,29 @@ router.post("/addtocartfromstore", auth, async (req, res) => {
 
       // Find existing item index
       const existingItemIndex = updatedCart.findIndex(
-        (item) => 
-          item.cartItem.id === newCartItem.id && 
+        (item) =>
+          item.cartItem.id === newCartItem.id &&
           item.cartItem.storeID === newCartItem.storeID &&
-          JSON.stringify(item.cartItem.options) === JSON.stringify(newCartItem.options) &&
-          JSON.stringify(item.cartItem.addOns) === JSON.stringify(newCartItem.addOns)
+          JSON.stringify(item.cartItem.options) ===
+            JSON.stringify(newCartItem.options) &&
+          JSON.stringify(item.cartItem.addOns) ===
+            JSON.stringify(newCartItem.addOns)
       );
 
       if (existingItemIndex !== -1) {
         // Update existing item
-        const currentQuantity = Number(updatedCart[existingItemIndex].cartItem.quantity);
-        const currentPrice = Number(updatedCart[existingItemIndex].cartItem.price);
+        const currentQuantity = Number(
+          updatedCart[existingItemIndex].cartItem.quantity
+        );
+        const currentPrice = Number(
+          updatedCart[existingItemIndex].cartItem.price
+        );
         const basePrice = currentPrice / currentQuantity;
-        
-        updatedCart[existingItemIndex].cartItem.quantity = currentQuantity + newCartItem.quantity;
-        updatedCart[existingItemIndex].cartItem.price = basePrice * updatedCart[existingItemIndex].cartItem.quantity;
+
+        updatedCart[existingItemIndex].cartItem.quantity =
+          currentQuantity + newCartItem.quantity;
+        updatedCart[existingItemIndex].cartItem.price =
+          basePrice * updatedCart[existingItemIndex].cartItem.quantity;
       } else {
         // Add new item
         newCartItem.quantity = Number(newCartItem.quantity);
@@ -355,7 +365,7 @@ router.post("/addtocartfromstore", auth, async (req, res) => {
       return res.status(500).json({
         error: true,
         operation: "null",
-        data: "فشل تحديث السلة"
+        data: "فشل تحديث السلة",
       });
     }
 
@@ -364,16 +374,15 @@ router.post("/addtocartfromstore", auth, async (req, res) => {
       data: {
         message: "تمت إضافة المنتج إلى السلة بنجاح",
         operation: "success",
-        cart: updatedCart
-      }
+        cart: updatedCart,
+      },
     });
-
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
       error: true,
       operation: "null",
-      data: error.message
+      data: error.message,
     });
   }
 });
@@ -392,7 +401,7 @@ router.patch("/deletestorefromcart", auth, async (req, res) => {
     }
 
     let updatedCart = [...user.cart];
-    updatedCart = updatedCart.filter(item => item.cartItem.storeID != id);
+    updatedCart = updatedCart.filter((item) => item.cartItem.storeID != id);
 
     // تحديث السلة باستخدام updateOne
     const result = await User.updateOne(
@@ -437,7 +446,6 @@ router.patch("/deleteitemfromcart", auth, async (req, res) => {
     const cartItemIndex = updatedCart.findIndex(
       (item) => item.cartItem && item.cartItem.id == id
     );
- 
 
     if (cartItemIndex === -1) {
       return res.status(404).json({
@@ -447,7 +455,7 @@ router.patch("/deleteitemfromcart", auth, async (req, res) => {
     }
 
     updatedCart.splice(cartItemIndex, 1);
-    
+
     // تحديث السلة باستخدام updateOne
     const result = await User.updateOne(
       { _id: userId },
@@ -483,27 +491,29 @@ router.patch("/editeQuantity", auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         error: true,
-        data: "المستخدم غير موجود"
+        data: "المستخدم غير موجود",
       });
     }
 
     // Create updated cart array
     let updatedCart = [...user.cart];
-    
+
     // Find item index in cart
-    const itemIndex = updatedCart.findIndex(item => item.cartItem.id === itemId);
-    
+    const itemIndex = updatedCart.findIndex(
+      (item) => item.cartItem.id === itemId
+    );
+
     if (itemIndex === -1) {
       return res.status(404).json({
         error: true,
-        data: "المنتج غير موجود في السلة"
+        data: "المنتج غير موجود في السلة",
       });
     }
 
     // Calculate new price based on quantity
     const currentItem = updatedCart[itemIndex];
     // const basePrice = currentItem.cartItem.price / currentItem.cartItem.quantity;
-    
+
     // Update quantity and recalculate total price
     updatedCart[itemIndex].cartItem.quantity = Number(quantity);
     // updatedCart[itemIndex].cartItem.price = basePrice * Number(quantity);
@@ -517,69 +527,76 @@ router.patch("/editeQuantity", auth, async (req, res) => {
     if (result.modifiedCount === 0) {
       return res.status(500).json({
         error: true,
-        data: "فشل تحديث السلة"
+        data: "فشل تحديث السلة",
       });
     }
-    console.log("success")
+    console.log("success");
 
     res.status(200).json({
       error: false,
       data: {
         message: "تم تحديث الكمية بنجاح",
-        cart: updatedCart
-      }
+        cart: updatedCart,
+      },
     });
-
   } catch (error) {
     console.log(error);
     res.status(500).json({
       error: true,
-      data: "حدث خطأ أثناء تحديث الكمية"
+      data: "حدث خطأ أثناء تحديث الكمية",
     });
   }
 });
 
-
-router.post ("/getPriceForCart",auth,async(req,res)=>{
+router.post("/getPriceForCart", auth, async (req, res) => {
   try {
     console.log(req.body);
-    const {point,storePoint,isModfiy,distance}=req.body;
-    
-    let price = 0;
-   if( getCityName(point).englishName != getCityName(storePoint).englishName 
-   && getCityName(point).englishName != "Outside the scope" 
-   && !(getCityName(storePoint).englishName.includes("Alshaty") && getCityName(point).englishName.includes("Alshaty")) ){
-    return res.status(200).json({
-      error: true,
-      message: "لا يمكن الطلب من مدن مختلفة",
-    });
-   }
-    if(!isModfiy){
-      if((getCityName(point).englishName =="Alshaty" && getCityName(storePoint).englishName =="East Alshaty") || (getCityName(point).englishName =="East Alshaty" && getCityName(storePoint).englishName =="Alshaty")){
-        price = 25;
-      }else if(distance<=4){
-        price = 10;
-      }else if(distance<=13){
-        price = 15;
-      }else if(distance<=23){
-        price = 20;
-      }else if(distance<=35){
-        price = 25;
-      }else if(distance<=65){
-        price = 30;
-      }else if(distance<=95){
-        price = 35;
-      }else if(distance<=125){
-        price = 40;
+    const { point, storePoint, isModfiy, distance } = req.body;
 
+    let price = 0;
+    if (
+      getCityName(point).englishName != getCityName(storePoint).englishName &&
+      getCityName(point).englishName != "Outside the scope" &&
+      !(
+        getCityName(storePoint).englishName.includes("Alshaty") &&
+        getCityName(point).englishName.includes("Alshaty")
+      )
+    ) {
+      return res.status(200).json({
+        error: true,
+        message: "لا يمكن الطلب من مدن مختلفة",
+      });
+    }
+    if (!isModfiy) {
+      if (
+        (getCityName(point).englishName == "Alshaty" &&
+          getCityName(storePoint).englishName == "East Alshaty") ||
+        (getCityName(point).englishName == "East Alshaty" &&
+          getCityName(storePoint).englishName == "Alshaty")
+      ) {
+        price = 25;
+      } else if (distance <= 4) {
+        price = 10;
+      } else if (distance <= 13) {
+        price = 15;
+      } else if (distance <= 23) {
+        price = 20;
+      } else if (distance <= 35) {
+        price = 25;
+      } else if (distance <= 65) {
+        price = 30;
+      } else if (distance <= 95) {
+        price = 35;
+      } else if (distance <= 125) {
+        price = 40;
       }
     }
 
     return res.status(200).json({
       error: false,
       data: {
-        price: price
-      }
+        price: price,
+      },
     });
   } catch (error) {
     console.log(error);
@@ -587,11 +604,209 @@ router.post ("/getPriceForCart",auth,async(req,res)=>{
       error: true,
       message: "حدث خطأ أثناء حساب السعر",
     });
-    
   }
+});
 
+// get cart
+router.post("/getCartNext", auth, async (req, res) => {
+    try {
+      console.log(req.body);
+      const userId = req.userId;
+      const user = await User.findById(userId);
+  
+      if (!user) {
+        return res.status(404).json({
+          error: true,
+          data: "المستخدم غير موجود",
+        });
+      }
+  
+      // git shop discounts
+      let discoundIds = [];
+      for (let i = 0; i < user.cart.length; i++) {
+        let the_item = await Item.findById(user.cart[i].cartItem.id);
+        if (the_item.retrenchment_end < Date.now()) {
+          discoundIds.push(the_item._id);
+          the_item.retrenchment_end = null;
+          the_item.retrenchment_percent = null;
+          the_item.is_retrenchment = false;
+          await Item.findByIdAndUpdate(the_item._id, {
+            $set: {
+              retrenchment_end: null,
+              retrenchment_percent: null,
+              is_retrenchment: false,
+            },
+          });
+        }
+        if (!the_item.is_retrenchment) {
+          user.cart[i].cartItem.price = the_item.price;
+        } else {
+          user.cart[i].cartItem.price =
+            the_item.price * (1 - the_item.retrenchment_percent / 100);
+        }
+      }
+      // delete if retrenchment_end is bigger than or equl now
+      Retrenchments.deleteMany({
+        retrenchment_end: { $lt: Date.now() },
+      });
+  
+      var thedata = [];
+  
+      for (var i = 0; i < user.cart.length; i++) {
+        const item = await Item.findById(user.cart[i].cartItem.id);
+  
+        // find shop
+        const store = await Store.findById(item.storeID);
+        if (thedata.length == 0) {
+          thedata.push({
+            shopId: item.storeID,
+            shopName: store.name,
+            shopImage: store.picture,
+            deliveryFee: store.deliveryCostByKilo,
+            companyFee: store.companyFee,
+            location: store.location,
+            isModfiy: store.isModfiy,
+            modfingPrice: store.modfingPrice,
+            items: [
+              {
+                id: item._id,
+                image: item.imageUrl,
+                name: item.name,
+                price: user.cart[i].cartItem.price,
+                quantity: user.cart[i].cartItem.quantity,
+                options: user.cart[i].cartItem.options,
+                addOns: user.cart[i].cartItem.addOns,
+                quantity: user.cart[i].cartItem.quantity,
+                shopId: item.storeID,
+              },
+            ],
+          });
+        } else {
+          var found = false;
+          for (var j = 0; j < thedata.length; j++) {
+            if (thedata[j].shopId.toString() == item.storeID.toString()) {
+              thedata[j].items.push({
+                id: item._id,
+                image: item.imageUrl,
+                name: item.name,
+                price: user.cart[i].cartItem.price,
+                quantity: user.cart[i].cartItem.quantity,
+                options: user.cart[i].cartItem.options,
+                addOns: user.cart[i].cartItem.addOns,
+                shopId: item.storeID,
+                quantity: user.cart[i].cartItem.quantity,
+              });
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            thedata.push({
+              shopId: item.storeID,
+              shopName: store.name,
+              shopImage: store.picture,
+              deliveryFee: store.deliveryCostByKilo,
+              companyFee: store.companyFee,
+              location: store.location,
+              isModfiy: store.isModfiy,
+              modfingPrice: store.modfingPrice,
+  
+              items: [
+                {
+                  id: item._id,
+                  image: item.imageUrl,
+                  name: item.name,
+                  price: user.cart[i].cartItem.price,
+                  quantity: user.cart[i].quantity,
+                  options: user.cart[i].cartItem.options,
+                  addOns: user.cart[i].cartItem.addOns,
+                  shopId: item.storeID,
+                  quantity: user.cart[i].cartItem.quantity,
+                },
+              ],
+            });
+          }
+        }
+      }
 
-})
+      for(const shop of thedata){
+        if(shop.shopId.toString() === req.body.id.toString()){
+          return res.status(200).json({
+            error: false,
+            data: shop,
+          });
+        }
+      }
+       return res.status(404).json({
+          error: true,
+          message: "المنتج غير موجود في السلة"
+        });
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).json({
+        error: true,
+        message: error.message,
+      });
+    }
+});
+
+// تقليل كمية المنتج من السلة
+router.patch("/decreaseFromCart", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        error: true,
+        message: "المستخدم غير موجود",
+      });
+    }
+
+    const { id, storeID } = req.body;
+    
+    if (!id || !storeID) {
+      return res.status(400).json({
+        error: true,
+        message: "معرف المنتج ومعرف المتجر مطلوبان",
+      });
+    }
+
+    // البحث عن المنتج في السلة
+    const cartItemIndex = user.cart.findIndex(
+      (item) => item.cartItem.id.toString() === id.toString()
+    );
+
+    if (cartItemIndex === -1) {
+      return res.status(404).json({
+        error: true,
+        message: "المنتج غير موجود في السلة",
+      });
+    }
+
+    // تقليل الكمية
+    if (user.cart[cartItemIndex].quantity > 1) {
+      user.cart[cartItemIndex].quantity -= 1;
+    } else {
+      // إذا كانت الكمية 1، نحذف المنتج من السلة
+      user.cart.splice(cartItemIndex, 1);
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      error: false,
+      message: "تم تقليل الكمية بنجاح",
+      data: {
+        cart: user.cart,
+      },
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      error: true,
+      message: error.message,
+    });
+  }
+});
 
 
 module.exports = router;

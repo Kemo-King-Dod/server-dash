@@ -249,7 +249,6 @@ router.post("/acceptDriver", auth, async (req, res) => {
 
 
 
-
 router.post("/updateDriverLocation", auth, async (req, res) => {
   try {
     const { location, driverId, name, phone } = req.body;
@@ -262,33 +261,23 @@ router.post("/updateDriverLocation", auth, async (req, res) => {
       });
     }
 
-    const filePath = path.join(__dirname, "../utils/driversLocations.json");
-
-    // قراءة الملف إذا كان موجودًا، أو إنشاء كائن فارغ
-    let driversData = { drivers: [] };
-    if (fs.existsSync(filePath)) {
-      try {
-        const fileData = fs.readFileSync(filePath, "utf8");
-        driversData = JSON.parse(fileData);
-      } catch (error) {
-        console.error("❌ خطأ في قراءة ملف المواقع:", error);
-      }
-    }
+    // قراءة البيانات الحالية من الملف
+    let DriversLocations = require("../utils/driversLocations.json");
 
     // التحقق من وجود السائق مسبقًا
-    const existingIndex = driversData.drivers.findIndex(
+    const existingIndex = DriversLocations.drivers.findIndex(
       (d) => d.id === driverId
     );
 
     if (existingIndex !== -1) {
       // ✅ تحديث موقع السائق
-      driversData.drivers[existingIndex].location = location;
-      driversData.drivers[existingIndex].name = name || driversData.drivers[existingIndex].name;
-      driversData.drivers[existingIndex].phone = phone || driversData.drivers[existingIndex].phone;
-      driversData.drivers[existingIndex].updatedAt = new Date().toISOString();
+      DriversLocations.drivers[existingIndex].location = location;
+      DriversLocations.drivers[existingIndex].name = name || DriversLocations.drivers[existingIndex].name;
+      DriversLocations.drivers[existingIndex].phone = phone || DriversLocations.drivers[existingIndex].phone;
+      DriversLocations.drivers[existingIndex].updatedAt = new Date().toISOString();
     } else {
       // ✅ إضافة سائق جديد
-      driversData.drivers.push({
+      DriversLocations.drivers.push({
         id: driverId,
         name: name || "غير معروف",
         phone: phone || "غير متوفر",
@@ -296,18 +285,51 @@ router.post("/updateDriverLocation", auth, async (req, res) => {
         updatedAt: new Date().toISOString(),
       });
     }
-
-    // حفظ البيانات في الملف
-    fs.writeFileSync(
-      filePath,
-      JSON.stringify(driversData, null, 2),
-      "utf8"
-    );
-
+   console.log("DriversLocations",DriversLocations)
     res.status(200).json({
       error: false,
       message: "✅ تم تحديث موقع السائق بنجاح",
     });
+  } catch (err) {
+    console.error("⚠️ Server Error:", err);
+    res.status(500).json({
+      error: true,
+      message: err.message || "حدث خطأ في الخادم",
+    });
+  }
+});
+
+router.get("/getDriverLocation/:phone", auth, async (req, res) => {
+  try {
+    const { phone } = req.params;
+
+    console.log("phone",phone)
+    if (!phone) {
+      return res.status(400).json({
+        error: true,
+        message: "الرجاء إرسال رقم الهاتف",
+      });
+    }
+
+    // قراءة البيانات من الملف
+    let DriversLocations = require("../utils/driversLocations.json");
+
+    // البحث عن السائق
+    const driver = DriversLocations.drivers.find((d) => d.phone == phone);
+
+    if (!driver) {
+      return res.status(404).json({
+        error: true,
+        message: "لم يتم العثور على موقع السائق",
+      });
+    }
+
+    res.status(200).json({
+      error: false,
+      message: "تم جلب موقع السائق بنجاح",
+      data: driver,
+    });
+    console.log("driver",driver)
   } catch (err) {
     console.error("⚠️ Server Error:", err);
     res.status(500).json({
