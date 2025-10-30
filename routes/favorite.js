@@ -10,7 +10,7 @@ router.get('/getFavoriveitems', auth, async (req, res) => {
     try {
         const userId = req.userId;
         const user = await User.findById(userId);
-
+ 
         const items = await Items.find({ _id: { $in: user.favorateItems } })
 
         for (var i = 0; i < items.length; i++) {

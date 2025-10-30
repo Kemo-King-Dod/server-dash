@@ -58,6 +58,7 @@ router.get("/getfromcart", auth, async (req, res) => {
       const store = await Store.findById(item.storeID);
       if (thedata.length == 0) {
         thedata.push({
+          isClosed: store.isClosed,
           shopId: item.storeID,
           shopName: store.name,
           shopImage: store.picture,
@@ -67,7 +68,7 @@ router.get("/getfromcart", auth, async (req, res) => {
           isModfiy: store.isModfiy,
           modfingPrice: store.modfingPrice,
           items: [
-            {
+            { 
               id: item._id,
               image: item.imageUrl,
               name: item.name,
@@ -101,6 +102,7 @@ router.get("/getfromcart", auth, async (req, res) => {
         }
         if (!found) {
           thedata.push({
+            isClosed: store.isClosed,
             shopId: item.storeID,
             shopName: store.name,
             shopImage: store.picture,

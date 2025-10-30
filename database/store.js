@@ -169,7 +169,11 @@ const stores = new Schema(
     modfingPrice:{
       type:Number,
       default:0.0,
-    }
+    },
+    isClosed:{
+      type:Boolean,
+      default:false,
+    },
   },
   {
     timestamps: true,
