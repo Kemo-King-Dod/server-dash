@@ -66,6 +66,10 @@ const orders = new Schema({
     type: Boolean,
     default: false,
   },
+  billingType:{
+    type: String,
+    default: "cash",
+  }
 })
 const Order = mongoose.model("Order", orders)
 module.exports = Order;

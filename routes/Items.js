@@ -187,7 +187,7 @@ route.patch("/deleteitem", auth, async (req, res) => {
       error: false,
       operation: "deleteProduct",
       message: error.message,
-    });
+    }); 
   }
 });
 
@@ -567,6 +567,26 @@ route.post("/category", async (req, res) => {
       }
     });
   } catch (error) {
+    console.log(error);
+    res.status(401).json({
+      error: true,
+      message: error.message,
+    });
+  }
+});
+
+route.post("/itemAvalibility", auth, async (req, res) => {
+  try {
+    const { itemId, available } = req.body;
+    const item = await items.findById(itemId);
+    if (!item) {
+      return res.status(404).json({ error: true, message: "Item not found" });
+    }
+    item.available = available;
+    await item.save();
+    res.status(200).json({ error: false, message: "Item availability updated" });
+  }
+  catch (error) {
     console.log(error);
     res.status(401).json({
       error: true,

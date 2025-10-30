@@ -106,6 +106,8 @@ const Notification = require("./database/notification.js");
 const OrderRecord = require("./database/orders_record.js");
 const getCityName = require("./utils/getCityName.js");
 const Store = require("./database/store.js");
+const Items = require("./database/items.js");
+const Order = require("./database/orders.js");
 app.use(ads)
 setCitiesforOrderRecord();
 
@@ -215,22 +217,22 @@ async function findCartLengthInUsers() {
  
  
  
-addIsClosedToAllStores();
-async function addIsClosedToAllStores() {
-  try {
-      await Store.updateMany(
-          {},
-          {
-              $set: {
-                  isClosed: false,
-              }
-          }
-      );
-      console.log('تم تحديث جميع المتاجر بنجاح');
-  } catch (err) {
-      console.error('حدث خطأ أثناء التحديث:', err);
-  }
-}
+// addIsClosedToAllStores();
+// async function addIsClosedToAllStores() {
+//   try {
+//       await Order.updateMany(
+//           {},
+//           {
+//               $set: {
+//                   billingType: "cash", 
+//               }
+//           }
+//       ); 
+//       console.log('تم تحديث جميع المتاجر بنجاح');
+//   } catch (err) {
+//       console.error('حدث خطأ أثناء التحديث:', err);
+//   }
+// }
  
 
 // sendNotification({token:"cvGkvF70RuuC9YrQHKw5wQ:APA91bFIgNdweGgxseHv-OvRMk7Fy48VU0FRtcWRcASbEbiKQsWR5ADRHvWbz3ThMmHjIXyV6Qs6iWTK3NiAkciivaBTFVlTL_gK14oaZq0UGJio7y6jMrk",title:"تجربة", body:"اول رسالة"})

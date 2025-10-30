@@ -63,6 +63,10 @@ const items = new Schema({
     storeImage: {
         type: String,
     },
+    available: {
+        type: Boolean,
+        default: true,
+    }
 })
 const Items= mongoose.model('Item', items);
 module.exports = Items

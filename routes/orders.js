@@ -88,7 +88,7 @@ router.post("/addOrder", auth, async (req, res) => {
     }
    
     
-    console.log(req.body)
+    // console.log(req.body)
     const itemsdata = [];
     const userId = req.userId;
     const StoreId = req.body.storeId;
@@ -207,6 +207,7 @@ router.post("/addOrder", auth, async (req, res) => {
       chat: [],
       ByCode: store.ByCode,
       handcheck: store.handcheck,
+      billingType: req.body.billingType
     });
 
     if (order.city.englishName != req.headers.cityen) {

@@ -139,9 +139,9 @@ router.get("/getfromcart", auth, async (req, res) => {
     res.status(500).json({
       error: true,
       message: error.message,
-    });
-  }
-});
+    }); 
+  }  
+});  
 // Add item to cart
 router.post("/addtocart", auth, async (req, res) => {
   try {
@@ -151,10 +151,10 @@ router.post("/addtocart", auth, async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({
+      return res.status(404).json({ 
         error: true,
         operation: "null",
-        data: "المستخدم غير موجود",
+        data: "المستخدم غير موجود", 
       });
     }
     const store = await Store.findById(storeID);
@@ -174,6 +174,8 @@ router.post("/addtocart", auth, async (req, res) => {
       });
     }
 
+
+
     // Set initial cart item properties
     const newCartItem = {
       storeID: cartItem.storeID,
@@ -183,7 +185,7 @@ router.post("/addtocart", auth, async (req, res) => {
       price: Number(cartItem.price), // تأكد من أن السعر رقم
       isModfiy: store.isModfiy,
       modfingPrice: store.modfingPrice,
-      quantity: 1, // تأكد من أن الكمية رقم
+      quantity: cartItem.quantity, // تأكد من أن الكمية رقم
     };
 
     // Calculate total price including options and addons
@@ -199,7 +201,7 @@ router.post("/addtocart", auth, async (req, res) => {
     }
 
     // نسخ السلة الحالية للمستخدم
-    let updatedCart = [...user.cart];
+    let updatedCart = [...user.cart];   
 
     // التحقق من وجود المنتج في السلة
     const existingItemIndex = updatedCart.findIndex(
@@ -217,20 +219,17 @@ router.post("/addtocart", auth, async (req, res) => {
       const currentQuantity = Number(
         updatedCart[existingItemIndex].cartItem.quantity
       );
-      const currentPrice = Number(
-        updatedCart[existingItemIndex].cartItem.price
-      );
 
       // زيادة الكمية (تأكد من أنها رقم)
-      updatedCart[existingItemIndex].cartItem.quantity = currentQuantity + 1;
+      updatedCart[existingItemIndex].cartItem.quantity = currentQuantity + cartItem.quantity;
 
       // تحديث السعر الإجمالي للمنتج بناءً على الكمية الجديدة
     } else {
-      // إضافة منتج جديد (تأكد من أن الكمية رقم)
+      // إضافة منتج جديد (تأكد من أن الكمية رقم) 
       newCartItem.quantity = Number(newCartItem.quantity);
-      updatedCart.push({ cartItem: newCartItem });
+      updatedCart.push({ cartItem: newCartItem }); 
     }
-
+ 
     // تحديث السلة باستخدام updateOne
     const result = await User.updateOne(
       { _id: userId },
