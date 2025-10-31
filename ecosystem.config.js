@@ -1,25 +1,47 @@
 module.exports = {
-          apps: [
-                    {
-                              name: "fasto",
-                              script: "server.js",
-                              watch: true,
-
-                              // ❌ أضف هنا الملفات أو المجلدات التي يتغيّر محتواها أثناء التشغيل
-                              ignore_watch: [
-                                        "data",
-                                        // "data/order.txt",   // عدّاد الطلبات
-                                        // "data/data.txt",   // عدّاد الطلبات
-                                        "logs",             // ملفات السجلات
-                                        "uploads",   // أي ملفات يرفعها المستخدم,
-                                        "node_modules", // مجلد node_modules
-                              ],
-
-                              env: {
-                                        NODE_ENV: "development", 
-                                        PORT: 3000
-                              },
-                              env_production: { NODE_ENV: "production",PORT: 4000 }
-                    }
-          ]
-};
+    apps: [
+      {
+        // السيرفر الحقيقي للزبائن
+        name: "fasto-prod",
+        script: "server.js",
+  
+        // ما يعيدش التشغيل تلقائياً مع أي تغيير في الملفات
+        watch: false,
+  
+        // حتى لو watch=false نقدر نخلي القائمة موجودة كتوثيق
+        ignore_watch: [
+          "uploads",
+          "logs",
+          "data",
+          "node_modules",
+        ],
+  
+        env: {
+          NODE_ENV: "production",
+          PORT: 4000, // المنفذ الرسمي للانتاج
+        },
+      },
+      {
+        // نسخة التطوير للتجارب
+        name: "fasto-dev",
+        script: "server.js",
+  
+        // أي تعديل في الكود (أو git pull يغير ملفات) => restart تلقائي
+        watch: true,
+  
+        // مجلدات ما نبيها تسبب restart
+        ignore_watch: [
+          "uploads",     // صور الزبائن
+          "logs",        // ملفات لوق
+          "data",        // ملفات runtime مؤقتة
+          "node_modules" // لا داعي نراقبها
+        ],
+  
+        env: {
+          NODE_ENV: "development",
+          PORT: 3000, // منفذ التطوير
+        },
+      },
+    ],
+  };
+  
