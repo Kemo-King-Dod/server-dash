@@ -220,14 +220,14 @@ async function findCartLengthInUsers() {
 // addIsClosedToAllStores();
 // async function addIsClosedToAllStores() {
 //   try {
-//       await Order.updateMany(
+//       await Items.updateMany(
 //           {},
 //           {
 //               $set: {
-//                   billingType: "cash", 
-//               }
-//           }
-//       ); 
+//                 available: true, 
+//               } 
+//           } 
+//       );  
 //       console.log('تم تحديث جميع المتاجر بنجاح');
 //   } catch (err) {
 //       console.error('حدث خطأ أثناء التحديث:', err);
