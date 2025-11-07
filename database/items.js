@@ -14,7 +14,6 @@ const items = new Schema({
     },
     gender: {
         type: String,
-        require: [true, 'الجنس مطلوب']
     },
     storeID: {
         type: Schema.Types.ObjectId

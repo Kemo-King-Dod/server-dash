@@ -38,7 +38,6 @@ route.post("/additems", auth, async (req, res) => {
     const {
       name,
       price,
-      gender,
       isActive,
       description,
       stock,
@@ -67,7 +66,6 @@ route.post("/additems", auth, async (req, res) => {
       price,
       description: description,
       options,
-      gender,
       addOns,
       isActive,
       stock,
@@ -109,7 +107,6 @@ route.post("/updateItem", auth, async (req, res) => {
     const {
       name,
       price,
-      gender,
       isActive,
       description,
       stock,
@@ -138,7 +135,6 @@ route.post("/updateItem", auth, async (req, res) => {
       $set: {
         name,
         price,
-        gender,
         description,
         stock,
         options,
@@ -210,40 +206,17 @@ route.get("/getAllItems", async (req, res) => {
 
     let data
     // Get all available items
-    if (id) {
-      var user = await User.findById(id)
-      if (user.gender)
-        if (user.gender == 'male') {
-          data = await items.aggregate([
-            {
-              $match: { gender: { $in: ['all', 'male'] }, city: { $in: [req.headers.cityen] },category:{$in:['مقهى','مطاعم','مواد غذائية']} }
-            },
-            {
-              $sample: { size: 10 }
-            }
-          ])
-        }
-        else {
-          data = await items.aggregate([
-            {
-              $match: { gender: { $in: ['all', 'female'] }, city: { $in: [req.headers.cityen] },category:{$in:['مقهى','مطاعم','مواد غذائية']}  }
-            },
-            {
-              $sample: { size: 10 }
-            }
-          ])
-        }
-    }
-    else {
+   
+    
       data = await items.aggregate([
         {
-          $match: { gender: { $in: ['all'] }, city: { $in: [req.headers.cityen] } ,category:{$in:['مقهى','مطاعم','مواد غذائية']}  }
+          $match: { city: { $in: [req.headers.cityen] } ,category:{$in:['مقهى','مطاعم','مواد غذائية']}  }
         },
         {
           $sample: { size: 10 }
         }
       ])
-    }
+    
     for (let i = 0; i < data.length; i++) {
       console.log(data[i].city)
     }

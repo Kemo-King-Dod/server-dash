@@ -17,7 +17,7 @@ const users = new Schema({
     },
     gender: {
         type: String,
-        require: [true, 'الجنس مطلوب']
+        default:"غير محدد"
     },
     locations: {
         type: Array

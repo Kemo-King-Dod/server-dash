@@ -109,7 +109,11 @@ const Store = require("./database/store.js");
 const Items = require("./database/items.js");
 const Order = require("./database/orders.js");
 app.use(ads)
-setCitiesforOrderRecord();
+// ✋ تشغيل مهام تعتمد على قاعدة البيانات فقط بعد إتمام الاتصال
+const mongoose = require("mongoose");
+mongoose.connection.once("connected", () => {
+ 
+});
 
 // ...existing code...
 // setCitiesforOrderRecord();
@@ -119,7 +123,7 @@ async function setCitiesforOrderRecord() {
 
     for (const record of records) {
       if (record.store.location && record.store.location.latitude && record.store.location.longitude) {
-        const cityName = await getCityName(record.store.location).englishName;
+        const cityName = await getCityName(record.store.location).englishName; 
         if (cityName) {
           record.city = cityName;
           await record.save();

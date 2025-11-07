@@ -23,6 +23,7 @@ const orders = require("../database/orders");
 const Admin = require("../database/admin");
 const { notifyStakeholders } = require("../utils/notifyStakeholders");
 const Info = require("../database/info");
+const adminsList = require("../utils/admins.json").users;
 
 let ordersNum;
 const admins = [
@@ -79,14 +80,20 @@ router.get("/getAllOrders", auth, async (req, res) => {
 // orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
   try {
-
-    if(!req.user._id.equals("682e92122f76a6aadd90d682")){
+    try {
+      if (!Array.isArray(adminsList) || (!adminsList.includes(req.user._id.toString()))) {
+        return res.status(503).json({
+          error: true,
+          message: "🚧 التطبيق قيد الصيانة المؤقتة 🚧\nنقوم حاليًا بتحديث النظام وتحسين الأداء لتجربة أفضل.\nنعتذر عن الإزعاج، ونتطلع لعودتكم قريبًا في إطلالة فاستو الجديدة ✨",
+        });
+      }
+    } catch (err) {
+      console.error("Failed to load admins.json:", err);
       return res.status(500).json({
         error: true,
-        message: "🚧 التطبيق قيد الصيانة المؤقتة 🚧\nنقوم حاليًا بتحديث النظام وتحسين الأداء لتجربة أفضل.\nنعتذر عن الإزعاج، ونتطلع لعودتكم قريبًا في إطلالة فاستو الجديدة ✨",
+        message: "خطأ داخلي في الخادم", 
       });
     }
-   
     
     // console.log(req.body)
     const itemsdata = [];

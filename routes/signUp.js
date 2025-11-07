@@ -55,7 +55,6 @@ router.post('/user', async (req, res) => {
                 name,
                 password: hashedPassword,
                 phone,
-                gender,
                 locations: locations || [],
                 registerCondition: "active",
                 orders: [],
