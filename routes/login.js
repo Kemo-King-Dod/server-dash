@@ -31,15 +31,6 @@ route.post("/login", async (req, res) => {
                 data: "رقم الهاتف غير موجود"
             })
         }
-
-        if (exist.connection) {
-            return res.status(400).json({
-                error: true,
-                ishaker: true,
-                message: "الحساب مفتوح في جهاز آخر"
-            })
-        }
-
         // Verify password
         const valid = await bcrypt.compare(password, exist.password)
         if (!valid) {

@@ -199,7 +199,7 @@ router.post('/store', async (req, res) => {
             idNumber:"000000",
             licenseNumber:"000000",
             ownerName,
-            city,
+            city:getCityName(location).englishName,
             location,
             address,
             picture,
