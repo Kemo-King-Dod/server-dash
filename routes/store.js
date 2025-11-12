@@ -164,18 +164,30 @@ router.post("/alterStorePassword", auth, async (req, res) => {
 // alter name
 router.post("/alterStore", auth, async (req, res) => {
   try {
-    const userId = req.userId;
+    let userId = req.userId;
+    if(req.user.userType == "Admin"){
+      userId = req.body.shopId;
+    }
     const store = await Store.findById(userId);
     store.name = req.body.name;
-    store.storeType = req.body.category;
+    store.storeType = req.user.userType == "Admin" ? req.body.storeType : req.body.category;
     store.picture = req.body.picture;
+    if(req.user.userType == "Admin"){
+      store.phone = req.body.phone;
+      store.deliveryCostByKilo = req.body.deliveryCostByKilo;
+      store.ownerName = req.body.ownerName;
+      store.licenseNumber = req.body.licenseNumber;
+      store.address = req.body.address;
+      store.city = req.body.city;
+      store.location = req.body.location;
+    }
     await store.save();
 
     await Ordre.updateMany(
       { "store.id": req.userId },
       {
         "store.name": req.body.name,
-        "store.category": req.body.category,
+        "store.category":req.user.userType == "Admin" ? req.body.storeType : req.body.category,
         "store.picture": req.body.picture,
       }
     );
