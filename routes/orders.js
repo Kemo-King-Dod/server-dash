@@ -80,20 +80,20 @@ router.get("/getAllOrders", auth, async (req, res) => {
 // orders [add , delete , change state]
 router.post("/addOrder", auth, async (req, res) => {
   try {
-    try {
-      if (!Array.isArray(adminsList) || (!adminsList.includes(req.user._id.toString()))) {
-        return res.status(503).json({
-          error: true,
-          message: "🚧 التطبيق قيد الصيانة المؤقتة 🚧\nنقوم حاليًا بتحديث النظام وتحسين الأداء لتجربة أفضل.\nنعتذر عن الإزعاج، ونتطلع لعودتكم قريبًا في إطلالة فاستو الجديدة ✨",
-        });
-      }
-    } catch (err) {
-      console.error("Failed to load admins.json:", err);
-      return res.status(500).json({
-        error: true,
-        message: "خطأ داخلي في الخادم", 
-      });
-    }
+    // try {
+    //   if (!Array.isArray(adminsList) || (!adminsList.includes(req.user._id.toString()))) {
+    //     return res.status(503).json({
+    //       error: true,
+    //       message: "🚧 التطبيق قيد الصيانة المؤقتة 🚧\nنقوم حاليًا بتحديث النظام وتحسين الأداء لتجربة أفضل.\nنعتذر عن الإزعاج، ونتطلع لعودتكم قريبًا في إطلالة فاستو الجديدة ✨",
+    //     });
+    //   }
+    // } catch (err) {
+    //   console.error("Failed to load admins.json:", err);
+    //   return res.status(500).json({
+    //     error: true,
+    //     message: "خطأ داخلي في الخادم", 
+    //   });
+    // }
     
     // console.log(req.body)
     const itemsdata = [];
@@ -167,10 +167,12 @@ router.post("/addOrder", auth, async (req, res) => {
       });
       return;
     }
-    if (
-      getCityName(theAddress).englishName !==
-      getCityName(store.location).englishName
-    ) {
+    const addressCity = getCityName(theAddress).englishName;
+    const storeCity = getCityName(store.location).englishName;
+    const isShatyRegion = (addressCity === "Alshaty" || addressCity === "East Alshaty") && 
+                          (storeCity === "Alshaty" || storeCity === "East Alshaty");
+    
+    if (!isShatyRegion && addressCity !== storeCity) {
       res.status(500).json({
         error: true,
         message: "لا يمكن الطلب من مدن مختلفة",
