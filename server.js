@@ -268,4 +268,36 @@ async function updateProductsStatusFromStores() {
     } catch (err) {
         console.error("خطأ أثناء التحديث:", err);
     }
+  
+
+}
+// updateProductsCityFromStores();
+async function updateProductsCityFromStores() {
+  try {
+    console.log("تم تحديث مدن المنتجات بنجاح");
+      // جلب جميع المنتجات
+      const products = await product.find({});
+      
+      let updatedCount = 0;
+      
+      for (const prod of products) {
+          // البحث عن المتجر الخاص بالمنتج
+          const store = await Store.findById(prod.storeID);
+          
+          if (store) {
+              // تحديث مدينة المنتج بناءً على مدينة المتجر
+              prod.city = store.city;
+              await prod.save();
+              updatedCount++;
+              
+              console.log(`تم تحديث المنتج ${prod._id} إلى مدينة: ${store.city}`);
+          } else {
+              console.log(`لم يتم العثور على متجر للمنتج ${prod._id}`);
+          }
+      }
+      
+      console.log(`تم تحديث ${updatedCount} منتجًا بنجاح.`);
+  } catch (err) {
+      console.error("خطأ أثناء تحديث المدن:", err);
+  }
 }

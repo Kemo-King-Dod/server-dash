@@ -41,6 +41,9 @@ router.get("/getStores", async (req, res) => {
         message: "يرجى التحقق من تفعيل الموقع وإعطاء الإذن",
       });
     }
+    if(req.headers.cityen == "Alshaty" || req.headers.cityen == "East Alshaty"){
+      req.headers.cityen = "Alshaty";
+    }
     const stores = await Store.find(
       { city: req.headers.cityen, registerCondition: "accepted" },
       { password: 0, items: 0 }
