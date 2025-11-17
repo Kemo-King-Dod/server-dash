@@ -65,7 +65,7 @@ async function sendNotificationToTopic({ topic, title, body, isAdmin }) {
     apns: {
       payload: {
         aps: {
-          sound: isAdmin ? "custom_sound" : "default",
+          sound:  "custom_sound" ,
           badge: 1,
         },
       },
