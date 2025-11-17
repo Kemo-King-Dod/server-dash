@@ -6,6 +6,7 @@ const Store = require("../database/store");
 const jwt = require("jsonwebtoken");
 const { auth } = require("../middleware/auth");
 const bcrypt = require("bcrypt");
+const Items = require("../database/items");
 
 router.get("/getStore", auth, async (req, res) => {
   try {
@@ -250,6 +251,7 @@ router.post("/adminStoreState", auth, async (req, res) => {
     // Update the store's registration condition
     store.registerCondition = state;
     await store.save();
+    await Items.updateMany({ storeID: targetUserId }, { store_register_condition: state });
 
     res.status(200).json({
       error: false,

@@ -210,14 +210,14 @@ route.get("/getAllItems", async (req, res) => {
     
       data = req.headers.cityen=="Alshaty" || req.headers.cityen=="East Alshaty" ? await items.aggregate([
         {
-          $match: { city: { $in: ["Alshaty","East Alshaty"] }  }
+          $match: { city: { $in: ["Alshaty","East Alshaty"] } ,  store_register_condition: "accepted" }
         },
         {
           $sample: { size: 10 }
         }
       ]) : await items.aggregate([
         {
-          $match: { city: { $in: [req.headers.cityen] }  }
+          $match: { city: { $in: [req.headers.cityen] }  , store_register_condition: "accepted"   }
         },
         {
           $sample: { size: 10 }

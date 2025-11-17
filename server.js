@@ -240,22 +240,32 @@ async function findCartLengthInUsers() {
        
 
 // sendNotification({token:"e5Q5Ket3QxOAX-Kxo1_Utu:APA91bGz1X_cLq8WChAtbtnJep2hwXowQFZbX2mO7Dh3VpJK-Jhaknkz_iic3q-3QB_anvZBrqhmd61LuDUPoVyaJJISXpC--Ev424MUqX34RGR4g_6iQ7I",title:"تجربة", body:"اول رسالة"})
-// دالة لتحديث جميع المستخدمين
-// async function addFieldsToAllUsers() {
-//     try {
-//         // تحديث جميع المستخدمين بإضافة الحقول إذا لم تكن موجودة
-//         const result = await product.updateMany(
-//             {}, // بدون شرط: يشمل كل المستخدمين
-//             {
-//                 $set: {
-//                   city : 
-//                     // يمكنك استخدام new Date(0) إذا أردت قيمة وقت صفرية
-//                 } 
-//             }
-//         );
-
-//         console.log(`تم تحديث ${result.modifiedCount} مستخدمًا.`);
-//     } catch (err) {
-//         console.error("خطأ أثناء التحديث:", err);
-//     }
-// }
+//updateProductsStatusFromStores();
+async function updateProductsStatusFromStores() {
+    try {
+        // جلب جميع المنتجات
+        const products = await product.find({});
+        
+        let updatedCount = 0;
+        
+        for (const prod of products) {
+            // البحث عن المتجر الخاص بالمنتج
+            const store = await Store.findById(prod.storeID);
+            
+            if (store) {
+                // تحديث حالة المنتج بناءً على حالة المتجر
+                prod.store_register_condition = store.registerCondition;
+                await prod.save();
+                updatedCount++;
+                
+                console.log(`تم تحديث المنتج ${prod._id} إلى حالة: ${store.registerCondition}`);
+            } else {
+                console.log(`لم يتم العثور على متجر للمنتج ${prod._id}`);
+            }
+        }
+        
+        console.log(`تم تحديث ${updatedCount} منتجًا بنجاح.`);
+    } catch (err) {
+        console.error("خطأ أثناء التحديث:", err);
+    }
+}
