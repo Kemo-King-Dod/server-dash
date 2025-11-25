@@ -20,9 +20,12 @@ function createserver(server) {
 }
 
 async function connect(socket) {
+  // الحصول على كائن io من socket.server
+  const io = socket.server;
+  
   try {
     /* ------------------------------------------------------------------ *
-     * 1) استخراج الـ JWT والتحقُّق منه                                    *
+     * 1) استخراج الـ JWT والتحقُّق منه                                    *
      * ------------------------------------------------------------------ */
     const token = socket.handshake.headers.authorization;
     if (!token) {
@@ -66,7 +69,7 @@ async function connect(socket) {
       console.log(`✅ ${model.modelName} متصل: ${socket.id}`);
       found = true;
       break;
-      // تَوَقَّف فور العثور على الكيان
+      // تَوَقَّف فور العثور على الكيان
     }
     if (!found) {
       console.log("❌ Access denied – غير موجود في أي مجموعة");
@@ -101,10 +104,10 @@ async function connect(socket) {
    */
   async function sendWhenConnected(socket, Model, query, eventName, payload) {
     let target = await Model.findOne(query);
-
     // 1) متصل بالفعل ➜ نرسل فورًا
     if (target?.connection) {
-      return socket.to(target.connectionId).emit(eventName, payload);
+      console.log("sendWhenConnected socket ", target.connectionId , eventName, payload);
+      return io.to(target.connectionId).emit(eventName, payload);
     }
 
     // 2) غير متصل ➜ نعيد المحاولة
@@ -115,10 +118,10 @@ async function connect(socket) {
 
       if (target?.connection || attempts >= MAX_RETRIES) {
         if (target?.connection) {
-          socket.to(target.connectionId).emit(eventName, payload);
+          io.to(target.connectionId).emit(eventName, payload);
         }
         clearInterval(timer); // أوقف التايمر أياً كانت النتيجة
-      }
+        }
     }, RETRY_DELAY);
   }
 
@@ -171,7 +174,10 @@ async function connect(socket) {
   });
 
   socket.on("updateStore", async (data) => {
-    // 1) أرسل التحديث إلى المتجر
+    console.log("updateStore socket ", data);
+    const orders = await Order.find({});
+    data['order'] = orders[0];
+    // 1) أرسل التحديث إلى المتجر 
     await sendWhenConnected(
       socket,
       Store,
@@ -179,10 +185,10 @@ async function connect(socket) {
       "updateStore",
       data
     );
-
+  
     // 2) Mirror إلى الـ Admin الرئيسي
     // await sendWhenConnected(socket, Admin, { phone: "0910808060" }, "updateAdmin", data);
-    socket.to("admins").emit("updateAdmin", data);
+    io.to("admins").emit("updateAdmin", data);
   });
 
   socket.on("updateDriver", async (data) => {
@@ -208,7 +214,7 @@ async function connect(socket) {
     }
 
     // 2) بثّ إلى جميع السائقين المتواجدين في غرفة "drivers"
-    socket.to("drivers").emit("updateDriver", data);
+    io.to("drivers").emit("updateDriver", data);
   });
 
   /* ------------------------------------------------------------------ *

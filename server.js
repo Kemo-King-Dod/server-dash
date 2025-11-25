@@ -271,7 +271,7 @@ async function updateProductsStatusFromStores() {
   
 
 }
-// updateProductsCityFromStores();
+//updateProductsCityFromStores();
 async function updateProductsCityFromStores() {
   try {
     console.log("تم تحديث مدن المنتجات بنجاح");
@@ -284,7 +284,7 @@ async function updateProductsCityFromStores() {
           // البحث عن المتجر الخاص بالمنتج
           const store = await Store.findById(prod.storeID);
           
-          if (store) {
+          if (store && (store.city!=prod.city)) {
               // تحديث مدينة المنتج بناءً على مدينة المتجر
               prod.city = store.city;
               await prod.save();
@@ -292,7 +292,7 @@ async function updateProductsCityFromStores() {
               
               console.log(`تم تحديث المنتج ${prod._id} إلى مدينة: ${store.city}`);
           } else {
-              console.log(`لم يتم العثور على متجر للمنتج ${prod._id}`);
+              console.log(`لم يتم العثور على متجر للمنتج ${prod.name}`);
           }
       }
       
@@ -300,4 +300,4 @@ async function updateProductsCityFromStores() {
   } catch (err) {
       console.error("خطأ أثناء تحديث المدن:", err);
   }
-}
+}  

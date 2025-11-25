@@ -19,11 +19,14 @@ const auth = async (req, res, next) => {
     // دالة مساعد لجلب المستخدم من أي مجموعة
     const findById = (model) => model.findById(id).lean ? model.findById(id) : null;
 
-    let user =
-      (await findById(User))   ||
-      (await findById(Driver)) ||
-      (await findById(Store))  ||
-      (await findById(Admin));
+    let user ;
+    if(req.headers.app_name=="fasto"){
+      user = (await findById(User));
+      if(!user) user = (await findById(Store));}
+      else{
+        user = (await findById(Driver));
+        if(!user) user = (await findById(Admin));
+      }
 
     if (!user) {
       return res.status(401).json({ error: true, message: "المستخدم غير موجود" });

@@ -189,6 +189,9 @@ route.patch("/deleteitem", auth, async (req, res) => {
 
 route.get("/getAllItems", async (req, res) => {
   try {
+    var {limit,page} = req.query;
+    console.log("limit",limit,"page",page
+    )
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
@@ -206,28 +209,34 @@ route.get("/getAllItems", async (req, res) => {
 
     let data
     // Get all available items
-   
-    
-      data = req.headers.cityen=="Alshaty" || req.headers.cityen=="East Alshaty" ? await items.aggregate([
-        {
-          $match: { city: { $in: ["Alshaty","East Alshaty"] } ,  store_register_condition: "accepted" }
-        },
-        {
-          $sample: { size: 10 }
-        }
-      ]) : await items.aggregate([
-        {
-          $match: { city: { $in: [req.headers.cityen] }  , store_register_condition: "accepted"   }
-        },
-        {
-          $sample: { size: 10 }
-        }
-      ])
-    
-    for (let i = 0; i < data.length; i++) {
-      console.log(data[i].city)
-    }
+    let matchCondition;
 
+    if (req.headers.cityen == "Alshaty" || req.headers.cityen == "East Alshaty") {
+      matchCondition = {
+        city: { $in: ["Alshaty", "East Alshaty"] },
+        store_register_condition: "accepted"
+      };
+    } else {
+      matchCondition = {
+        city: req.headers.cityen,
+        store_register_condition: "accepted"
+      };
+    }
+    
+        data = await items.aggregate([
+          {
+          $match: matchCondition
+        },
+        {
+          $skip: (Number(page) - 1) * Number(limit)
+        },
+        {
+          $limit:Number(limit)
+        }
+      ]) 
+    const total = await items.countDocuments(matchCondition)
+    console.log("total",total, "numofpage:" , total/20)
+ 
     let discoundIds = []
 
     for (let i = 0; i < data.length; i++) {
@@ -255,7 +264,7 @@ route.get("/getAllItems", async (req, res) => {
 
 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
-      res.json({ error: false, items: data });
+      res.json({ error: false, items: data, total: total });
       return;
     }
 
@@ -293,7 +302,7 @@ route.get("/getAllItems", async (req, res) => {
       }
     }
 
-    res.json({ error: false, items: data });
+    res.json({ error: false, items: data, total: total });
   } catch (error) {
     console.log(error);
     res.status(401).json({
