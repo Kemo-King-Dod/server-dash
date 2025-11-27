@@ -22,16 +22,20 @@ route.post("/login", async (req, res) => {
          const app_name = req.headers.app_name
         // Find user across all collections
         let exist ;
-         if(app_name=="fasto")  {
+        if(app_name==null){
             exist = await User.findOne({ phone });
             if(!exist) exist = await Store.findOne({ phone });
-         }    else{
-            exist = await Driver.findOne({ phone })
-            if (!exist) exist = await Admin.findOne({ phone })
-    
-         } 
-    
-        
+            if(!exist) exist = await Driver.findOne({ phone });
+            if(!exist) exist = await Admin.findOne({ phone });
+        }
+        else if(app_name=="fasto"){
+            exist = await User.findOne({ phone });
+            if(!exist) exist = await Store.findOne({ phone });
+        }
+        else{
+            exist = await Driver.findOne({ phone });
+            if(!exist) exist = await Admin.findOne({ phone });
+        }
        
         if (!exist) {
             return res.status(400).json({

@@ -20,7 +20,13 @@ const auth = async (req, res, next) => {
     const findById = (model) => model.findById(id).lean ? model.findById(id) : null;
 
     let user ;
-    if(req.headers.app_name=="fasto"){
+    if(req.headers.app_name==null){
+      user = (await findById(User));
+      if(!user) user = (await findById(Store));
+      if(!user) user = (await findById(Driver));
+      if(!user) user = (await findById(Admin));
+    }
+   else if(req.headers.app_name=="fasto"){
       user = (await findById(User));
       if(!user) user = (await findById(Store));}
       else{

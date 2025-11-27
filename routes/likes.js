@@ -107,7 +107,7 @@ router.get("/mostLiked", async (req, res) => {
         message: "يرجى التحقق من تفعيل الموقع وإعطاء الإذن"
       });
     }
-    const data = await Item.find({ city: req.headers.cityen })
+    const data = await Item.find({ city: req.headers.cityen  ,store_register_condition: "accepted"})
       .sort({ likes: -1 }) // Sort by likes in descending order
       .limit(4); // Get only 4 items
 

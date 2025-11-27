@@ -91,7 +91,7 @@ router.get("/MostFollowedStores", async (req, res) => {
       });
     }
     
-    const stores = await Store.find({ city: req.headers.cityen }).sort({ followersNumber: -1 }).limit(4);
+    const stores = await Store.find({ city: req.headers.cityen ,registerCondition: "accepted"}).sort({ followersNumber: -1 }).limit(4);
     // Handle authenticated user case
     // Add isFollow property to each store
     for (var i = 0; i < stores.length; i++) {

@@ -11,11 +11,11 @@ router.get('/getFavoriveitems', auth, async (req, res) => {
         const userId = req.userId;
         const user = await User.findById(userId);
  
-        const items = await Items.find({ _id: { $in: user.favorateItems } })
+        const items = await Items.find({ _id: { $in: user.favorateItems } ,store_register_condition: "accepted"})
 
         for (var i = 0; i < items.length; i++) {
             items[i]._doc.isFavorite = true;
-        }
+        } 
 
         res.status(200).json({
             error: false,

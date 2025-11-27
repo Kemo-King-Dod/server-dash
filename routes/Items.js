@@ -192,6 +192,7 @@ route.get("/getAllItems", async (req, res) => {
     var {limit,page} = req.query;
     console.log("limit",limit,"page",page
     )
+  
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
@@ -223,22 +224,29 @@ route.get("/getAllItems", async (req, res) => {
       };
     }
     
-        data = await items.aggregate([
-          {
-          $match: matchCondition
-        },
-        {
-          $skip: (Number(page) - 1) * Number(limit)
-        },
-        {
-          $limit:Number(limit)
-        }
-      ]) 
+    // بناء الـ pipeline بشكل ديناميكي
+    let pipeline = [
+      {
+        $match: matchCondition
+      }
+    ];
+
+    // إضافة skip و limit فقط إذا كانت موجودة
+    if (limit != null && page != null) {
+      pipeline.push({
+        $skip: (Number(page) - 1) * Number(limit)
+      });
+      pipeline.push({
+        $limit: Number(limit)    
+      });
+    }
+
+    data = await items.aggregate(pipeline); 
     const total = await items.countDocuments(matchCondition)
     console.log("total",total, "numofpage:" , total/20)
  
     let discoundIds = []
-
+  
     for (let i = 0; i < data.length; i++) {
       if (data[i].retrenchment_end < Date.now()) {
         discoundIds.push(data[i]._id)

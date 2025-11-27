@@ -53,6 +53,7 @@ route.post("/search", async (req, res) => {
             $options: "i",
           },
           city: city,
+          registerCondition: "accepted",
         },
       },
       // {
@@ -88,6 +89,7 @@ route.post("/search", async (req, res) => {
             $options: "i",
           },
           city: city,
+          store_register_condition: "accepted",
         },
       },
       // {
