@@ -230,6 +230,10 @@ route.get("/getAllItems", async (req, res) => {
         $match: matchCondition
       }
     ];
+    // إضافة الترتيب العشوائي
+    pipeline.push({
+      $sample: { size: 10000 } // حجم كبير للحصول على جميع النتائج بشكل عشوائي
+    });
 
     // إضافة skip و limit فقط إذا كانت موجودة
     if (limit != null && page != null) {
