@@ -52,43 +52,43 @@
   "avilableCat": [
     {
       "name": "مواد غذائية",
-      "image": "/uploads/categories/materialfood.png"
+      "image": "/categories/materialfood.png"
     },
     {
       "name": "مطاعم",
-      "image": "/uploads/categories/fastfoods.png"
+      "image": "/categories/fastfoods.png"
     },
     
     
   {
     "name": "خضروات وفواكه",  
-    "image": "/uploads/categories/foods.png"},
+    "image": "/categories/foods.png"},
     { 
       "name": "قطع غيار السيارات", 
-      "image": "/uploads/categories/material.png" 
+      "image": "/categories/material.png" 
        
     },
     {
       "name": "مقهى",  
-      "image": "/uploads/categories/coffee.png"
+      "image": "/categories/coffee.png"
     },
     {
       "name": "القرطاسية",
-      "image": "/uploads/categories/backbag.png"
+      "image": "/categories/backbag.png"
     },
     {
       "name": "مواد تجميل",
-      "image": "/uploads/categories/zina.png" 
+      "image": "/categories/zina.png" 
     },
     {  
       "name": "اكسسوارات الهواتف",
-      "image": "/uploads/categories/phone.png"
+      "image": "/categories/phone.png"
     },{
        "name": "أجهزة الكومبيوتر",
-      "image": "/uploads/categories/phone.png"
+      "image": "/categories/phone.png"
     }, {
       "name": "مواد تنظيف",
-      "image": "/uploads/categories/cleaners.png"
+      "image": "/categories/cleaners.png"
     }
     
      
