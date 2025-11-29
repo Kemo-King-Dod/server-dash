@@ -1,11 +1,11 @@
 {
-  "version": "1.0.23",
+  "version": "1.0.25",
   "build": "1",
   "date": "2025-6-29",
   "author": "Kemo king",
   "description": "This is a description of the version",
   "url": "https://play.google.com/store/apps/details?id=com.fasto.ly",
-  "ios_url":"https://apps.apple.com/app/id6784126482",
+  "ios_url":"https://apps.apple.com/dz/app/فاستو/id6754520489?l=ar",
   "image": "newUpdateNoBg.png",
-  "versions": ["1.0.23","1.0.24"]
+  "versions": ["1.0.23","1.0.24","1.0.25"]
 }
