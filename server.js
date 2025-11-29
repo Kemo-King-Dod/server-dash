@@ -17,6 +17,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const expressserver = app.listen(PORT, () => {
   console.log(`server is listening on  ${PORT}`);
 });
+app.use("/categories", express.static(path.join(__dirname, "categories")));
+
 
 const io = createserver(expressserver);
 io.on("connection", connect);
