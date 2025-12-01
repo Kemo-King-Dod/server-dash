@@ -242,10 +242,10 @@ async function findCartLengthInUsers() {
 //   } catch (err) {
 //       console.error('حدث خطأ أثناء التحديث:', err);
 //   }
-// }
+// }ة
        
 
-// sendNotification({token:"e5Q5Ket3QxOAX-Kxo1_Utu:APA91bGz1X_cLq8WChAtbtnJep2hwXowQFZbX2mO7Dh3VpJK-Jhaknkz_iic3q-3QB_anvZBrqhmd61LuDUPoVyaJJISXpC--Ev424MUqX34RGR4g_6iQ7I",title:"تجربة", body:"اول رسالة"})
+// sendNotification({token:"elD7RIOlRaaBfKVYkUgSjq:APA91bHDAzRiWNp-CHLKygQXAUSfFc2OhzSiq46rQAWCZRR2BEsEpwjXsBO5UPf592yCD-12dAWy0bpvF_4OThsnPgeoq7C6N-ZFtuigXDm3pOSHjRrIpdk",title:"تجربة", body:"اول رسالة"})
 //updateProductsStatusFromStores();
 async function updateProductsStatusFromStores() {
     try {

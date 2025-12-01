@@ -15,7 +15,6 @@ async function sendNotification({ token, title, body }) {
     android: {
       priority: "high",
       notification: {
-        sound: "custom_sound",
         priority: "max",
         channelId: "fasto_notifications", // <-- طابقه مع Flutter
       },
