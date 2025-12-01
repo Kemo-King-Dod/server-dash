@@ -362,16 +362,16 @@ router.post("/updateDriver", auth, async (req, res) => {
         message: "السائق غير موجود",
       });
     }
-    if(updatedDriver.licenseImage!==driver.licenseImage){
+    if(driver.licenseImage && updatedDriver.licenseImage!==driver.licenseImage){
       await deleteUploadedFile(updatedDriver.licenseImage);
     }
-    if(updatedDriver.passportImage!==driver.passportImage){
+    if(driver.passportImage && updatedDriver.passportImage!==driver.passportImage){
       await deleteUploadedFile(updatedDriver.passportImage);
     }
-    if(updatedDriver.CarBookImage!==driver.CarBookImage){
+    if(driver.CarBookImage && updatedDriver.CarBookImage!==driver.CarBookImage){
       await deleteUploadedFile(updatedDriver.CarBookImage);
     }
-    if(updatedDriver.CarImage!==driver.CarImage){
+    if(driver.CarImage && updatedDriver.CarImage!==driver.CarImage){
       await deleteUploadedFile(updatedDriver.CarImage);
     }
 
@@ -400,10 +400,18 @@ router.post("/updateDriver", auth, async (req, res) => {
       data: updatedDriver,
     });
   } catch (err) {
-    await deleteUploadedFile(req.body.driver.licenseImage);
-    await deleteUploadedFile(req.body.driver.passportImage);
-    await deleteUploadedFile(req.body.driver.CarBookImage);
-    await deleteUploadedFile(req.body.driver.CarImage);
+    if(req.body.driver.licenseImage){
+      await deleteUploadedFile(req.body.driver.licenseImage);
+    }
+    if(req.body.driver.passportImage){
+      await deleteUploadedFile(req.body.driver.passportImage);
+    }
+    if(req.body.driver.CarBookImage){
+      await deleteUploadedFile(req.body.driver.CarBookImage);
+    }
+    if(req.body.driver.CarImage){
+      await deleteUploadedFile(req.body.driver.CarImage);
+    }
     console.log(err);
     res.status(500).json({
       error: true,
