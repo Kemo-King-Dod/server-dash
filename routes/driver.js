@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 const Driver = require("../database/driver");
 const { auth } = require("../middleware/auth");
 const Transaction = require("../database/transactions");
@@ -399,6 +400,10 @@ router.post("/updateDriver", auth, async (req, res) => {
       data: updatedDriver,
     });
   } catch (err) {
+    await deleteUploadedFile(req.body.driver.licenseImage);
+    await deleteUploadedFile(req.body.driver.passportImage);
+    await deleteUploadedFile(req.body.driver.CarBookImage);
+    await deleteUploadedFile(req.body.driver.CarImage);
     console.log(err);
     res.status(500).json({
       error: true,
