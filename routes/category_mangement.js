@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
     cb(null, 'categories/')
   },
   filename: function (req, file, cb) {
-    cb(null,  file.filename + '.' + file.originalname.split('.').pop())
+    cb(null,  file.originalname)
   }
 })
 
@@ -113,6 +113,7 @@ router.post('/deleteCategory', (req, res) => {
     const updatedCategories = currentCategories.avilableCat.filter(cat => cat.name !== category);
     fs.writeFileSync(categoriesPath, JSON.stringify({ avilableCat: updatedCategories }, null, 2));
     delete require.cache[require.resolve("../utils/categories.json")];
+    fs.unlinkSync(path.join(__dirname, "..", "categories", category.image.split('/').pop()));
     res.status(200).json({ error: false, message: "Category deleted successfully" });
   }
   catch (err) {
