@@ -57,10 +57,9 @@ router.post('/addCategory', upload.single('photo'), (req, res) => {
       })
     }
 
-    const { category } = req.body;
     const newCategory = {
-      name: req.body.category,             // اسم الفئة من الفورم
-      image: "/categories/" + req.file.filename  // مسار الصورة
+      name: req.body.category.name,             // اسم الفئة من الفورم
+      image: "/categories/" + req.file.originalname  // مسار الصورة
     };
     // Read the current categories
     const categoriesPath = path.join(__dirname, "..", "utils", "categories.json");
