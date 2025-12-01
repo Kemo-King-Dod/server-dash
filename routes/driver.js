@@ -350,8 +350,10 @@ router.post("/updateDriver", auth, async (req, res) => {
     }
     const { driver} = req.body;
 
-  
-    driver.password = await bcrypt.hash(driver.password, 10);
+    // Only hash password if it's provided and not empty
+    if (driver.password && driver.password.trim() !== "") {
+      driver.password = await bcrypt.hash(driver.password, 10);
+    }
     driver.funds = driver.funds || 0;
     driver.balance = driver.balance || 0;
     driver.lastWithdrawal = driver.lastWithdrawal || null;
@@ -384,7 +386,10 @@ router.post("/updateDriver", auth, async (req, res) => {
     updatedDriver.age = driver.age || updatedDriver.age;
     updatedDriver.gender = driver.gender || updatedDriver.gender;
     updatedDriver.vehicleType = driver.vehicleType || updatedDriver.vehicleType;
-    updatedDriver.password = driver.password || updatedDriver.password;
+    // Only update password if it was hashed (i.e., if it was provided)
+    if (driver.password && driver.password.trim() !== "") {
+      updatedDriver.password = driver.password;
+    }
     updatedDriver.licenseNumber = driver.licenseNumber || updatedDriver.licenseNumber;
     updatedDriver.carCardNumber = driver.carCardNumber || updatedDriver.carCardNumber;
     updatedDriver.licenseImage = driver.licenseImage || updatedDriver.licenseImage;
