@@ -376,28 +376,16 @@ router.post("/updateDriver", auth, async (req, res) => {
     }
 
 
-    updatedDriver.name = driver.name || updatedDriver.name;
-    updatedDriver.phone = driver.phone || updatedDriver.phone;
-    updatedDriver.age = driver.age || updatedDriver.age;
-    updatedDriver.gender = driver.gender || updatedDriver.gender;
-    updatedDriver.vehicleType = driver.vehicleType || updatedDriver.vehicleType;
+  
     // Only update password if it was hashed (i.e., if it was provided)
     if (driver.password && driver.password.trim() !== "") {
       updatedDriver.password = driver.password;
     }
-    updatedDriver.licenseNumber = driver.licenseNumber || updatedDriver.licenseNumber;
-    updatedDriver.carCardNumber = driver.carCardNumber || updatedDriver.carCardNumber;
-    updatedDriver.licenseImage = driver.licenseImage || updatedDriver.licenseImage;
-    updatedDriver.CarBookImage = driver.CarBookImage || updatedDriver.CarBookImage;
-    updatedDriver.CarImage = driver.CarImage || updatedDriver.CarImage;
-    updatedDriver.passportImage = driver.passportImage || updatedDriver.passportImage;
-    updatedDriver.funds = driver.funds || updatedDriver.funds;
-    updatedDriver.balance = driver.balance || updatedDriver.balance;
-   await updatedDriver.save();
+     const updateDriver = await Driver.findByIdAndUpdate(driver.id, driver, { new: true });
     res.status(200).json({
       error: false,
       message: "تم تحديث البيانات بنجاح",
-      data: updatedDriver,
+      data: updateDriver,
     });
   } catch (err) {
     if(req.body.driver.licenseImage){
