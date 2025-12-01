@@ -98,6 +98,9 @@ app.use(notification);
 const version = require("./routes/version.js");
 app.use(version);
 
+const categoryManagement = require("./routes/category_mangement.js");
+app.use(categoryManagement);
+
 const reports = require('./routes/reports.js');
 const product = require('./database/items.js');
 app.use(reports)

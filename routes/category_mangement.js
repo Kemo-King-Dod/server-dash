@@ -1,6 +1,7 @@
 const fs = require('fs');
 const express = require('express')
 const app = express()
+const router = express.Router();
 const multer = require('multer')
 const path = require('path')
 
@@ -35,7 +36,7 @@ const upload = multer({
   }
 })
 
-app.post('/addCategory', upload.single('photo'), (req, res) => {
+router.post('/addCategory', upload.single('photo'), (req, res) => {
   try {
     if (!req.body.password || req.body.password !== 'Chackmate@9876') {
       return res.status(401).json({
@@ -88,7 +89,7 @@ app.post('/addCategory', upload.single('photo'), (req, res) => {
   }
 })
 
-app.delete('/deleteCategory', (req, res) => {
+router.delete('/deleteCategory', (req, res) => {
   try {
     if (!req.body.password || req.body.password !== 'Chackmate@9876') {
       return res.status(401).json({
@@ -118,7 +119,7 @@ app.delete('/deleteCategory', (req, res) => {
     })
   }
 })
-app.patch('/updateCategory', (req, res) => {
+router.patch('/updateCategory', (req, res) => {
   try {
     if (!req.body.password || req.body.password !== 'Chackmate@9876') {
       return res.status(401).json({
@@ -149,4 +150,4 @@ app.patch('/updateCategory', (req, res) => {
     })
   }
 })
-module.exports = app
+module.exports = router
