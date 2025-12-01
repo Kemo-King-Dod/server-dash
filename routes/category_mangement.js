@@ -58,16 +58,19 @@ router.post('/addCategory', upload.single('photo'), (req, res) => {
     }
 
     const { category } = req.body;
-    category.image = "/"+req.file.path;
+    const newCategory = {
+      name: req.body.category,             // اسم الفئة من الفورم
+      image: "/categories/" + req.file.filename  // مسار الصورة
+    };
     // Read the current categories
     const categoriesPath = path.join(__dirname, "..", "utils", "categories.json");
     const currentCategories = require("../utils/categories.json");
     
     // Add the new category
     const updatedCategories = {
-      avilableCat: [...currentCategories.avilableCat, category]
+      avilableCat: [...currentCategories.avilableCat, newCategory]
     };
-    
+
     // Write back to file
     fs.writeFileSync(categoriesPath, JSON.stringify(updatedCategories, null, 2));
     

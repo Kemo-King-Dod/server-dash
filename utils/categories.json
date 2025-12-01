@@ -36,10 +36,12 @@
     },{
        "name": "أجهزة الكومبيوتر",
       "image": "/categories/phone.png"
-    }, {
+    },
+     {
       "name": "مواد تنظيف",
       "image": "/categories/cleaners.png"
     }
+
     
      
     
