@@ -10,10 +10,10 @@ module.exports = {
   
         // حتى لو watch=false نقدر نخلي القائمة موجودة كتوثيق
         ignore_watch: [
+          "categories",
           "uploads",
           "logs",
           "data",
-          "node_modules",
         ],
   
         env: {

@@ -175,15 +175,18 @@ router.post("/alterStore", auth, async (req, res) => {
     const store = await Store.findById(userId);
     store.name = req.body.name;
     store.storeType = req.user.userType == "Admin" ? req.body.storeType : req.body.category;
+    if(req.body.picture && store.picture!==req.body.picture){
+      await deleteUploadedFile(store.picture);
     store.picture = req.body.picture;
+    }
     if(req.user.userType == "Admin"){
-      store.phone = req.body.phone;
-      store.deliveryCostByKilo = req.body.deliveryCostByKilo;
-      store.ownerName = req.body.ownerName;
-      store.licenseNumber = req.body.licenseNumber;
-      store.address = req.body.address;
-      store.city = req.body.city;
-      store.location = req.body.location;
+      store.phone = req.body.phone || store.phone;
+      store.deliveryCostByKilo = req.body.deliveryCostByKilo || store.deliveryCostByKilo;
+      store.ownerName = req.body.ownerName || store.ownerName;
+      store.licenseNumber = req.body.licenseNumber || store.licenseNumber;
+      store.address = req.body.address || store.address;
+      store.city = req.body.city || store.city;
+      store.location = req.body.location || store.location;
     }
     await store.save();
 
@@ -191,8 +194,6 @@ router.post("/alterStore", auth, async (req, res) => {
       { "store.id": req.userId },
       {
         "store.name": req.body.name,
-        "store.category":req.user.userType == "Admin" ? req.body.storeType : req.body.category,
-        "store.picture": req.body.picture,
       }
     );
 
