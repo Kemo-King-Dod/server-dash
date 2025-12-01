@@ -349,19 +349,12 @@ router.post("/updateDriver", auth, async (req, res) => {
       });
     }
     const { driver} = req.body;
+    console.log("driver",driver)
 
     // Only hash password if it's provided and not empty
     if (driver.password && driver.password.trim() !== "") {
       driver.password = await bcrypt.hash(driver.password, 10);
     }
-    driver.funds = driver.funds || 0;
-    driver.balance = driver.balance || 0;
-    driver.lastWithdrawal = driver.lastWithdrawal || null;
-    driver.status = driver.status || "waiting";
-    driver.connection = driver.connection || false;
-    driver.connectionId = driver.connectionId || null;
-    driver.moneyRecord = driver.moneyRecord || [];
-   
     const updatedDriver = await Driver.findById(driver.id);
     if(!updatedDriver){
       return res.status(404).json({
@@ -381,6 +374,8 @@ router.post("/updateDriver", auth, async (req, res) => {
     if(updatedDriver.CarImage!==driver.CarImage){
       await deleteUploadedFile(updatedDriver.CarImage);
     }
+
+
     updatedDriver.name = driver.name || updatedDriver.name;
     updatedDriver.phone = driver.phone || updatedDriver.phone;
     updatedDriver.age = driver.age || updatedDriver.age;
