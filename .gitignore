@@ -1,10 +1,11 @@
 # Node modules
 node_modules/
 
+
 # Uploads
 uploads/
 categories/
-
+utils/categories.json
 # Firebase
 firebase/fasto-82029-firebase-adminsdk-fbsvc-56efdd6fa7.json
 
