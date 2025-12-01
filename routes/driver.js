@@ -7,6 +7,7 @@ const Admin = require("../database/admin");
 const { default: mongoose } = require("mongoose");
 const fs = require("fs");
 const path = require("path");
+const deleteUploadedFile = require("../utils/deleteImage");
  
 router.get("/getDriver", auth, async (req, res) => {
   try {
@@ -338,8 +339,75 @@ router.get("/getDriverLocation/:phone", auth, async (req, res) => {
     });
   }
 });
+router.post("/updateDriver", auth, async (req, res) => {
+  try {
+    if(req.user.userType != "Admin"){
+      return res.status(403).json({
+        error: true,
+        message: "ليس لديك صلاحية لتحديث البيانات",
+      });
+    }
+    const { driver} = req.body;
+
+  
+    driver.password = await bcrypt.hash(driver.password, 10);
+    driver.funds = driver.funds || 0;
+    driver.balance = driver.balance || 0;
+    driver.lastWithdrawal = driver.lastWithdrawal || null;
+    driver.status = driver.status || "waiting";
+    driver.connection = driver.connection || false;
+    driver.connectionId = driver.connectionId || null;
+    driver.moneyRecord = driver.moneyRecord || [];
+   
+    const updatedDriver = await Driver.findById(driver.id);
+    if(!updatedDriver){
+      return res.status(404).json({
+        error: true,
+        message: "السائق غير موجود",
+      });
+    }
+    if(updatedDriver.licenseImage!==driver.licenseImage){
+      await deleteUploadedFile(updatedDriver.licenseImage);
+    }
+    if(updatedDriver.passportImage!==driver.passportImage){
+      await deleteUploadedFile(updatedDriver.passportImage);
+    }
+    if(updatedDriver.CarBookImage!==driver.CarBookImage){
+      await deleteUploadedFile(updatedDriver.CarBookImage);
+    }
+    if(updatedDriver.CarImage!==driver.CarImage){
+      await deleteUploadedFile(updatedDriver.CarImage);
+    }
+    updatedDriver.name = driver.name || updatedDriver.name;
+    updatedDriver.phone = driver.phone || updatedDriver.phone;
+    updatedDriver.age = driver.age || updatedDriver.age;
+    updatedDriver.gender = driver.gender || updatedDriver.gender;
+    updatedDriver.vehicleType = driver.vehicleType || updatedDriver.vehicleType;
+    updatedDriver.password = driver.password || updatedDriver.password;
+    updatedDriver.licenseNumber = driver.licenseNumber || updatedDriver.licenseNumber;
+    updatedDriver.carCardNumber = driver.carCardNumber || updatedDriver.carCardNumber;
+    updatedDriver.licenseImage = driver.licenseImage || updatedDriver.licenseImage;
+    updatedDriver.CarBookImage = driver.CarBookImage || updatedDriver.CarBookImage;
+    updatedDriver.CarImage = driver.CarImage || updatedDriver.CarImage;
+    updatedDriver.passportImage = driver.passportImage || updatedDriver.passportImage;
+    updatedDriver.funds = driver.funds || updatedDriver.funds;
+    updatedDriver.balance = driver.balance || updatedDriver.balance;
+   await updatedDriver.save();
+    res.status(200).json({
+      error: false,
+      message: "تم تحديث البيانات بنجاح",
+      data: updatedDriver,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      error: true,
+      message: err.message || "حدث خطأ في الخادم",
+    });
+  }
+});
 
 module.exports = router;
 
 
-module.exports = router;
+

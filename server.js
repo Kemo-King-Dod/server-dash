@@ -113,6 +113,7 @@ const Order = require("./database/orders.js");
 app.use(ads)
 // ✋ تشغيل مهام تعتمد على قاعدة البيانات فقط بعد إتمام الاتصال
 const mongoose = require("mongoose");
+const Driver = require("./database/driver.js");
 mongoose.connection.once("connected", () => {
  
 });
@@ -303,3 +304,17 @@ async function updateProductsCityFromStores() {
       console.error("خطأ أثناء تحديث المدن:", err);
   }
 }  
+ 
+setByCodeFaslse=async()=>{
+
+  try {
+    const Drivers = await Driver.find({vehicleType:{$nin:["سيارة"]}});
+    for (const Driver of Drivers) {
+      Driver.vehicleType = "سيارة";
+      await Driver.save();
+    }
+    console.log("انتهيت");
+  } catch (error) {
+    console.log(error);
+  }
+}

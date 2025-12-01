@@ -149,7 +149,7 @@ const stores = new Schema(
     },
     ByCode: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     blockUntil:{
       type : Date ,
