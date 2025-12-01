@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
     cb(null, 'categories/')
   },
   filename: function (req, file, cb) {
-    cb(null,  file.fieldname)
+    cb(null,  file.filename + '.' + file.originalname.split('.').pop())
   }
 })
 
@@ -56,9 +56,11 @@ router.post('/addCategory', upload.single('photo'), (req, res) => {
         path: 'لم يتم تحميل ملفات'
       })
     }
-
+    // Parse the category data from JSON string
+    const categoryData = JSON.parse(req.body.category);
+    
     const newCategory = {
-      name: req.body.category.name,             // اسم الفئة من الفورم
+      name: categoryData.name,             // اسم الفئة من الفورم
       image: "/categories/" + req.file.filename  // مسار الصورة
     };
     // Read the current categories
