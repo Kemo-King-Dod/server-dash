@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
 const Item = require('../database/items');
+const Store = require('../database/store');
 const Retrenchments = require('../database/Retrenchments');
 const { sendNotificationToTopic } = require('../firebase/notification');
 
@@ -86,6 +87,23 @@ router.post('/deleteDiscount', auth, async (req, res) => {
             error: true,
             message: error.message,
         })
+    }
+})
+
+
+router.post('/delevryDiscount', async (req, res) => {
+    try {
+        const { shopId, price } = req.body
+        const shop = await Store.findById(shopId)
+        shop.hasDiscount = true
+        shop.deliveryCostByKilo = price
+        await shop.save()
+        res.status(200).json({
+            error:false
+        })
+    }
+    catch (e) {
+        console.log(e)
     }
 })
 

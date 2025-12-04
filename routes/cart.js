@@ -68,7 +68,7 @@ router.get("/getfromcart", auth, async (req, res) => {
           isModfiy: store.isModfiy,
           modfingPrice: store.modfingPrice,
           items: [
-            { 
+            {
               id: item._id,
               image: item.imageUrl,
               name: item.name,
@@ -139,9 +139,9 @@ router.get("/getfromcart", auth, async (req, res) => {
     res.status(500).json({
       error: true,
       message: error.message,
-    }); 
-  }  
-});  
+    });
+  }
+});
 // Add item to cart
 router.post("/addtocart", auth, async (req, res) => {
   try {
@@ -151,10 +151,10 @@ router.post("/addtocart", auth, async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: true,
         operation: "null",
-        data: "المستخدم غير موجود", 
+        data: "المستخدم غير موجود",
       });
     }
     const store = await Store.findById(storeID);
@@ -201,7 +201,7 @@ router.post("/addtocart", auth, async (req, res) => {
     }
 
     // نسخ السلة الحالية للمستخدم
-    let updatedCart = [...user.cart];   
+    let updatedCart = [...user.cart];
 
     // التحقق من وجود المنتج في السلة
     const existingItemIndex = updatedCart.findIndex(
@@ -209,9 +209,9 @@ router.post("/addtocart", auth, async (req, res) => {
         item.cartItem.id === newCartItem.id &&
         item.cartItem.storeID === newCartItem.storeID &&
         JSON.stringify(item.cartItem.options) ===
-          JSON.stringify(newCartItem.options) &&
+        JSON.stringify(newCartItem.options) &&
         JSON.stringify(item.cartItem.addOns) ===
-          JSON.stringify(newCartItem.addOns)
+        JSON.stringify(newCartItem.addOns)
     );
 
     if (existingItemIndex !== -1) {
@@ -227,9 +227,9 @@ router.post("/addtocart", auth, async (req, res) => {
     } else {
       // إضافة منتج جديد (تأكد من أن الكمية رقم) 
       newCartItem.quantity = Number(newCartItem.quantity);
-      updatedCart.push({ cartItem: newCartItem }); 
+      updatedCart.push({ cartItem: newCartItem });
     }
- 
+
     // تحديث السلة باستخدام updateOne
     const result = await User.updateOne(
       { _id: userId },
@@ -329,9 +329,9 @@ router.post("/addtocartfromstore", auth, async (req, res) => {
           item.cartItem.id === newCartItem.id &&
           item.cartItem.storeID === newCartItem.storeID &&
           JSON.stringify(item.cartItem.options) ===
-            JSON.stringify(newCartItem.options) &&
+          JSON.stringify(newCartItem.options) &&
           JSON.stringify(item.cartItem.addOns) ===
-            JSON.stringify(newCartItem.addOns)
+          JSON.stringify(newCartItem.addOns)
       );
 
       if (existingItemIndex !== -1) {
@@ -552,9 +552,21 @@ router.patch("/editeQuantity", auth, async (req, res) => {
 router.post("/getPriceForCart", auth, async (req, res) => {
   try {
     console.log(req.body);
-    const { point, storePoint, isModfiy, distance } = req.body;
+    const { point, storePoint, isModfiy, distance, shopId } = req.body;
 
     let price = 0;
+    const shop = await Store.findById(shopId)
+    if (shop.hasDiscount) {
+      price = shop.deliveryCostByKilo
+      return res.status(200).json({
+        error: false,
+        data: {
+          price: price,
+        },
+      });
+    }
+
+
     if (
       getCityName(point).englishName != getCityName(storePoint).englishName &&
       getCityName(point).englishName != "Outside the scope" &&
@@ -610,55 +622,98 @@ router.post("/getPriceForCart", auth, async (req, res) => {
 
 // get cart
 router.post("/getCartNext", auth, async (req, res) => {
-    try {
-      console.log(req.body);
-      const userId = req.userId;
-      const user = await User.findById(userId);
-  
-      if (!user) {
-        return res.status(404).json({
-          error: true,
-          data: "المستخدم غير موجود",
+  try {
+    console.log(req.body);
+    const userId = req.userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        error: true,
+        data: "المستخدم غير موجود",
+      });
+    }
+
+    // git shop discounts
+    let discoundIds = [];
+    for (let i = 0; i < user.cart.length; i++) {
+      let the_item = await Item.findById(user.cart[i].cartItem.id);
+      if (the_item.retrenchment_end < Date.now()) {
+        discoundIds.push(the_item._id);
+        the_item.retrenchment_end = null;
+        the_item.retrenchment_percent = null;
+        the_item.is_retrenchment = false;
+        await Item.findByIdAndUpdate(the_item._id, {
+          $set: {
+            retrenchment_end: null,
+            retrenchment_percent: null,
+            is_retrenchment: false,
+          },
         });
       }
-  
-      // git shop discounts
-      let discoundIds = [];
-      for (let i = 0; i < user.cart.length; i++) {
-        let the_item = await Item.findById(user.cart[i].cartItem.id);
-        if (the_item.retrenchment_end < Date.now()) {
-          discoundIds.push(the_item._id);
-          the_item.retrenchment_end = null;
-          the_item.retrenchment_percent = null;
-          the_item.is_retrenchment = false;
-          await Item.findByIdAndUpdate(the_item._id, {
-            $set: {
-              retrenchment_end: null,
-              retrenchment_percent: null,
-              is_retrenchment: false,
-            },
-          });
-        }
-        if (!the_item.is_retrenchment) {
-          user.cart[i].cartItem.price = the_item.price;
-        } else {
-          user.cart[i].cartItem.price =
-            the_item.price * (1 - the_item.retrenchment_percent / 100);
-        }
+      if (!the_item.is_retrenchment) {
+        user.cart[i].cartItem.price = the_item.price;
+      } else {
+        user.cart[i].cartItem.price =
+          the_item.price * (1 - the_item.retrenchment_percent / 100);
       }
-      // delete if retrenchment_end is bigger than or equl now
-      Retrenchments.deleteMany({
-        retrenchment_end: { $lt: Date.now() },
-      });
-  
-      var thedata = [];
-  
-      for (var i = 0; i < user.cart.length; i++) {
-        const item = await Item.findById(user.cart[i].cartItem.id);
-  
-        // find shop
-        const store = await Store.findById(item.storeID);
-        if (thedata.length == 0) {
+    }
+    // delete if retrenchment_end is bigger than or equl now
+    Retrenchments.deleteMany({
+      retrenchment_end: { $lt: Date.now() },
+    });
+
+    var thedata = [];
+
+    for (var i = 0; i < user.cart.length; i++) {
+      const item = await Item.findById(user.cart[i].cartItem.id);
+
+      // find shop
+      const store = await Store.findById(item.storeID);
+      if (thedata.length == 0) {
+        thedata.push({
+          shopId: item.storeID,
+          shopName: store.name,
+          shopImage: store.picture,
+          deliveryFee: store.deliveryCostByKilo,
+          companyFee: store.companyFee,
+          location: store.location,
+          isModfiy: store.isModfiy,
+          modfingPrice: store.modfingPrice,
+          items: [
+            {
+              id: item._id,
+              image: item.imageUrl,
+              name: item.name,
+              price: user.cart[i].cartItem.price,
+              quantity: user.cart[i].cartItem.quantity,
+              options: user.cart[i].cartItem.options,
+              addOns: user.cart[i].cartItem.addOns,
+              quantity: user.cart[i].cartItem.quantity,
+              shopId: item.storeID,
+            },
+          ],
+        });
+      } else {
+        var found = false;
+        for (var j = 0; j < thedata.length; j++) {
+          if (thedata[j].shopId.toString() == item.storeID.toString()) {
+            thedata[j].items.push({
+              id: item._id,
+              image: item.imageUrl,
+              name: item.name,
+              price: user.cart[i].cartItem.price,
+              quantity: user.cart[i].cartItem.quantity,
+              options: user.cart[i].cartItem.options,
+              addOns: user.cart[i].cartItem.addOns,
+              shopId: item.storeID,
+              quantity: user.cart[i].cartItem.quantity,
+            });
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
           thedata.push({
             shopId: item.storeID,
             shopName: store.name,
@@ -668,87 +723,44 @@ router.post("/getCartNext", auth, async (req, res) => {
             location: store.location,
             isModfiy: store.isModfiy,
             modfingPrice: store.modfingPrice,
+
             items: [
               {
                 id: item._id,
                 image: item.imageUrl,
                 name: item.name,
                 price: user.cart[i].cartItem.price,
-                quantity: user.cart[i].cartItem.quantity,
+                quantity: user.cart[i].quantity,
                 options: user.cart[i].cartItem.options,
                 addOns: user.cart[i].cartItem.addOns,
-                quantity: user.cart[i].cartItem.quantity,
                 shopId: item.storeID,
+                quantity: user.cart[i].cartItem.quantity,
               },
             ],
           });
-        } else {
-          var found = false;
-          for (var j = 0; j < thedata.length; j++) {
-            if (thedata[j].shopId.toString() == item.storeID.toString()) {
-              thedata[j].items.push({
-                id: item._id,
-                image: item.imageUrl,
-                name: item.name,
-                price: user.cart[i].cartItem.price,
-                quantity: user.cart[i].cartItem.quantity,
-                options: user.cart[i].cartItem.options,
-                addOns: user.cart[i].cartItem.addOns,
-                shopId: item.storeID,
-                quantity: user.cart[i].cartItem.quantity,
-              });
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            thedata.push({
-              shopId: item.storeID,
-              shopName: store.name,
-              shopImage: store.picture,
-              deliveryFee: store.deliveryCostByKilo,
-              companyFee: store.companyFee,
-              location: store.location,
-              isModfiy: store.isModfiy,
-              modfingPrice: store.modfingPrice,
-  
-              items: [
-                {
-                  id: item._id,
-                  image: item.imageUrl,
-                  name: item.name,
-                  price: user.cart[i].cartItem.price,
-                  quantity: user.cart[i].quantity,
-                  options: user.cart[i].cartItem.options,
-                  addOns: user.cart[i].cartItem.addOns,
-                  shopId: item.storeID,
-                  quantity: user.cart[i].cartItem.quantity,
-                },
-              ],
-            });
-          }
         }
       }
-
-      for(const shop of thedata){
-        if(shop.shopId.toString() === req.body.id.toString()){
-          return res.status(200).json({
-            error: false,
-            data: shop,
-          });
-        }
-      }
-       return res.status(404).json({
-          error: true,
-          message: "المنتج غير موجود في السلة"
-        });
-    } catch (error) {
-      console.log(error.message);
-      res.status(500).json({
-        error: true,
-        message: error.message,
-      });
     }
+
+    for (const shop of thedata) {
+      if (shop.shopId.toString() === req.body.id.toString()) {
+        return res.status(200).json({
+          error: false,
+          data: shop,
+        });
+      }
+    }
+    return res.status(404).json({
+      error: true,
+      message: "المنتج غير موجود في السلة"
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      error: true,
+      message: error.message,
+    });
+  }
 });
 
 // تقليل كمية المنتج من السلة
@@ -763,7 +775,7 @@ router.patch("/decreaseFromCart", auth, async (req, res) => {
     }
 
     const { id, storeID } = req.body;
-    
+
     if (!id || !storeID) {
       return res.status(400).json({
         error: true,

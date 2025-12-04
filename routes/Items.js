@@ -452,9 +452,11 @@ route.post("/category", async (req, res) => {
 
     const storeMatch = {
       city: req.headers.cityen,
+      registerCondition: "accepted"
     };
     const itemsMatch = {
       city: req.headers.cityen,
+      store_register_condition: "accepted"
     };
     
     if (req.body.category !== "all") {
