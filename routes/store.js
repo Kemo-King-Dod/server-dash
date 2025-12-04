@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const { auth } = require("../middleware/auth");
 const bcrypt = require("bcrypt");
 const Items = require("../database/items");
+const deleteUploadedFile = require("../utils/deleteImage");
 
 router.get("/getStore", auth, async (req, res) => {
   try {
@@ -176,7 +177,7 @@ router.post("/alterStore", auth, async (req, res) => {
     store.name = req.body.name;
     store.storeType = req.user.userType == "Admin" ? req.body.storeType : req.body.category;
     if(req.body.picture && store.picture!==req.body.picture){
-      await deleteUploadedFile(store.picture);
+      await deleteUploadedFile ( store.picture);
     store.picture = req.body.picture;
     }
     if(req.user.userType == "Admin"){

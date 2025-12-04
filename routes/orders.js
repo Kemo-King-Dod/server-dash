@@ -411,7 +411,7 @@ router.get("/getOrdersForUser", auth, async (req, res) => {
     });
 
     for (let i = 0; i < orders.length; i++) {
-      orders[i].reserveCode = "";
+      orders[i].reseveCode = "";
     }
 
     res.status(200).json({
@@ -475,10 +475,7 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
         $sample: { size: 10 },
       },
     ]);
-    console.log(order);
-    console.log("city.englishName", req.headers.cityen);
-    console.log("status", "ready");
-    console.log("acceptedorders", acceptedorders);
+    
     
 
     if (order.length == 0 && acceptedorders.length == 0) {
@@ -543,7 +540,7 @@ router.post("/driverAcceptOrder", auth, async (req, res) => {
 
     if (
       req.user.userType !== "admin" &&
-      acceptedordersCount >= 3 &&
+      acceptedordersCount > 1 &&
       !admins.includes(req.userId)
     ) {
       return res.status(200).json({

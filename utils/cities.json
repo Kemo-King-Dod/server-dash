@@ -41,6 +41,28 @@
     },
     {
         "center": {
+            "latitude": 29.981443,
+            "longitude": 14.261437
+
+
+        },
+        "Arabicname": "الشويرف",
+        "Englishname": "Shawerf",
+        "boundary": [
+          {"latitude": 30.013156, "longitude": 14.368727},
+          {"latitude": 30.025878, "longitude": 14.269645},
+          {"latitude": 29.980155, "longitude": 14.213590},
+          {"latitude": 29.950054, "longitude": 14.279448}
+
+
+
+
+
+           
+        ]
+    },
+    {
+        "center": {
             "latitude": 27.038482,
             "longitude": 14.426147
         },
