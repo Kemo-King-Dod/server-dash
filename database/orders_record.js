@@ -52,6 +52,11 @@ const orders_record = new Schema({
     type: String,
     default: "all",
   },
+  rate: {
+    type: String,
+    enum: ['reated', 'needRate', 'cancel'],
+    default: 'needRate'
+  }
 });
 
 const OrderRecord = mongoose.model("OrderRecodr", orders_record);

@@ -91,7 +91,7 @@ router.post('/deleteDiscount', auth, async (req, res) => {
 })
 
 
-router.post('/delevryDiscount', async (req, res) => {
+router.post('/deliveryDiscount',auth, async (req, res) => {
     try {
         const { shopId, price } = req.body
         const shop = await Store.findById(shopId)
@@ -103,6 +103,28 @@ router.post('/delevryDiscount', async (req, res) => {
         })
     }
     catch (e) {
+        res.status(200).json({
+            error:true
+        })
+        console.log(e)
+    }
+})
+
+router.post('/removeDeliveryDiscount',auth, async (req, res) => {
+    try {
+        const { shopId } = req.body
+        const shop = await Store.findById(shopId)
+        shop.hasDiscount = false
+        await shop.save()
+        res.status(200).json({
+            error:false
+        })
+    }
+    catch (e) {
+        res.status(200).json({
+            error:true,
+
+        })
         console.log(e)
     }
 })

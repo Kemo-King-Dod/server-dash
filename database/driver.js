@@ -107,6 +107,18 @@ const drivers = new Schema({
     lastWithdrawal: {
         type: Date,
         default: null
+    },
+    rating: {
+      type: Number,
+      default: 0
+    },
+    ratingUsers:{
+      type:Number,
+      default: 0
+    },
+    rate:{
+      type:Number,
+      default:0
     }
 })
 const Driver = mongoose.model('Driver', drivers);

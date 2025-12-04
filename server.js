@@ -8,16 +8,27 @@ require("dotenv").config(); // CommonJS
 // database
 const { createserver, connect } = require("./connention/socketio.js");
 const connecting = require("./database/database.js");
-connecting(); 
+connecting();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
- const PORT = process.env.PORT || 3500;
+const PORT = process.env.PORT || 3500;
 const expressserver = app.listen(PORT, () => {
   console.log(`server is listening on  ${PORT}`);
 });
 app.use("/categories", express.static(path.join(__dirname, "categories")));
+
+// const orders_record = require("./database/orders_record")
+// async function calc() {
+//   const orders = await orders_record.find()
+//   for (let i = 0; i < orders; i++) {
+//     orders[i].rate = 'needRaing'
+//     await orders[i].save()
+//   }
+// }
+
+// calc()
 
 
 const io = createserver(expressserver);
@@ -86,6 +97,9 @@ app.use(storeSettings);
 const controlPanel = require("./routes/controlPanel.js");
 app.use(controlPanel);
 
+const rating = require("./routes/rating.js");
+app.use(rating);
+
 const getCity = require("./routes/getCities.js");
 app.use(getCity);
 
@@ -105,7 +119,7 @@ const reports = require('./routes/reports.js');
 const product = require('./database/items.js');
 app.use(reports)
 
-const ads= require('./routes/ads.js');
+const ads = require('./routes/ads.js');
 const User = require("./database/users.js");
 const Notification = require("./database/notification.js");
 const OrderRecord = require("./database/orders_record.js");
@@ -118,7 +132,7 @@ app.use(ads)
 const mongoose = require("mongoose");
 const Driver = require("./database/driver.js");
 mongoose.connection.once("connected", () => {
- 
+
 });
 
 // ...existing code...
@@ -129,7 +143,7 @@ async function setCitiesforOrderRecord() {
 
     for (const record of records) {
       if (record.store.location && record.store.location.latitude && record.store.location.longitude) {
-        const cityName = await getCityName(record.store.location).englishName; 
+        const cityName = await getCityName(record.store.location).englishName;
         if (cityName) {
           record.city = cityName;
           await record.save();
@@ -186,13 +200,13 @@ async function findCartLengthInUsers() {
     console.error('Error clearing user carts:', err);
   }
 }
-  //  sendNotificationToTopic({
-  //       topic: "admins",
-  //       title: "طلبية جديدة",
-  //       body: ` قام زبون م`,   
-  //       isAdmin:true
-  //    });
- 
+//  sendNotificationToTopic({
+//       topic: "admins",
+//       title: "طلبية جديدة",
+//       body: ` قام زبون م`,   
+//       isAdmin:true
+//    });
+
 
 // fixNotificationsWithoutId()
 //    async function fixNotificationsWithoutId() {
@@ -219,14 +233,14 @@ async function findCartLengthInUsers() {
 //     console.error("خطأ أثناء تحديث الإشعارات:", err);
 //   }
 // } 
- 
 
-  
-  
 
- 
- 
- 
+
+
+
+
+
+
 // addIsClosedToAllStores();
 // async function addIsClosedToAllStores() {
 //   try {
@@ -243,75 +257,74 @@ async function findCartLengthInUsers() {
 //       console.error('حدث خطأ أثناء التحديث:', err);
 //   }
 // }ة
-       
+
 
 // sendNotification({token:"elD7RIOlRaaBfKVYkUgSjq:APA91bHDAzRiWNp-CHLKygQXAUSfFc2OhzSiq46rQAWCZRR2BEsEpwjXsBO5UPf592yCD-12dAWy0bpvF_4OThsnPgeoq7C6N-ZFtuigXDm3pOSHjRrIpdk",title:"تجربة", body:"اول رسالة"})
 //updateProductsStatusFromStores();
 async function updateProductsStatusFromStores() {
-    try {
-        // جلب جميع المنتجات
-        const products = await product.find({});
-        
-        let updatedCount = 0;
-        
-        for (const prod of products) {
-            // البحث عن المتجر الخاص بالمنتج
-            const store = await Store.findById(prod.storeID);
-            
-            if (store) {
-                // تحديث حالة المنتج بناءً على حالة المتجر
-                prod.store_register_condition = store.registerCondition;
-                await prod.save();
-                updatedCount++;
-                
-                console.log(`تم تحديث المنتج ${prod._id} إلى حالة: ${store.registerCondition}`);
-            } else {
-                console.log(`لم يتم العثور على متجر للمنتج ${prod._id}`);
-            }
-        }
-        
-        console.log(`تم تحديث ${updatedCount} منتجًا بنجاح.`);
-    } catch (err) {
-        console.error("خطأ أثناء التحديث:", err);
+  try {
+    // جلب جميع المنتجات
+    const products = await product.find({});
+
+    let updatedCount = 0;
+
+    for (const prod of products) {
+      // البحث عن المتجر الخاص بالمنتج
+      const store = await Store.findById(prod.storeID);
+
+      if (store) {
+        // تحديث حالة المنتج بناءً على حالة المتجر
+        prod.store_register_condition = store.registerCondition;
+        await prod.save();
+        updatedCount++;
+
+        console.log(`تم تحديث المنتج ${prod._id} إلى حالة: ${store.registerCondition}`);
+      } else {
+        console.log(`لم يتم العثور على متجر للمنتج ${prod._id}`);
+      }
     }
-  
+
+    console.log(`تم تحديث ${updatedCount} منتجًا بنجاح.`);
+  } catch (err) {
+    console.error("خطأ أثناء التحديث:", err);
+  }
+
 
 }
 //updateProductsCityFromStores();
 async function updateProductsCityFromStores() {
   try {
     console.log("تم تحديث مدن المنتجات بنجاح");
-      // جلب جميع المنتجات
-      const products = await product.find({});
-      
-      let updatedCount = 0;
-      
-      for (const prod of products) {
-          // البحث عن المتجر الخاص بالمنتج
-          const store = await Store.findById(prod.storeID);
-          
-          if (store && (store.city!=prod.city)) {
-              // تحديث مدينة المنتج بناءً على مدينة المتجر
-              prod.city = store.city;
-              await prod.save();
-              updatedCount++;
-              
-              console.log(`تم تحديث المنتج ${prod._id} إلى مدينة: ${store.city}`);
-          } else {
-              console.log(`لم يتم العثور على متجر للمنتج ${prod.name}`);
-          }
-      }
-      
-      console.log(`تم تحديث ${updatedCount} منتجًا بنجاح.`);
-  } catch (err) {
-      console.error("خطأ أثناء تحديث المدن:", err);
-  }
-}  
- 
-setByCodeFaslse=async()=>{
+    // جلب جميع المنتجات
+    const products = await product.find({});
 
+    let updatedCount = 0;
+
+    for (const prod of products) {
+      // البحث عن المتجر الخاص بالمنتج
+      const store = await Store.findById(prod.storeID);
+
+      if (store && (store.city != prod.city)) {
+        // تحديث مدينة المنتج بناءً على مدينة المتجر
+        prod.city = store.city;
+        await prod.save();
+        updatedCount++;
+
+        console.log(`تم تحديث المنتج ${prod._id} إلى مدينة: ${store.city}`);
+      } else {
+        console.log(`لم يتم العثور على متجر للمنتج ${prod.name}`);
+      }
+    }
+
+    console.log(`تم تحديث ${updatedCount} منتجًا بنجاح.`);
+  } catch (err) {
+    console.error("خطأ أثناء تحديث المدن:", err);
+  }
+}
+
+setByCodeFaslse = async () => {
   try {
-    const Drivers = await Driver.find({vehicleType:{$nin:["سيارة"]}});
+    const Drivers = await Driver.find({ vehicleType: { $nin: ["سيارة"] } });
     for (const Driver of Drivers) {
       Driver.vehicleType = "سيارة";
       await Driver.save();

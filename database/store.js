@@ -151,34 +151,47 @@ const stores = new Schema(
       type: Boolean,
       default: false,
     },
-    blockUntil:{
-      type : Date ,
-  },
-  timesForgetPassword:{
+    blockUntil: {
+      type: Date,
+    },
+    timesForgetPassword: {
       type: Number,
-      default:0,
+      default: 0,
     },
     handcheck: {
       type: Boolean,
       default: false,
     },
-    isModfiy:{
-      type:Boolean,
-      default:false,
+    isModfiy: {
+      type: Boolean,
+      default: false,
     },
-    modfingPrice:{
+    modfingPrice: {
+      type: Number,
+      default: 0.0,
+    },
+    isClosed: {
+      type: Boolean,
+      default: false,
+    },
+    rating: {
+      type: Number,
+      default: 0
+    },
+    ratingUsers:{
       type:Number,
-      default:0.0,
+      default: 0
     },
-    isClosed:{
-      type:Boolean,
-      default:false,
-    },
+    rate:{
+      type:Number,
+      default:0
+    }
   },
   {
     timestamps: true,
   }
 );
-const Store= mongoose.model("Store", stores);
 
-module.exports =Store;
+const Store = mongoose.model("Store", stores);
+
+module.exports = Store;
