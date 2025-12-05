@@ -13,9 +13,30 @@ router.get("/getStore", auth, async (req, res) => {
   try {
     const id = req.userId;
     const store = await Store.findById(id, { password: 0, items: 0 });
+    
+    // Normalize numeric fields to ensure they are always doubles
+    const normalizedStore = {
+      ...store._doc,
+      deliveryCostByKilo: parseFloat(store.deliveryCostByKilo || 0),
+      companyFee: parseFloat(store.companyFee || 0),
+      rating: parseFloat(store.rating || 0),
+      ratingUsers: parseFloat(store.ratingUsers || 0),
+      rate: parseFloat(store.rate || 0),
+      modfingPrice: parseFloat(store.modfingPrice || 0),
+      totalCommission: store.totalCommission ? parseFloat(store.totalCommission) : null,
+      funds: store.funds ? parseFloat(store.funds) : null,
+      lastWidrawal: store.lastWidrawal ? parseFloat(store.lastWidrawal) : null,
+      followersNumber: parseFloat(store.followersNumber || 0),
+      timesForgetPassword: parseFloat(store.timesForgetPassword || 0),
+      location: store.location ? {
+        latitude: parseFloat(store.location.latitude || 0),
+        longitude: parseFloat(store.location.longitude || 0)
+      } : null
+    };
+    
     res.status(200).json({
       error: false,
-      data: store,
+      data: normalizedStore,
     });
   } catch (err) {
     console.log(err);
@@ -99,10 +120,34 @@ router.get("/getStores", async (req, res) => {
       stores[i].save();
     }
 
+    // Normalize numeric fields to ensure they are always doubles
+    const normalizeStoreNumbers = (store) => {
+      const storeObj = store._doc || store;
+      return {
+        ...storeObj,
+        deliveryCostByKilo: parseFloat(storeObj.deliveryCostByKilo || 0),
+        companyFee: parseFloat(storeObj.companyFee || 0),
+        rating: parseFloat(storeObj.rating || 0),
+        ratingUsers: parseFloat(storeObj.ratingUsers || 0),
+        rate: parseFloat(storeObj.rate || 0),
+        modfingPrice: parseFloat(storeObj.modfingPrice || 0),
+        totalCommission: storeObj.totalCommission ? parseFloat(storeObj.totalCommission) : null,
+        funds: storeObj.funds ? parseFloat(storeObj.funds) : null,
+        lastWidrawal: storeObj.lastWidrawal ? parseFloat(storeObj.lastWidrawal) : null,
+        followersNumber: parseFloat(storeObj.followersNumber || 0),
+        timesForgetPassword: parseFloat(storeObj.timesForgetPassword || 0),
+        location: storeObj.location ? {
+          latitude: parseFloat(storeObj.location.latitude || 0),
+          longitude: parseFloat(storeObj.location.longitude || 0)
+        } : null
+      };
+    };
+
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
+      const normalizedStores = stores.map(normalizeStoreNumbers);
       return res.status(200).json({
         error: false,
-        data: stores,
+        data: normalizedStores,
       });
     }
 
@@ -122,9 +167,10 @@ router.get("/getStores", async (req, res) => {
       }
     }
 
+    const normalizedStores = stores.map(normalizeStoreNumbers);
     res.status(200).json({
       error: false,
-      data: stores,
+      data: normalizedStores,
     });
   } catch (error) {
     console.log(error);

@@ -291,6 +291,15 @@ async function updateProductsStatusFromStores() {
 
 
 }
+setRatingToZero()
+async function setRatingToZero() {
+  try {
+    const stores = await Store.updateMany({},{rating:parseFloat(0.0)});
+    console.log("تم تحديث جميع المتاجر بنجاح");
+  } catch (error) {
+    console.log(error);
+  }
+
 //updateProductsCityFromStores();
 async function updateProductsCityFromStores() {
   try {
@@ -321,16 +330,4 @@ async function updateProductsCityFromStores() {
     console.error("خطأ أثناء تحديث المدن:", err);
   }
 }
-
-setByCodeFaslse = async () => {
-  try {
-    const Drivers = await Driver.find({ vehicleType: { $nin: ["سيارة"] } });
-    for (const Driver of Drivers) {
-      Driver.vehicleType = "سيارة";
-      await Driver.save();
-    }
-    console.log("انتهيت");
-  } catch (error) {
-    console.log(error);
-  }
 }
