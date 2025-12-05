@@ -15,22 +15,29 @@ router.get("/getStore", auth, async (req, res) => {
     const store = await Store.findById(id, { password: 0, items: 0 });
     
     // Normalize numeric fields to ensure they are always doubles
+    const toDouble = (val) => {
+      if (val === null || val === undefined) return null;
+      const num = Number(val);
+      // Return as is - Flutter should handle the conversion
+      return num;
+    };
+
     const normalizedStore = {
       ...store._doc,
-      deliveryCostByKilo: parseFloat(store.deliveryCostByKilo || 0),
-      companyFee: parseFloat(store.companyFee || 0),
-      rating: parseFloat(store.rating || 0),
-      ratingUsers: parseFloat(store.ratingUsers || 0),
-      rate: parseFloat(store.rate || 0),
-      modfingPrice: parseFloat(store.modfingPrice || 0),
-      totalCommission: store.totalCommission ? parseFloat(store.totalCommission) : null,
-      funds: store.funds ? parseFloat(store.funds) : null,
-      lastWidrawal: store.lastWidrawal ? parseFloat(store.lastWidrawal) : null,
-      followersNumber: parseFloat(store.followersNumber || 0),
-      timesForgetPassword: parseFloat(store.timesForgetPassword || 0),
+      deliveryCostByKilo: toDouble(store.deliveryCostByKilo) || 0,
+      companyFee: toDouble(store.companyFee) || 0,
+      rating: toDouble(store.rating) || 0,
+      ratingUsers: toDouble(store.ratingUsers) || 0,
+      rate: toDouble(store.rate) || 0,
+      modfingPrice: toDouble(store.modfingPrice) || 0,
+      totalCommission: toDouble(store.totalCommission),
+      funds: toDouble(store.funds),
+      lastWidrawal: toDouble(store.lastWidrawal),
+      followersNumber: toDouble(store.followersNumber) || 0,
+      timesForgetPassword: toDouble(store.timesForgetPassword) || 0,
       location: store.location ? {
-        latitude: parseFloat(store.location.latitude || 0),
-        longitude: parseFloat(store.location.longitude || 0)
+        latitude: toDouble(store.location.latitude) || 0,
+        longitude: toDouble(store.location.longitude) || 0
       } : null
     };
     
@@ -121,24 +128,31 @@ router.get("/getStores", async (req, res) => {
     }
 
     // Normalize numeric fields to ensure they are always doubles
+    const toDouble = (val) => {
+      if (val === null || val === undefined) return null;
+      const num = Number(val);
+      // Force floating point by ensuring at least one decimal place
+      return Number(num.toFixed(1));
+    };
+
     const normalizeStoreNumbers = (store) => {
       const storeObj = store._doc || store;
       return {
         ...storeObj,
-        deliveryCostByKilo: parseFloat(storeObj.deliveryCostByKilo || 0),
-        companyFee: parseFloat(storeObj.companyFee || 0),
-        rating: parseFloat(storeObj.rating || 0),
-        ratingUsers: parseFloat(storeObj.ratingUsers || 0),
-        rate: parseFloat(storeObj.rate || 0),
-        modfingPrice: parseFloat(storeObj.modfingPrice || 0),
-        totalCommission: storeObj.totalCommission ? parseFloat(storeObj.totalCommission) : null,
-        funds: storeObj.funds ? parseFloat(storeObj.funds) : null,
-        lastWidrawal: storeObj.lastWidrawal ? parseFloat(storeObj.lastWidrawal) : null,
-        followersNumber: parseFloat(storeObj.followersNumber || 0),
-        timesForgetPassword: parseFloat(storeObj.timesForgetPassword || 0),
+        deliveryCostByKilo: toDouble(storeObj.deliveryCostByKilo) ?? 0.0,
+        companyFee: toDouble(storeObj.companyFee) ?? 0.0,
+        rating: toDouble(storeObj.rating) ?? 0.0,
+        ratingUsers: toDouble(storeObj.ratingUsers) ?? 0.0,
+        rate: toDouble(storeObj.rate) ?? 0.0,
+        modfingPrice: toDouble(storeObj.modfingPrice) ?? 0.0,
+        totalCommission: toDouble(storeObj.totalCommission),
+        funds: toDouble(storeObj.funds),
+        lastWidrawal: toDouble(storeObj.lastWidrawal),
+        followersNumber: toDouble(storeObj.followersNumber) ?? 0.0,
+        timesForgetPassword: toDouble(storeObj.timesForgetPassword) ?? 0.0,
         location: storeObj.location ? {
-          latitude: parseFloat(storeObj.location.latitude || 0),
-          longitude: parseFloat(storeObj.location.longitude || 0)
+          latitude: toDouble(storeObj.location.latitude) ?? 0.0,
+          longitude: toDouble(storeObj.location.longitude) ?? 0.0
         } : null
       };
     };
