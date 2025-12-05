@@ -132,7 +132,7 @@ router.get("/getStores", async (req, res) => {
       if (val === null || val === undefined) return null;
       const num = Number(val);
       // Force floating point by ensuring at least one decimal place
-      return Number(num.toFixed(1));
+      return Number(num.toFixed(10));
     };
 
     const normalizeStoreNumbers = (store) => {
