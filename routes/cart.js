@@ -555,7 +555,11 @@ router.post("/getPriceForCart", auth, async (req, res) => {
     const { point, storePoint, isModfiy, distance, shopId } = req.body;
 
     let price = 0;
-    const shop = await Store.findById(shopId)
+    let shop ;
+    if(req.body.shopId){
+      shop = await Store.findById(shopId)
+    
+    
     if (shop.hasDiscount) {
       price = shop.deliveryCostByKilo
       return res.status(200).json({
@@ -565,7 +569,7 @@ router.post("/getPriceForCart", auth, async (req, res) => {
         },
       });
     }
-
+  }
 
     if (
       getCityName(point).englishName != getCityName(storePoint).englishName &&

@@ -85,7 +85,6 @@ router.post('/deleteAllNotifications', auth, async (req, res) => {
 
 router.post('/sendNotification',auth,async(req,res)=>{
     try {
-        console.log(req.body)
         const {title,body,type,target,phone,origin} = req.body;
         if(target=="specific"){
             const user = await User.findOne({phone})
@@ -118,7 +117,7 @@ router.post('/sendNotification',auth,async(req,res)=>{
             topicName = topicName.replace(/[^a-zA-Z0-9-_.~%]/g, '_');
             console.log(topicName)
             sendNotificationToTopic({topic: topicName, title, body})
-            return res.json({
+            return res.json({ 
                 error:false,
                 message:"Notification sent successfully",
                 target,
