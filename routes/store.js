@@ -12,38 +12,10 @@ const deleteUploadedFile = require("../utils/deleteImage");
 router.get("/getStore", auth, async (req, res) => {
   try {
     const id = req.userId;
-    const store = await Store.findById(id, { password: 0, items: 0 });
-    
-    // Normalize numeric fields to ensure they are always doubles
-    const toDouble = (val) => {
-      if (val === null || val === undefined) return null;
-      const num = Number(val);
-      // Return as is - Flutter should handle the conversion
-      return num;
-    };
-
-    const normalizedStore = {
-      ...store._doc,
-      deliveryCostByKilo: toDouble(store.deliveryCostByKilo) || 0,
-      companyFee: toDouble(store.companyFee) || 0,
-      rating: toDouble(store.rating) || 0,
-      ratingUsers: toDouble(store.ratingUsers) || 0,
-      rate: toDouble(store.rate) || 0,
-      modfingPrice: toDouble(store.modfingPrice) || 0,
-      totalCommission: toDouble(store.totalCommission),
-      funds: toDouble(store.funds),
-      lastWidrawal: toDouble(store.lastWidrawal),
-      followersNumber: toDouble(store.followersNumber) || 0,
-      timesForgetPassword: toDouble(store.timesForgetPassword) || 0,
-      location: store.location ? {
-        latitude: toDouble(store.location.latitude) || 0,
-        longitude: toDouble(store.location.longitude) || 0
-      } : null
-    };
-    
+    const store = await Store.findById(id, { password: 0, items: 0, rating: 0 });
     res.status(200).json({
       error: false,
-      data: normalizedStore,
+      data: store,
     });
   } catch (err) {
     console.log(err);
@@ -75,7 +47,7 @@ router.get("/getStores", async (req, res) => {
     }
     const stores = await Store.find(
       { city: req.headers.cityen, registerCondition: "accepted" },
-      { password: 0, items: 0 }
+      { password: 0, items: 0, rating: 0 }
     );
 
     // Check if current time is between opening and closing times
@@ -127,41 +99,12 @@ router.get("/getStores", async (req, res) => {
       stores[i].save();
     }
 
-    // Normalize numeric fields to ensure they are always doubles
-    const toDouble = (val) => {
-      if (val === null || val === undefined) return null;
-      const num = Number(val);
-      // Force floating point by ensuring at least one decimal place
-      return Number(num.toFixed(10));
-    };
-
-    const normalizeStoreNumbers = (store) => {
-      const storeObj = store._doc || store;
-      return {
-        ...storeObj,
-        deliveryCostByKilo: toDouble(storeObj.deliveryCostByKilo) ?? 0.0,
-        companyFee: toDouble(storeObj.companyFee) ?? 0.0,
-        rating: toDouble(storeObj.rating) ?? 0.0,
-        ratingUsers: toDouble(storeObj.ratingUsers) ?? 0.0,
-        rate: toDouble(storeObj.rate) ?? 0.0,
-        modfingPrice: toDouble(storeObj.modfingPrice) ?? 0.0,
-        totalCommission: toDouble(storeObj.totalCommission),
-        funds: toDouble(storeObj.funds),
-        lastWidrawal: toDouble(storeObj.lastWidrawal),
-        followersNumber: toDouble(storeObj.followersNumber) ?? 0.0,
-        timesForgetPassword: toDouble(storeObj.timesForgetPassword) ?? 0.0,
-        location: storeObj.location ? {
-          latitude: toDouble(storeObj.location.latitude) ?? 0.0,
-          longitude: toDouble(storeObj.location.longitude) ?? 0.0
-        } : null
-      };
-    };
+   
 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
-      const normalizedStores = stores.map(normalizeStoreNumbers);
       return res.status(200).json({
         error: false,
-        data: normalizedStores,
+        data: stores,
       });
     }
 
@@ -181,10 +124,9 @@ router.get("/getStores", async (req, res) => {
       }
     }
 
-    const normalizedStores = stores.map(normalizeStoreNumbers);
     res.status(200).json({
       error: false,
-      data: normalizedStores,
+      data: stores,
     });
   } catch (error) {
     console.log(error);
