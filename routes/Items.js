@@ -28,11 +28,11 @@ const deleteUploadedFile = async (filePath) => {
 
 route.post("/additems", auth, async (req, res) => {
   try {
-    console.log("the body : ",req.body)
-    console.log("the user : ",req.user)
-        var userId = req.userId
+    console.log("the body : ", req.body)
+    console.log("the user : ", req.user)
+    var userId = req.userId
 
-    if(req.user.userType == "Admin"){
+    if (req.user.userType == "Admin") {
       userId = req.body.shopId
     }
     const {
@@ -48,8 +48,8 @@ route.post("/additems", auth, async (req, res) => {
 
     const the_store = await Store.findById(userId)
 
-    if (!the_store || the_store.registerCondition !== "accepted") { 
-      await deleteUploadedFile(imageUrl); 
+    if (!the_store || the_store.registerCondition !== "accepted") {
+      await deleteUploadedFile(imageUrl);
       console.log("غير مصرح");
       return res.status(403).json({
         error: true,
@@ -114,11 +114,11 @@ route.post("/updateItem", auth, async (req, res) => {
       addOns,
       imageUrl,
     } = req.body;
-     
-   
+
+
     const item = await items.findById(req.body.id);
-    if(!item){
-      return  res.status(200).json({
+    if (!item) {
+      return res.status(200).json({
         error: true,
         operation: "editProduct",
         message: "حصل خطأ ما",
@@ -183,16 +183,16 @@ route.patch("/deleteitem", auth, async (req, res) => {
       error: false,
       operation: "deleteProduct",
       message: error.message,
-    }); 
+    });
   }
 });
 
 route.get("/getAllItems", async (req, res) => {
   try {
-    var {limit,page} = req.query;
-    console.log("limit",limit,"page",page
+    var { limit, page } = req.query;
+    console.log("limit", limit, "page", page
     )
-  
+
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
@@ -223,7 +223,7 @@ route.get("/getAllItems", async (req, res) => {
         store_register_condition: "accepted"
       };
     }
-    
+
     // بناء الـ pipeline بشكل ديناميكي
     let pipeline = [
       {
@@ -241,16 +241,16 @@ route.get("/getAllItems", async (req, res) => {
         $skip: (Number(page) - 1) * Number(limit)
       });
       pipeline.push({
-        $limit: Number(limit)    
+        $limit: Number(limit)
       });
     }
 
-    data = await items.aggregate(pipeline); 
+    data = await items.aggregate(pipeline);
     const total = await items.countDocuments(matchCondition)
-    console.log("total",total, "numofpage:" , total/20)
- 
+    console.log("total", total, "numofpage:", total / 20)
+
     let discoundIds = []
-  
+
     for (let i = 0; i < data.length; i++) {
       if (data[i].retrenchment_end < Date.now()) {
         discoundIds.push(data[i]._id)
@@ -326,8 +326,8 @@ route.get("/getAllItems", async (req, res) => {
 
 route.post("/getStoreItems", async (req, res) => {
   try {
-    
-    
+
+
     var id = req.body.shopId;
     var userid = null;
 
@@ -338,8 +338,8 @@ route.post("/getStoreItems", async (req, res) => {
       userid = decoded.id;
       req.user = decoded;
     }
-  console.log( req.user);
-  
+    console.log(req.user);
+
     const allItems = [];
 
     // Get Store
@@ -411,8 +411,8 @@ route.post("/getStoreItems", async (req, res) => {
 route.get("/storeItems", auth, async (req, res) => {
   try {
 
-  var  userId = req.userId;
-  
+    var userId = req.userId;
+
     const allItems = [];
 
     // Get Store
@@ -440,7 +440,7 @@ route.get("/storeItems", auth, async (req, res) => {
 
 route.post("/category", async (req, res) => {
   try {
-    console.log("req.body category",req.body)
+    console.log("req.body category", req.body)
     var id = null;
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (token) {
@@ -458,15 +458,22 @@ route.post("/category", async (req, res) => {
       city: req.headers.cityen,
       store_register_condition: "accepted"
     };
-    
+
     if (req.body.category !== "all") {
       storeMatch.storeType = req.body.category;
-      itemsMatch.category=req.body.category;
+      itemsMatch.category = req.body.category;
     }
-    
+
     // الحصول على المتاجر
     const allStores = await Store.aggregate([
       { $match: storeMatch },
+      {
+        $project: {
+          rate: 0,
+          rating: 0,
+          ratingUsers: 0
+        }
+      },
       // { $sample: { size: 10 } }
     ]);
     const allItems = await items.aggregate([
