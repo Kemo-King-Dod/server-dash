@@ -110,10 +110,12 @@ router.post('/deleteCategory', (req, res) => {
     const { category } = req.body;
     const categoriesPath = path.join(__dirname, "..", "utils", "categories.json");
     const currentCategories = require("../utils/categories.json");
+    const categoryImage = currentCategories.avilableCat.find(cat => cat.name === category).image;
     const updatedCategories = currentCategories.avilableCat.filter(cat => cat.name !== category);
+    fs.unlinkSync(path.join(__dirname, "..", "categories", categoryImage.split('/').pop()));
     fs.writeFileSync(categoriesPath, JSON.stringify({ avilableCat: updatedCategories }, null, 2));
     delete require.cache[require.resolve("../utils/categories.json")];
-    fs.unlinkSync(path.join(__dirname, "..", "categories", category.image.split('/').pop()));
+ 
     res.status(200).json({ error: false, message: "Category deleted successfully" });
   }
   catch (err) {
@@ -141,8 +143,14 @@ router.post('/updateCategory',upload.single('photo'), (req, res) => {
     }
     const { category } = req.body;
     const categoriesPath = path.join(__dirname, "..", "utils", "categories.json");
+    const categoryImage = currentCategories.avilableCat.find(cat => cat.name === category).image;
+    const newCategory = {
+      name: category.name,             // اسم الفئة من الفورم
+      image: "/categories/" + req.file.filename  // مسار الصورة
+    };
     const currentCategories = require("../utils/categories.json");
     const updatedCategories = currentCategories.avilableCat.filter(cat => cat.name !== category);
+    fs.unlinkSync(path.join(__dirname, "..", "categories", categoryImage.split('/').pop()));
     fs.writeFileSync(categoriesPath, JSON.stringify({ avilableCat: updatedCategories }, null, 2));
     delete require.cache[require.resolve("../utils/categories.json")];
     res.status(200).json({ error: false, message: "Category updated successfully" });
