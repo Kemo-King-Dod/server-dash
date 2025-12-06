@@ -555,21 +555,21 @@ router.post("/getPriceForCart", auth, async (req, res) => {
     const { point, storePoint, isModfiy, distance, shopId } = req.body;
 
     let price = 0;
-    let shop ;
-    if(req.body.shopId){
-      shop = await Store.findById(shopId)
-    
-    
-    if (shop.hasDiscount) {
-      price = shop.deliveryCostByKilo
-      return res.status(200).json({
-        error: false,
-        data: {
-          price: price,
-        },
-      });
-    }
-  }
+    let shop;
+    // if (req.body.shopId) {
+    //   shop = await Store.findById(shopId)
+
+
+    //   if (shop.hasDiscount) {
+    //     price = shop.deliveryCostByKilo
+    //     return res.status(200).json({
+    //       error: false,
+    //       data: {
+    //         price: price,
+    //       },
+    //     });
+    //   }
+    // }
 
     if (
       getCityName(point).englishName != getCityName(storePoint).englishName &&
