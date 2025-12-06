@@ -143,12 +143,13 @@ router.patch('/updateCategory',upload.single('photo'), (req, res) => {
     }
     const { category } = req.body;
     const categoriesPath = path.join(__dirname, "..", "utils", "categories.json");
-    const categoryImage = currentCategories.avilableCat.find(cat => cat.name === category).image;
+  
     const newCategory = {
       name: category.name,             // اسم الفئة من الفورم
       image: "/categories/" + req.file.filename  // مسار الصورة
     };
     const currentCategories = require("../utils/categories.json");
+    const categoryImage = currentCategories.avilableCat.find(cat => cat.name === category).image;
     const updatedCategories = currentCategories.avilableCat.filter(cat => cat.name !== category);
     fs.unlinkSync(path.join(__dirname, "..", "categories", categoryImage.split('/').pop()));
     fs.writeFileSync(categoriesPath, JSON.stringify({ avilableCat: [...updatedCategories, newCategory] }, null, 2));
