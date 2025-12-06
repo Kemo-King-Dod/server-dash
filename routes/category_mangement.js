@@ -126,7 +126,7 @@ router.post('/deleteCategory', (req, res) => {
     })
   }
 })
-router.post('/updateCategory',upload.single('photo'), (req, res) => {
+router.patch('/updateCategory',upload.single('photo'), (req, res) => {
   try {
     if (!req.body.password || req.body.password !== 'Chackmate@9876') {
       return res.status(401).json({
