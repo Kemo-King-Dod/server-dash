@@ -7,7 +7,7 @@ const { auth } = require('../middleware/auth');
 
 route.get('/checkRating', auth, async (req, res) => {
     try {
-        const data = await orders_record.find({rate: 'needRating'})
+        const data = await orders_record.find({"customer.id": req.user._id, rate: 'needRate'})
         res.status(200).json({
             error:false,
             data: data
