@@ -25,32 +25,85 @@ function normalizeArabicText(text) {
 // ✅ دالة لتوليد أشكال مختلفة من الكلمة
 function generateArabicVariations(word) {
   const normalized = normalizeArabicText(word);
-  const variations = [normalized];
+  const original = word.trim();
+  const variations = new Set([normalized, original]);
 
-  // إضافة نسخة بالتاء المربوطة والهاء
-  if (normalized.endsWith('ه')) {
-    variations.push(normalized.slice(0, -1) + 'ة');
-  } else if (normalized.endsWith('ة')) {
-    variations.push(normalized.slice(0, -1) + 'ه');
+  // === معالجة نهايات الكلمات ===
+  
+  // نهايات ى/ي/ه/ة
+  const endings = ['ى', 'ي', 'ه', 'ة'];
+  endings.forEach(ending => {
+    if (normalized.endsWith(ending)) {
+      const base = normalized.slice(0, -1);
+      endings.forEach(e => variations.add(base + e));
+    }
+  });
+
+  // === معالجة الجمع والمفرد ===
+  
+  // Case 1: مقاهي → مقهى
+  // إذا كانت تحتوي على 'ا' قبل آخر حرفين، احذفها
+  if (normalized.length > 3) {
+    const lastTwo = normalized.slice(-2);
+    const beforeLastTwo = normalized.slice(0, -2);
+    
+    if (beforeLastTwo.includes('ا')) {
+      // حذف آخر 'ا' في الكلمة
+      const lastAIndex = beforeLastTwo.lastIndexOf('ا');
+      const withoutA = beforeLastTwo.slice(0, lastAIndex) + beforeLastTwo.slice(lastAIndex + 1);
+      
+      // توليد جميع الأشكال
+      endings.forEach(ending => {
+        variations.add(withoutA + ending);
+        variations.add(withoutA + lastTwo.charAt(0) + ending);
+      });
+    }
+  }
+  
+  // Case 2: مقهى → مقاهي
+  // إضافة 'ا' قبل آخر حرف
+  if (normalized.length > 2 && !normalized.slice(0, -1).endsWith('ا')) {
+    const base = normalized.slice(0, -1);
+    const lastChar = normalized.slice(-1);
+    
+    endings.forEach(ending => {
+      variations.add(base + 'ا' + lastChar.replace(/[ىيهة]/, '') + ending);
+      variations.add(base.slice(0, -1) + 'ا' + base.slice(-1) + ending);
+    });
   }
 
-  // إضافة أشكال الجمع الشائعة
-  // مقهى → مقاهي
-  if (normalized.endsWith('ي')) {
-    const singular = normalized.slice(0, -2) + 'ى';
-    variations.push(singular);
-  }
+  // === معالجة ألف ولام التعريف ===
+  
+  const currentVariations = Array.from(variations);
+  currentVariations.forEach(v => {
+    if (v.startsWith('ال')) {
+      variations.add(v.substring(2));
+    } else {
+      variations.add('ال' + v);
+    }
+  });
 
-  // إضافة ألف ولام التعريف
-  if (!normalized.startsWith('ال')) {
-    variations.push('ال' + normalized);
-  } else {
-    variations.push(normalized.substring(2));
-  }
+  // === إضافة أشكال إضافية للكلمات الشائعة ===
+  
+  const commonPatterns = {
+    'مقاهي': ['مقهى', 'مقهي', 'مقهه', 'مقاهى'],
+    'مقهى': ['مقاهي', 'مقهي', 'مقهه'],
+    'مطاعم': ['مطعم', 'مطعمة'],
+    'مطعم': ['مطاعم', 'مطعمة'],
+    'محلات': ['محل', 'محله'],
+    'محل': ['محلات', 'محله'],
+  };
+  
+  const normalizedLower = normalized.toLowerCase();
+  Object.keys(commonPatterns).forEach(key => {
+    if (normalizedLower.includes(key.toLowerCase()) || key.toLowerCase().includes(normalizedLower)) {
+      commonPatterns[key].forEach(variant => variations.add(variant));
+    }
+  });
 
-  return [...new Set(variations)]; // إزالة التكرار
+  const result = Array.from(variations).filter(v => v && v.length > 0);
+  return result;
 }
-
 route.post("/search", async (req, res) => {
   try {
     var id = null;
