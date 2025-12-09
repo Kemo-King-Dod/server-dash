@@ -251,52 +251,52 @@ route.post("/search", async (req, res) => {
       return rest;
     });
 
-    // ==================== معالجة أوقات العمل للمتاجر ====================
-    for (let i = 0; i < allStores.length; i++) {
-      allStores[i].isFollow = false;
-      allStores[i].isFavorite = false;
+    // // ==================== معالجة أوقات العمل للمتاجر ====================
+    // for (let i = 0; i < allStores.length; i++) {
+    //   allStores[i].isFollow = false;
+    //   allStores[i].isFavorite = false;
 
-      // التحقق من أوقات العمل
-      if (allStores[i].opentimeam && allStores[i].closetimeam &&
-        allStores[i].opentimepm && allStores[i].closetimepm) {
+    //   // التحقق من أوقات العمل
+    //   if (allStores[i].opentimeam && allStores[i].closetimeam &&
+    //     allStores[i].opentimepm && allStores[i].closetimepm) {
 
-        const now = new Date();
-        let hours = now.getHours();
-        const minutes = now.getMinutes();
+    //     const now = new Date();
+    //     let hours = now.getHours();
+    //     const minutes = now.getMinutes();
 
-        const openAMHour = parseInt(allStores[i].opentimeam.split(":")[0]);
-        const openAMMinute = parseInt(allStores[i].opentimeam.split(":")[1]);
-        const closeAMHour = parseInt(allStores[i].closetimeam.split(":")[0]);
-        const closeAMMinute = parseInt(allStores[i].closetimeam.split(":")[1]);
-        const openPMHour = parseInt(allStores[i].opentimepm.split(":")[0]);
-        const openPMMinute = parseInt(allStores[i].opentimepm.split(":")[1]);
-        let closePMHour = parseInt(allStores[i].closetimepm.split(":")[0]);
-        const closePMMinute = parseInt(allStores[i].closetimepm.split(":")[1]);
+    //     const openAMHour = parseInt(allStores[i].opentimeam.split(":")[0]);
+    //     const openAMMinute = parseInt(allStores[i].opentimeam.split(":")[1]);
+    //     const closeAMHour = parseInt(allStores[i].closetimeam.split(":")[0]);
+    //     const closeAMMinute = parseInt(allStores[i].closetimeam.split(":")[1]);
+    //     const openPMHour = parseInt(allStores[i].opentimepm.split(":")[0]);
+    //     const openPMMinute = parseInt(allStores[i].opentimepm.split(":")[1]);
+    //     let closePMHour = parseInt(allStores[i].closetimepm.split(":")[0]);
+    //     const closePMMinute = parseInt(allStores[i].closetimepm.split(":")[1]);
 
-        if (closePMHour < 7) {
-          closePMHour += 24;
-        }
-        if (hours < 7) {
-          if (closePMHour < 10) {
-            hours += 24;
-          }
-        }
+    //     if (closePMHour < 7) {
+    //       closePMHour += 24;
+    //     }
+    //     if (hours < 7) {
+    //       if (closePMHour < 10) {
+    //         hours += 24;
+    //       }
+    //     }
 
-        const currentTimeInMinutes = hours * 60 + 120 + minutes;
-        const openAMInMinutes = openAMHour * 60 + openAMMinute;
-        const closeAMInMinutes = closeAMHour * 60 + closeAMMinute;
-        const openPMInMinutes = openPMHour * 60 + openPMMinute;
-        const closePMInMinutes = closePMHour * 60 + closePMMinute;
+    //     const currentTimeInMinutes = hours * 60 + 120 + minutes;
+    //     const openAMInMinutes = openAMHour * 60 + openAMMinute;
+    //     const closeAMInMinutes = closeAMHour * 60 + closeAMMinute;
+    //     const openPMInMinutes = openPMHour * 60 + openPMMinute;
+    //     const closePMInMinutes = closePMHour * 60 + closePMMinute;
 
-        allStores[i].openCondition =
-          (currentTimeInMinutes >= openAMInMinutes &&
-            currentTimeInMinutes <= closeAMInMinutes) ||
-          (currentTimeInMinutes >= openPMInMinutes &&
-            currentTimeInMinutes <= closePMInMinutes);
-      } else {
-        allStores[i].openCondition = false;
-      }
-    }
+    //     allStores[i].openCondition =
+    //       (currentTimeInMinutes >= openAMInMinutes &&
+    //         currentTimeInMinutes <= closeAMInMinutes) ||
+    //       (currentTimeInMinutes >= openPMInMinutes &&
+    //         currentTimeInMinutes <= closePMInMinutes);
+    //   } else {
+    //     allStores[i].openCondition = false;
+    //   }
+    // }
 
     // ==================== حالة الزائر ====================
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
