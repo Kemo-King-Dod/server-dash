@@ -4,8 +4,182 @@ const jwt = require("jsonwebtoken");
 const items = require("../database/items");
 const Store = require("../database/store");
 const User = require("../database/users");
+const categories = require("../utils/categories.json");
 
-// ✅ دالة تطبيع النص العربي
+// ==================== 🎯 قاموس مرادفات ومصطلحات شامل ====================
+const SEMANTIC_DICTIONARY = {
+  // مطاعم وأطعمة
+  'مطعم': ['مطاعم', 'مطعمه', 'ريستورانت', 'restaurant', 'مأكولات', 'اكل', 'طعام', 'وجبات'],
+  'برجر': ['برغر', 'همبرغر', 'همبرجر', 'بيرجر', 'برقر', 'burger', 'هامبورجر', 'ساندويتش'],
+  'بيتزا': ['بيزا', 'pizza', 'فطيرة', 'فطائر'],
+  'شاورما': ['شورما', 'شاورمه', 'شاورمة', 'shawarma', 'شورمه'],
+  'فلافل': ['طعمية', 'فلافل', 'falafel'],
+  'كشري': ['كشرى', 'كشري', 'koshari'],
+  
+  // مقاهي ومشروبات
+  'قهوة': ['قهوه', 'كافيه', 'كافي', 'cafe', 'coffee', 'كوفي', 'قهاوي'],
+  'مقهى': ['مقهي', 'مقهه', 'مقاهي', 'كافيه', 'كافي', 'cafe', 'coffee shop', 'كوفي شوب'],
+  'شاي': ['تشاي', 'tea', 'شاى'],
+  'عصير': ['عصائر', 'juice', 'عصيرات', 'مشروب', 'مشروبات'],
+  'كابتشينو': ['كابوتشينو', 'cappuccino', 'كابتشينو'],
+  'اسبريسو': ['اسبرسو', 'espresso', 'إسبريسو'],
+  
+  // خضروات وفواكه
+  'خضار': ['خضروات', 'خضار وفواكه', 'خضراوات', 'خضره', 'vegetables', 'خضرة'],
+  'فواكه': ['فاكهة', 'فاكهه', 'فواكة', 'fruits', 'ثمار', 'فواكهه'],
+  'طماطم': ['طماطة', 'بندورة', 'طماط', 'tomato'],
+  'بطاطس': ['بطاطا', 'potato', 'بطاطه'],
+  'موز': ['banana', 'الموز'],
+  'تفاح': ['تفاحة', 'apple', 'تفاحه'],
+  
+  // محلات ومتاجر
+  'محل': ['محلات', 'متجر', 'متاجر', 'shop', 'store', 'محله', 'دكان', 'دكاكين'],
+  'سوق': ['أسواق', 'اسواق', 'market', 'ماركت', 'سوبر ماركت', 'supermarket'],
+  'مول': ['مجمع', 'mall', 'مركز تسوق'],
+  
+  // مواد غذائية
+  'غذائية': ['غذائيه', 'مواد غذائية', 'غذاء', 'تموينات', 'بقالة', 'بقاله', 'grocery'],
+  'لحم': ['لحوم', 'لحمة', 'meat', 'لحمه'],
+  'دجاج': ['فراخ', 'chicken', 'دجاجة'],
+  'سمك': ['اسماك', 'أسماك', 'fish', 'سمكة'],
+  'حليب': ['لبن', 'milk', 'ألبان', 'البان'],
+  'خبز': ['bread', 'عيش', 'خبزة'],
+  
+  // إلكترونيات وأجهزة
+  'موبايل': ['جوال', 'هاتف', 'تلفون', 'phone', 'mobile', 'محمول'],
+  'كمبيوتر': ['حاسوب', 'لابتوب', 'computer', 'laptop', 'كومبيوتر', 'حاسب', 'PC'],
+  'تابلت': ['tablet', 'لوحي', 'ايباد', 'ipad'],
+  'سماعة': ['سماعات', 'headphone', 'earphone', 'ايربودز', 'airpods'],
+  'شاشة': ['شاشات', 'monitor', 'display', 'تلفزيون', 'تلفاز', 'TV'],
+  
+  // قطع غيار وإكسسوارات
+  'اكسسوار': ['اكسسوارات', 'accessories', 'اكسسوار', 'إكسسوار', 'اكسسوارت'],
+  'كفر': ['كفرات', 'جراب', 'case', 'حافظة'],
+  'شاحن': ['شواحن', 'charger', 'شحن'],
+  'سلك': ['كابل', 'cable', 'أسلاك', 'اسلاك'],
+  
+  // قرطاسية ومكتبية
+  'قرطاسية': ['قرطاسيه', 'مكتبية', 'مكتبيه', 'stationery', 'ادوات مكتبية', 'أدوات مكتبية'],
+  'دفتر': ['دفاتر', 'notebook', 'كراسة', 'كراسات'],
+  'قلم': ['أقلام', 'اقلام', 'pen', 'pencil', 'قلمة'],
+  'كتاب': ['كتب', 'book', 'books'],
+  
+  // ملابس وأحذية
+  'ملابس': ['لبس', 'ثياب', 'clothes', 'هدوم', 'البسة'],
+  'قميص': ['قمصان', 'shirt', 'تيشرت', 't-shirt'],
+  'بنطلون': ['بنطال', 'pants', 'جينز', 'jeans', 'بنطرون'],
+  'حذاء': ['أحذية', 'احذيه', 'shoes', 'جزمة'],
+  
+  // تجميل وعناية
+  'تجميل': ['مكياج', 'makeup', 'كوزمتك', 'cosmetics', 'زينة', 'زينه'],
+  'عطر': ['عطور', 'perfume', 'عطورات'],
+  'شامبو': ['shampoo', 'شامبوهات'],
+  'صابون': ['soap', 'صابونة'],
+  
+  // تنظيف ومنظفات
+  'تنظيف': ['منظفات', 'مواد تنظيف', 'نظافة', 'منظف', 'cleaning', 'تنظيفات'],
+  'منظف': ['منظفات', 'cleaner', 'مطهر'],
+  'مسحوق': ['مساحيق', 'powder', 'غسيل'],
+  
+  // سيارات وقطع غيار
+  'سيارة': ['سيارات', 'عربية', 'car', 'cars', 'عربيه'],
+  'قطع غيار': ['قطع', 'غيار', 'spare parts', 'قطع سيارات'],
+  'زيت': ['زيوت', 'oil', 'زيت محرك'],
+  'اطار': ['إطارات', 'اطارات', 'كفر', 'tire', 'كاوتش'],
+  
+  // أدوات منزلية
+  'أدوات': ['ادوات', 'tools', 'معدات'],
+  'طبق': ['أطباق', 'اطباق', 'plate', 'صحن'],
+  'كوب': ['أكواب', 'اكواب', 'cup', 'glass'],
+  
+  // حلويات ومخبوزات
+  'حلويات': ['حلوى', 'حلو', 'sweets', 'dessert', 'حلاوة'],
+  'كيك': ['كعكة', 'cake', 'كعك', 'تورتة'],
+  'شوكولاته': ['شوكولاتة', 'شوكلت', 'chocolate', 'شوكولا'],
+  'بسكويت': ['بسكوت', 'biscuit', 'cookies'],
+  
+  // صيدليات وأدوية
+  'صيدلية': ['صيدليه', 'pharmacy', 'دواء', 'ادوية', 'أدوية'],
+  'دواء': ['ادوية', 'أدوية', 'medicine', 'علاج'],
+  
+  // رياضة ولياقة
+  'رياضة': ['رياضيه', 'sports', 'جيم', 'gym', 'نادي'],
+  'نادي': ['نوادي', 'club', 'gym', 'جيم'],
+  
+  // مجوهرات وذهب
+  'ذهب': ['مجوهرات', 'gold', 'ذهبيات', 'حلي'],
+  'فضة': ['silver', 'فضيات'],
+  
+  // ورود وهدايا
+  'ورد': ['ورود', 'زهور', 'flowers', 'زهره', 'زهرة'],
+  'هدية': ['هدايا', 'gift', 'gifts', 'هديه'],
+  
+  // أثاث ومفروشات
+  'أثاث': ['اثاث', 'furniture', 'عفش', 'مفروشات'],
+  'كنب': ['كنبة', 'sofa', 'أريكة', 'اريكه'],
+  
+  // أجهزة منزلية
+  'ثلاجة': ['ثلاجات', 'fridge', 'refrigerator', 'براد'],
+  'غسالة': ['غسالات', 'washing machine', 'غساله'],
+  'مكيف': ['مكيفات', 'AC', 'air conditioner', 'تكييف'],
+  
+  // كلمات عامة ومفيدة
+  'جديد': ['حديث', 'new', 'جدد'],
+  'قديم': ['مستعمل', 'used', 'second hand'],
+  'رخيص': ['رخص', 'cheap', 'سعر منخفض'],
+  'غالي': ['غالى', 'expensive', 'سعر مرتفع'],
+  'عرض': ['عروض', 'offer', 'تخفيض', 'خصم', 'تخفيضات'],
+};
+
+// ==================== 📚 قاموس الأخطاء الإملائية الشائعة ====================
+const TYPO_CORRECTIONS = {
+  'مقاهى': 'مقاهي',
+  'قهوه': 'قهوة',
+  'مطاعمة': 'مطاعم',
+  'بيزا': 'بيتزا',
+  'كمبيوتر': 'كومبيوتر',
+  'موبايل': 'جوال',
+  'اكسسوار': 'إكسسوار',
+  'خضراوات': 'خضروات',
+  'فواكة': 'فواكه',
+  'مكتبيه': 'مكتبية',
+  'قرطاسيه': 'قرطاسية',
+};
+
+// ==================== 🔄 دالة Levenshtein Distance لحساب التشابه ====================
+function levenshteinDistance(str1, str2) {
+  const m = str1.length;
+  const n = str2.length;
+  const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (str1[i - 1] === str2[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else {
+        dp[i][j] = Math.min(
+          dp[i - 1][j] + 1,
+          dp[i][j - 1] + 1,
+          dp[i - 1][j - 1] + 1
+        );
+      }
+    }
+  }
+  return dp[m][n];
+}
+
+// ==================== 🎯 دالة حساب نسبة التشابه ====================
+function similarityScore(str1, str2) {
+  const maxLen = Math.max(str1.length, str2.length);
+  if (maxLen === 0) return 1.0;
+  const distance = levenshteinDistance(str1, str2);
+  return 1.0 - distance / maxLen;
+}
+
+// ==================== ✨ دالة تطبيع النص العربي المحسّنة ====================
 function normalizeArabicText(text) {
   if (!text) return "";
 
@@ -17,51 +191,114 @@ function normalizeArabicText(text) {
     .replace(/[ىي]/g, 'ي')
     // توحيد التاء المربوطة والهاء
     .replace(/ة/g, 'ه')
+    // توحيد الواو
+    .replace(/ؤ/g, 'و')
+    // توحيد الهمزة على الياء
+    .replace(/ئ/g, 'ي')
     // إزالة المسافات الزائدة
     .trim()
+    .replace(/\s+/g, ' ')
     .toLowerCase();
 }
 
-// ✅ دالة لتوليد أشكال مختلفة من الكلمة
+// ==================== 🔍 دالة استخراج المرادفات والكلمات ذات الصلة ====================
+function getSemanticVariations(word) {
+  const normalized = normalizeArabicText(word);
+  const variations = new Set();
+  
+  variations.add(word);
+  variations.add(normalized);
+  
+  // البحث في قاموس المرادفات
+  Object.keys(SEMANTIC_DICTIONARY).forEach(key => {
+    const normalizedKey = normalizeArabicText(key);
+    
+    // إذا كانت الكلمة تطابق المفتاح أو أحد مرادفاته
+    if (normalized.includes(normalizedKey) || normalizedKey.includes(normalized)) {
+      variations.add(key);
+      SEMANTIC_DICTIONARY[key].forEach(synonym => {
+        variations.add(synonym);
+        variations.add(normalizeArabicText(synonym));
+      });
+    }
+    
+    // البحث في المرادفات
+    SEMANTIC_DICTIONARY[key].forEach(synonym => {
+      const normalizedSynonym = normalizeArabicText(synonym);
+      if (normalized.includes(normalizedSynonym) || normalizedSynonym.includes(normalized)) {
+        variations.add(key);
+        variations.add(synonym);
+        SEMANTIC_DICTIONARY[key].forEach(s => variations.add(s));
+      }
+    });
+    
+    // البحث بالتشابه (similarity > 0.85)
+    const similarity = similarityScore(normalized, normalizedKey);
+    if (similarity > 0.85) {
+      variations.add(key);
+      SEMANTIC_DICTIONARY[key].forEach(s => variations.add(s));
+    }
+  });
+  
+  // البحث في الفئات من categories.json
+  if (categories && categories.avilableCat) {
+    categories.avilableCat.forEach(cat => {
+      const catName = normalizeArabicText(cat.name);
+      if (normalized.includes(catName) || catName.includes(normalized)) {
+        variations.add(cat.name);
+        variations.add(catName);
+      }
+      
+      const similarity = similarityScore(normalized, catName);
+      if (similarity > 0.8) {
+        variations.add(cat.name);
+      }
+    });
+  }
+  
+  return Array.from(variations).filter(v => v && v.length > 0);
+}
+
+// ==================== 🚀 دالة توليد أشكال مختلفة من الكلمة - النسخة المحسّنة ====================
 function generateArabicVariations(word) {
   const normalized = normalizeArabicText(word);
   const original = word.trim();
   const variations = new Set([normalized, original]);
 
-  // === معالجة نهايات الكلمات ===
-  
-  // نهايات ى/ي/ه/ة
-  const endings = ['ى', 'ي', 'ه', 'ة'];
+  // 1. معالجة الأخطاء الإملائية الشائعة
+  if (TYPO_CORRECTIONS[normalized]) {
+    variations.add(TYPO_CORRECTIONS[normalized]);
+  }
+
+  // 2. معالجة نهايات الكلمات
+  const endings = ['ى', 'ي', 'ه', 'ة', 'ا'];
   endings.forEach(ending => {
     if (normalized.endsWith(ending)) {
       const base = normalized.slice(0, -1);
-      endings.forEach(e => variations.add(base + e));
+      endings.forEach(e => {
+        variations.add(base + e);
+        variations.add(base);
+      });
     }
   });
 
-  // === معالجة الجمع والمفرد ===
-  
-  // Case 1: مقاهي → مقهى
-  // إذا كانت تحتوي على 'ا' قبل آخر حرفين، احذفها
+  // 3. معالجة الجمع والمفرد
   if (normalized.length > 3) {
     const lastTwo = normalized.slice(-2);
     const beforeLastTwo = normalized.slice(0, -2);
     
     if (beforeLastTwo.includes('ا')) {
-      // حذف آخر 'ا' في الكلمة
       const lastAIndex = beforeLastTwo.lastIndexOf('ا');
       const withoutA = beforeLastTwo.slice(0, lastAIndex) + beforeLastTwo.slice(lastAIndex + 1);
       
-      // توليد جميع الأشكال
       endings.forEach(ending => {
         variations.add(withoutA + ending);
         variations.add(withoutA + lastTwo.charAt(0) + ending);
+        variations.add(withoutA + lastTwo);
       });
     }
   }
   
-  // Case 2: مقهى → مقاهي
-  // إضافة 'ا' قبل آخر حرف
   if (normalized.length > 2 && !normalized.slice(0, -1).endsWith('ا')) {
     const base = normalized.slice(0, -1);
     const lastChar = normalized.slice(-1);
@@ -72,8 +309,7 @@ function generateArabicVariations(word) {
     });
   }
 
-  // === معالجة ألف ولام التعريف ===
-  
+  // 4. معالجة ألف ولام التعريف
   const currentVariations = Array.from(variations);
   currentVariations.forEach(v => {
     if (v.startsWith('ال')) {
@@ -83,27 +319,92 @@ function generateArabicVariations(word) {
     }
   });
 
-  // === إضافة أشكال إضافية للكلمات الشائعة ===
+  // 5. إضافة أنماط الجمع الشائعة
+  const pluralPatterns = {
+    'ات': '', // مطاعمات → مطاعم
+    'ين': '', // مطاعمين → مطاعم
+    'ون': '', // مطعمون → مطعم
+  };
   
+  Object.keys(pluralPatterns).forEach(pattern => {
+    if (normalized.endsWith(pattern)) {
+      const singular = normalized.slice(0, -pattern.length);
+      variations.add(singular);
+      endings.forEach(e => variations.add(singular + e));
+    } else {
+      variations.add(normalized + pattern);
+    }
+  });
+
+  // 6. معالجة الحروف المتشابهة صوتياً
+  const phoneticVariations = normalized
+    .replace(/س/g, 'ص')
+    .replace(/ذ/g, 'ز')
+    .replace(/ض/g, 'د')
+    .replace(/ظ/g, 'ز');
+  
+  if (phoneticVariations !== normalized) {
+    variations.add(phoneticVariations);
+  }
+
+  // 7. الأشكال الشائعة المخصصة
   const commonPatterns = {
-    'مقاهي': ['مقهى', 'مقهي', 'مقهه', 'مقاهى'],
-    'مقهى': ['مقاهي', 'مقهي', 'مقهه'],
-    'مطاعم': ['مطعم', 'مطعمة'],
-    'مطعم': ['مطاعم', 'مطعمة'],
-    'محلات': ['محل', 'محله'],
-    'محل': ['محلات', 'محله'],
+    'مقاهي': ['مقهى', 'مقهي', 'مقهه', 'مقاهى', 'كافيه', 'كافي', 'قهوة'],
+    'مقهى': ['مقاهي', 'مقهي', 'مقهه', 'كافيه', 'كافي'],
+    'مطاعم': ['مطعم', 'مطعمة', 'ريستورانت', 'مأكولات'],
+    'مطعم': ['مطاعم', 'مطعمة', 'ريستورانت'],
+    'محلات': ['محل', 'محله', 'متجر', 'دكان'],
+    'محل': ['محلات', 'محله', 'متجر', 'دكان'],
+    'خضار': ['خضروات', 'خضراوات', 'خضره', 'خضرة'],
+    'فواكه': ['فاكهة', 'فواكة', 'فاكهه', 'ثمار'],
+    'موبايل': ['جوال', 'هاتف', 'تلفون', 'محمول'],
+    'كمبيوتر': ['حاسوب', 'لابتوب', 'حاسب', 'كومبيوتر'],
   };
   
   const normalizedLower = normalized.toLowerCase();
   Object.keys(commonPatterns).forEach(key => {
-    if (normalizedLower.includes(key.toLowerCase()) || key.toLowerCase().includes(normalizedLower)) {
-      commonPatterns[key].forEach(variant => variations.add(variant));
+    const keyLower = normalizeArabicText(key);
+    if (normalizedLower.includes(keyLower) || keyLower.includes(normalizedLower)) {
+      commonPatterns[key].forEach(variant => {
+        variations.add(variant);
+        variations.add(normalizeArabicText(variant));
+      });
     }
   });
 
   const result = Array.from(variations).filter(v => v && v.length > 0);
   return result;
 }
+
+// ==================== 🎨 دالة البحث الذكي المتقدم ====================
+function generateAdvancedSearchTerms(searchTerm) {
+  const allTerms = new Set();
+  
+  // 1. الكلمة الأصلية وتطبيعها
+  allTerms.add(searchTerm);
+  allTerms.add(normalizeArabicText(searchTerm));
+  
+  // 2. توليد الأشكال المختلفة
+  const variations = generateArabicVariations(searchTerm);
+  variations.forEach(v => allTerms.add(v));
+  
+  // 3. المرادفات الدلالية
+  const semanticVars = getSemanticVariations(searchTerm);
+  semanticVars.forEach(v => allTerms.add(v));
+  
+  // 4. تقسيم الكلمات المركبة
+  const words = searchTerm.split(/\s+/).filter(w => w.length > 0);
+  words.forEach(word => {
+    allTerms.add(word);
+    allTerms.add(normalizeArabicText(word));
+    generateArabicVariations(word).forEach(v => allTerms.add(v));
+    getSemanticVariations(word).forEach(v => allTerms.add(v));
+  });
+  
+  return Array.from(allTerms).filter(t => t && t.length > 0);
+}
+
+// ==================== 🔥 البحث الأسطوري الرئيسي ====================
 route.post("/search", async (req, res) => {
   try {
     var id = null;
@@ -138,35 +439,51 @@ route.post("/search", async (req, res) => {
     const cleanSearchTerm = searchTerm.trim();
     const normalizedSearch = normalizeArabicText(cleanSearchTerm);
 
+    // 🚀 توليد جميع مصطلحات البحث المتقدمة
+    const allSearchTerms = generateAdvancedSearchTerms(cleanSearchTerm);
+
     // ✅ Escape special regex characters
     const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-    // ✅ توليد أشكال مختلفة من الكلمة
-    const searchVariations = generateArabicVariations(cleanSearchTerm);
-
-    // 🔍 Debug: طباعة الأشكال المولدة
+    // 🔍 Debug: طباعة معلومات البحث
     console.log('🔍 كلمة البحث الأصلية:', cleanSearchTerm);
     console.log('🔍 الكلمة المطبّعة:', normalizedSearch);
-    console.log('🔍 جميع الأشكال المولدة:', searchVariations);
+    console.log('🔍 عدد المصطلحات المولدة:', allSearchTerms.length);
+    console.log('🔍 أول 20 مصطلح:', allSearchTerms.slice(0, 20));
 
-    // ✅ إنشاء أنماط بحث للكلمة الأصلية والمطبّعة
+    // ✅ إنشاء أنماط بحث متعددة
     const createPatterns = (term) => {
       const escaped = escapeRegex(term);
       return {
         exact: `^${escaped}$`,
         startsWith: `^${escaped}`,
+        endsWith: `${escaped}$`,
         contains: escaped,
-        flexible: escaped.split('').join('.*')
+        flexible: escaped.split('').join('.*'),
+        wordBoundary: `\\b${escaped}\\b`
       };
     };
 
-    const originalPatterns = createPatterns(cleanSearchTerm);
-    const normalizedPatterns = createPatterns(normalizedSearch);
+    // ==================== 🏪 البحث في المتاجر ====================
 
-    // ✅ تقسيم الكلمة لكلمات منفصلة
-    const searchWords = cleanSearchTerm.split(/\s+/).filter(word => word.length > 0);
-
-    // ==================== البحث في المتاجر ====================
+    // بناء شروط البحث الديناميكية
+    const storeSearchConditions = [];
+    
+    allSearchTerms.forEach(term => {
+      const patterns = createPatterns(term);
+      storeSearchConditions.push(
+        { name: { $regex: patterns.exact, $options: "i" } },
+        { storeType: { $regex: patterns.exact, $options: "i" } },
+        { name: { $regex: patterns.startsWith, $options: "i" } },
+        { storeType: { $regex: patterns.startsWith, $options: "i" } },
+        { name: { $regex: patterns.contains, $options: "i" } },
+        { storeType: { $regex: patterns.contains, $options: "i" } },
+        { discription: { $regex: patterns.contains, $options: "i" } },
+        { address: { $regex: patterns.contains, $options: "i" } },
+        { name: { $regex: patterns.wordBoundary, $options: "i" } },
+        { storeType: { $regex: patterns.wordBoundary, $options: "i" } }
+      );
+    });
 
     let allStores = await Store.aggregate([
       {
@@ -174,148 +491,53 @@ route.post("/search", async (req, res) => {
           $and: [
             { city: city },
             { registerCondition: "accepted" },
-            {
-              $or: [
-                // 1. مطابقة تامة - النص الأصلي
-                { name: { $regex: originalPatterns.exact, $options: "i" } },
-                { storeType: { $regex: originalPatterns.exact, $options: "i" } },
-
-                // 2. مطابقة تامة - النص المطبّع
-                { name: { $regex: normalizedPatterns.exact, $options: "i" } },
-                { storeType: { $regex: normalizedPatterns.exact, $options: "i" } },
-
-                // 3. البحث في جميع الأشكال المختلفة للكلمة
-                ...searchVariations.map(variation => {
-                  const escaped = escapeRegex(variation);
-                  return {
-                    $or: [
-                      { name: { $regex: escaped, $options: "i" } },
-                      { storeType: { $regex: escaped, $options: "i" } },
-                      { discription: { $regex: escaped, $options: "i" } }
-                    ]
-                  };
-                }),
-
-                // 4. تبدأ بالكلمة
-                { name: { $regex: originalPatterns.startsWith, $options: "i" } },
-                { storeType: { $regex: originalPatterns.startsWith, $options: "i" } },
-                { name: { $regex: normalizedPatterns.startsWith, $options: "i" } },
-                { storeType: { $regex: normalizedPatterns.startsWith, $options: "i" } },
-
-                // 5. تحتوي على الكلمة
-                { name: { $regex: originalPatterns.contains, $options: "i" } },
-                { discription: { $regex: originalPatterns.contains, $options: "i" } },
-                { storeType: { $regex: originalPatterns.contains, $options: "i" } },
-                { address: { $regex: originalPatterns.contains, $options: "i" } },
-                { name: { $regex: normalizedPatterns.contains, $options: "i" } },
-                { storeType: { $regex: normalizedPatterns.contains, $options: "i" } },
-
-                // 6. بحث مرن
-                { name: { $regex: originalPatterns.flexible, $options: "i" } },
-                { name: { $regex: normalizedPatterns.flexible, $options: "i" } },
-
-                // 7. بحث في الكلمات المنفصلة
-                ...searchWords.map(word => {
-                  const normalizedWord = normalizeArabicText(word);
-                  const escapedWord = escapeRegex(word);
-                  const escapedNormalized = escapeRegex(normalizedWord);
-                  return {
-                    $or: [
-                      { name: { $regex: escapedWord, $options: "i" } },
-                      { storeType: { $regex: escapedWord, $options: "i" } },
-                      { discription: { $regex: escapedWord, $options: "i" } },
-                      { name: { $regex: escapedNormalized, $options: "i" } },
-                      { storeType: { $regex: escapedNormalized, $options: "i" } }
-                    ]
-                  };
-                })
-              ]
-            }
+            { $or: storeSearchConditions }
           ]
         }
       },
       {
         $addFields: {
           searchScore: {
-            $switch: {
-              branches: [
-                // مطابقة تامة للاسم = 100 نقطة
-                {
-                  case: {
-                    $or: [
-                      { $regexMatch: { input: "$name", regex: originalPatterns.exact, options: "i" } },
-                      { $regexMatch: { input: "$name", regex: normalizedPatterns.exact, options: "i" } }
-                    ]
-                  },
-                  then: 100
+            $let: {
+              vars: {
+                nameScore: {
+                  $cond: {
+                    if: { $regexMatch: { input: "$name", regex: escapeRegex(normalizedSearch), options: "i" } },
+                    then: 100,
+                    else: 0
+                  }
                 },
-                // مطابقة تامة للنوع = 95 نقطة
-                {
-                  case: {
-                    $or: [
-                      { $regexMatch: { input: "$storeType", regex: originalPatterns.exact, options: "i" } },
-                      { $regexMatch: { input: "$storeType", regex: normalizedPatterns.exact, options: "i" } }
-                    ]
-                  },
-                  then: 95
+                typeScore: {
+                  $cond: {
+                    if: { $regexMatch: { input: "$storeType", regex: escapeRegex(normalizedSearch), options: "i" } },
+                    then: 95,
+                    else: 0
+                  }
                 },
-                // يبدأ بالكلمة في الاسم = 80 نقطة
-                {
-                  case: {
-                    $or: [
-                      { $regexMatch: { input: "$name", regex: originalPatterns.startsWith, options: "i" } },
-                      { $regexMatch: { input: "$name", regex: normalizedPatterns.startsWith, options: "i" } }
-                    ]
-                  },
-                  then: 80
-                },
-                // يبدأ بالكلمة في النوع = 75 نقطة
-                {
-                  case: {
-                    $or: [
-                      { $regexMatch: { input: "$storeType", regex: originalPatterns.startsWith, options: "i" } },
-                      { $regexMatch: { input: "$storeType", regex: normalizedPatterns.startsWith, options: "i" } }
-                    ]
-                  },
-                  then: 75
-                },
-                // يحتوي على الكلمة في الاسم = 60 نقطة
-                {
-                  case: {
-                    $or: [
-                      { $regexMatch: { input: "$name", regex: originalPatterns.contains, options: "i" } },
-                      { $regexMatch: { input: "$name", regex: normalizedPatterns.contains, options: "i" } }
-                    ]
-                  },
-                  then: 60
-                },
-                // يحتوي على الكلمة في الوصف = 50 نقطة
-                {
-                  case: {
-                    $and: [
-                      { $ne: ["$discription", null] },
-                      {
-                        $or: [
-                          { $regexMatch: { input: "$discription", regex: originalPatterns.contains, options: "i" } },
-                          { $regexMatch: { input: "$discription", regex: normalizedPatterns.contains, options: "i" } }
-                        ]
-                      }
-                    ]
-                  },
-                  then: 50
-                },
-                // يحتوي على الكلمة في النوع = 45 نقطة
-                {
-                  case: {
-                    $or: [
-                      { $regexMatch: { input: "$storeType", regex: originalPatterns.contains, options: "i" } },
-                      { $regexMatch: { input: "$storeType", regex: normalizedPatterns.contains, options: "i" } }
-                    ]
-                  },
-                  then: 45
+                descScore: {
+                  $cond: {
+                    if: { 
+                      $and: [
+                        { $ne: ["$discription", null] },
+                        { $regexMatch: { input: "$discription", regex: escapeRegex(normalizedSearch), options: "i" } }
+                      ]
+                    },
+                    then: 50,
+                    else: 0
+                  }
                 }
-              ],
-              default: 30
+              },
+              in: {
+                $max: ["$$nameScore", "$$typeScore", "$$descScore"]
+              }
+            }
+          },
+          // حساب نقاط إضافية بناءً على التشابه
+          relevanceBoost: {
+            $cond: {
+              if: { $gte: [{ $strLenCP: "$name" }, 1] },
+              then: 10,
+              else: 0
             }
           }
         }
@@ -325,8 +547,10 @@ route.post("/search", async (req, res) => {
           finalScore: {
             $add: [
               "$searchScore",
-              { $multiply: [{ $ifNull: ["$rating", 0] }, 2] },
-              { $divide: [{ $ifNull: ["$followersNumber", 0] }, 10] }
+              "$relevanceBoost",
+              { $multiply: [{ $ifNull: ["$rating", 0] }, 3] },
+              { $divide: [{ $ifNull: ["$followersNumber", 0] }, 10] },
+              { $cond: [{ $eq: ["$openCondition", true] }, 15, 0] }
             ]
           }
         }
@@ -342,12 +566,31 @@ route.post("/search", async (req, res) => {
       {
         $project: {
           searchScore: 0,
-          finalScore: 0
+          finalScore: 0,
+          relevanceBoost: 0
         }
       }
     ]);
 
-    // ==================== البحث في المنتجات ====================
+    // ==================== 🛍️ البحث في المنتجات ====================
+
+    const itemSearchConditions = [];
+    
+    allSearchTerms.forEach(term => {
+      const patterns = createPatterns(term);
+      itemSearchConditions.push(
+        { name: { $regex: patterns.exact, $options: "i" } },
+        { category: { $regex: patterns.exact, $options: "i" } },
+        { name: { $regex: patterns.startsWith, $options: "i" } },
+        { category: { $regex: patterns.startsWith, $options: "i" } },
+        { name: { $regex: patterns.contains, $options: "i" } },
+        { category: { $regex: patterns.contains, $options: "i" } },
+        { description: { $regex: patterns.contains, $options: "i" } },
+        { storeName: { $regex: patterns.contains, $options: "i" } },
+        { name: { $regex: patterns.wordBoundary, $options: "i" } },
+        { category: { $regex: patterns.wordBoundary, $options: "i" } }
+      );
+    });
 
     let allItems = await items.aggregate([
       {
@@ -355,119 +598,45 @@ route.post("/search", async (req, res) => {
           $and: [
             { city: city },
             { store_register_condition: "accepted" },
-            {
-              $or: [
-                // 1. مطابقة تامة
-                { name: { $regex: originalPatterns.exact, $options: "i" } },
-                { category: { $regex: originalPatterns.exact, $options: "i" } },
-                { name: { $regex: normalizedPatterns.exact, $options: "i" } },
-                { category: { $regex: normalizedPatterns.exact, $options: "i" } },
-
-                // 2. البحث في الأشكال المختلفة
-                ...searchVariations.map(variation => {
-                  const escaped = escapeRegex(variation);
-                  return {
-                    $or: [
-                      { name: { $regex: escaped, $options: "i" } },
-                      { category: { $regex: escaped, $options: "i" } },
-                      { description: { $regex: escaped, $options: "i" } }
-                    ]
-                  };
-                }),
-
-                // 3. تبدأ بالكلمة
-                { name: { $regex: originalPatterns.startsWith, $options: "i" } },
-                { category: { $regex: originalPatterns.startsWith, $options: "i" } },
-                { name: { $regex: normalizedPatterns.startsWith, $options: "i" } },
-
-                // 4. تحتوي على الكلمة
-                { name: { $regex: originalPatterns.contains, $options: "i" } },
-                { description: { $regex: originalPatterns.contains, $options: "i" } },
-                { category: { $regex: originalPatterns.contains, $options: "i" } },
-                { storeName: { $regex: originalPatterns.contains, $options: "i" } },
-                { name: { $regex: normalizedPatterns.contains, $options: "i" } },
-
-                // 5. بحث مرن
-                { name: { $regex: originalPatterns.flexible, $options: "i" } },
-                { name: { $regex: normalizedPatterns.flexible, $options: "i" } },
-
-                // 6. بحث في الكلمات المنفصلة
-                ...searchWords.map(word => {
-                  const normalizedWord = normalizeArabicText(word);
-                  const escapedWord = escapeRegex(word);
-                  const escapedNormalized = escapeRegex(normalizedWord);
-                  return {
-                    $or: [
-                      { name: { $regex: escapedWord, $options: "i" } },
-                      { description: { $regex: escapedWord, $options: "i" } },
-                      { category: { $regex: escapedWord, $options: "i" } },
-                      { name: { $regex: escapedNormalized, $options: "i" } },
-                      { category: { $regex: escapedNormalized, $options: "i" } }
-                    ]
-                  };
-                })
-              ]
-            }
+            { $or: itemSearchConditions }
           ]
         }
       },
       {
         $addFields: {
           searchScore: {
-            $switch: {
-              branches: [
-                {
-                  case: {
-                    $or: [
-                      { $regexMatch: { input: "$name", regex: originalPatterns.exact, options: "i" } },
-                      { $regexMatch: { input: "$name", regex: normalizedPatterns.exact, options: "i" } }
-                    ]
-                  },
-                  then: 100
+            $let: {
+              vars: {
+                nameScore: {
+                  $cond: {
+                    if: { $regexMatch: { input: "$name", regex: escapeRegex(normalizedSearch), options: "i" } },
+                    then: 100,
+                    else: 0
+                  }
                 },
-                {
-                  case: {
-                    $or: [
-                      { $regexMatch: { input: "$category", regex: originalPatterns.exact, options: "i" } },
-                      { $regexMatch: { input: "$category", regex: normalizedPatterns.exact, options: "i" } }
-                    ]
-                  },
-                  then: 95
+                categoryScore: {
+                  $cond: {
+                    if: { $regexMatch: { input: "$category", regex: escapeRegex(normalizedSearch), options: "i" } },
+                    then: 90,
+                    else: 0
+                  }
                 },
-                {
-                  case: {
-                    $or: [
-                      { $regexMatch: { input: "$name", regex: originalPatterns.startsWith, options: "i" } },
-                      { $regexMatch: { input: "$name", regex: normalizedPatterns.startsWith, options: "i" } }
-                    ]
-                  },
-                  then: 80
-                },
-                {
-                  case: {
-                    $or: [
-                      { $regexMatch: { input: "$name", regex: originalPatterns.contains, options: "i" } },
-                      { $regexMatch: { input: "$name", regex: normalizedPatterns.contains, options: "i" } }
-                    ]
-                  },
-                  then: 60
-                },
-                {
-                  case: {
-                    $and: [
-                      { $ne: ["$description", null] },
-                      {
-                        $or: [
-                          { $regexMatch: { input: "$description", regex: originalPatterns.contains, options: "i" } },
-                          { $regexMatch: { input: "$description", regex: normalizedPatterns.contains, options: "i" } }
-                        ]
-                      }
-                    ]
-                  },
-                  then: 50
+                descScore: {
+                  $cond: {
+                    if: { 
+                      $and: [
+                        { $ne: ["$description", null] },
+                        { $regexMatch: { input: "$description", regex: escapeRegex(normalizedSearch), options: "i" } }
+                      ]
+                    },
+                    then: 45,
+                    else: 0
+                  }
                 }
-              ],
-              default: 30
+              },
+              in: {
+                $max: ["$$nameScore", "$$categoryScore", "$$descScore"]
+              }
             }
           }
         }
@@ -477,7 +646,8 @@ route.post("/search", async (req, res) => {
           finalScore: {
             $add: [
               "$searchScore",
-              { $divide: [{ $ifNull: ["$likes", 0] }, 5] }
+              { $divide: [{ $ifNull: ["$likes", 0] }, 5] },
+              { $cond: [{ $eq: ["$available", true] }, 10, 0] }
             ]
           }
         }
@@ -497,7 +667,7 @@ route.post("/search", async (req, res) => {
       }
     ]);
 
-    // ==================== معالجة أوقات العمل للمتاجر ====================
+    // ==================== ⏰ معالجة أوقات العمل للمتاجر ====================
     for (let i = 0; i < allStores.length; i++) {
       allStores[i].isFollow = false;
       allStores[i].isFavorite = false;
@@ -543,22 +713,25 @@ route.post("/search", async (req, res) => {
       }
     }
 
-    // ==================== حالة الزائر ====================
+    // ==================== 👤 حالة الزائر ====================
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
+      console.log(`✅ نتائج البحث: ${allStores.length} متجر، ${allItems.length} منتج`);
       return res.json({
         error: false,
         data: {
           products: allItems,
           stores: allStores,
+          searchTermsGenerated: allSearchTerms.length
         },
       });
     }
 
-    // ==================== حالة المستخدم المسجّل ====================
+    // ==================== 🔐 حالة المستخدم المسجّل ====================
     if (id) {
       const user = await User.findOne({ _id: id });
 
       if (user) {
+        // معالجة حالة المتابعة للمتاجر
         for (var i = 0; i < allStores.length; i++) {
           if (!allStores[i]) continue;
           allStores[i].isFollow = false;
@@ -570,6 +743,7 @@ route.post("/search", async (req, res) => {
           }
         }
 
+        // معالجة المفضلة للمتاجر
         for (var i = 0; i < allStores.length; i++) {
           if (!allStores[i]) continue;
           allStores[i].isFavorite = false;
@@ -582,6 +756,7 @@ route.post("/search", async (req, res) => {
           }
         }
 
+        // معالجة المفضلة للمنتجات
         for (var i = 0; i < allItems.length; i++) {
           if (!allItems[i]) continue;
           allItems[i].isFavorite = false;
@@ -594,6 +769,7 @@ route.post("/search", async (req, res) => {
           }
         }
 
+        // معالجة الإعجاب للمنتجات
         for (var i = 0; i < allItems.length; i++) {
           if (!allItems[i]) continue;
           allItems[i].like = false;
@@ -608,16 +784,19 @@ route.post("/search", async (req, res) => {
       }
     }
 
+    console.log(`✅ نتائج البحث النهائية: ${allStores.length} متجر، ${allItems.length} منتج`);
+
     res.json({
       error: false,
       data: {
         products: allItems,
         stores: allStores,
+        searchTermsGenerated: allSearchTerms.length
       },
     });
 
   } catch (error) {
-    console.log("خطأ في البحث:", error);
+    console.log("❌ خطأ في البحث:", error);
     res.status(401).json({
       error: true,
       message: error.message,
