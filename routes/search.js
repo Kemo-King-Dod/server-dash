@@ -5,6 +5,52 @@ const items = require("../database/items");
 const Store = require("../database/store");
 const User = require("../database/users");
 
+// ✅ دالة تطبيع النص العربي
+function normalizeArabicText(text) {
+  if (!text) return "";
+
+  return text
+    // إزالة التشكيل
+    .replace(/[\u064B-\u065F\u0670]/g, '')
+    // توحيد الهمزات
+    .replace(/[إأآا]/g, 'ا')
+    .replace(/[ىي]/g, 'ي')
+    // توحيد التاء المربوطة والهاء
+    .replace(/ة/g, 'ه')
+    // إزالة المسافات الزائدة
+    .trim()
+    .toLowerCase();
+}
+
+// ✅ دالة لتوليد أشكال مختلفة من الكلمة
+function generateArabicVariations(word) {
+  const normalized = normalizeArabicText(word);
+  const variations = [normalized];
+
+  // إضافة نسخة بالتاء المربوطة والهاء
+  if (normalized.endsWith('ه')) {
+    variations.push(normalized.slice(0, -1) + 'ة');
+  } else if (normalized.endsWith('ة')) {
+    variations.push(normalized.slice(0, -1) + 'ه');
+  }
+
+  // إضافة أشكال الجمع الشائعة
+  // مقهى → مقاهي
+  if (normalized.endsWith('ي')) {
+    const singular = normalized.slice(0, -2) + 'ى';
+    variations.push(singular);
+  }
+
+  // إضافة ألف ولام التعريف
+  if (!normalized.startsWith('ال')) {
+    variations.push('ال' + normalized);
+  } else {
+    variations.push(normalized.substring(2));
+  }
+
+  return [...new Set(variations)]; // إزالة التكرار
+}
+
 route.post("/search", async (req, res) => {
   try {
     var id = null;
@@ -35,18 +81,29 @@ route.post("/search", async (req, res) => {
       });
     }
 
-    // ✅ تنظيف كلمة البحث
+    // ✅ تنظيف وتطبيع كلمة البحث
     const cleanSearchTerm = searchTerm.trim();
+    const normalizedSearch = normalizeArabicText(cleanSearchTerm);
 
     // ✅ Escape special regex characters
     const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const escapedTerm = escapeRegex(cleanSearchTerm);
 
-    // ✅ إنشاء أنماط بحث مختلفة
-    const exactPattern = `^${escapedTerm}$`; // مطابقة تامة
-    const startsWithPattern = `^${escapedTerm}`; // تبدأ بـ
-    const containsPattern = escapedTerm; // تحتوي على
-    const flexiblePattern = escapedTerm.split('').join('.*'); // بحث مرن
+    // ✅ توليد أشكال مختلفة من الكلمة
+    const searchVariations = generateArabicVariations(cleanSearchTerm);
+
+    // ✅ إنشاء أنماط بحث للكلمة الأصلية والمطبّعة
+    const createPatterns = (term) => {
+      const escaped = escapeRegex(term);
+      return {
+        exact: `^${escaped}$`,
+        startsWith: `^${escaped}`,
+        contains: escaped,
+        flexible: escaped.split('').join('.*')
+      };
+    };
+
+    const originalPatterns = createPatterns(cleanSearchTerm);
+    const normalizedPatterns = createPatterns(normalizedSearch);
 
     // ✅ تقسيم الكلمة لكلمات منفصلة
     const searchWords = cleanSearchTerm.split(/\s+/).filter(word => word.length > 0);
@@ -61,31 +118,56 @@ route.post("/search", async (req, res) => {
             { registerCondition: "accepted" },
             {
               $or: [
-                // 1. مطابقة تامة (أعلى أولوية)
-                { name: { $regex: exactPattern, $options: "i" } },
-                { storeType: { $regex: exactPattern, $options: "i" } },
+                // 1. مطابقة تامة - النص الأصلي
+                { name: { $regex: originalPatterns.exact, $options: "i" } },
+                { storeType: { $regex: originalPatterns.exact, $options: "i" } },
 
-                // 2. تبدأ بالكلمة
-                { name: { $regex: startsWithPattern, $options: "i" } },
-                { storeType: { $regex: startsWithPattern, $options: "i" } },
+                // 2. مطابقة تامة - النص المطبّع
+                { name: { $regex: normalizedPatterns.exact, $options: "i" } },
+                { storeType: { $regex: normalizedPatterns.exact, $options: "i" } },
 
-                // 3. تحتوي على الكلمة
-                { name: { $regex: containsPattern, $options: "i" } },
-                { discription: { $regex: containsPattern, $options: "i" } },
-                { storeType: { $regex: containsPattern, $options: "i" } },
-                { address: { $regex: containsPattern, $options: "i" } },
+                // 3. البحث في جميع الأشكال المختلفة للكلمة
+                ...searchVariations.map(variation => {
+                  const escaped = escapeRegex(variation);
+                  return {
+                    $or: [
+                      { name: { $regex: escaped, $options: "i" } },
+                      { storeType: { $regex: escaped, $options: "i" } },
+                      { discription: { $regex: escaped, $options: "i" } }
+                    ]
+                  };
+                }),
 
-                // 4. بحث مرن (أحرف متباعدة)
-                { name: { $regex: flexiblePattern, $options: "i" } },
+                // 4. تبدأ بالكلمة
+                { name: { $regex: originalPatterns.startsWith, $options: "i" } },
+                { storeType: { $regex: originalPatterns.startsWith, $options: "i" } },
+                { name: { $regex: normalizedPatterns.startsWith, $options: "i" } },
+                { storeType: { $regex: normalizedPatterns.startsWith, $options: "i" } },
 
-                // 5. بحث في الكلمات المنفصلة
+                // 5. تحتوي على الكلمة
+                { name: { $regex: originalPatterns.contains, $options: "i" } },
+                { discription: { $regex: originalPatterns.contains, $options: "i" } },
+                { storeType: { $regex: originalPatterns.contains, $options: "i" } },
+                { address: { $regex: originalPatterns.contains, $options: "i" } },
+                { name: { $regex: normalizedPatterns.contains, $options: "i" } },
+                { storeType: { $regex: normalizedPatterns.contains, $options: "i" } },
+
+                // 6. بحث مرن
+                { name: { $regex: originalPatterns.flexible, $options: "i" } },
+                { name: { $regex: normalizedPatterns.flexible, $options: "i" } },
+
+                // 7. بحث في الكلمات المنفصلة
                 ...searchWords.map(word => {
+                  const normalizedWord = normalizeArabicText(word);
                   const escapedWord = escapeRegex(word);
+                  const escapedNormalized = escapeRegex(normalizedWord);
                   return {
                     $or: [
                       { name: { $regex: escapedWord, $options: "i" } },
                       { storeType: { $regex: escapedWord, $options: "i" } },
-                      { discription: { $regex: escapedWord, $options: "i" } }
+                      { discription: { $regex: escapedWord, $options: "i" } },
+                      { name: { $regex: escapedNormalized, $options: "i" } },
+                      { storeType: { $regex: escapedNormalized, $options: "i" } }
                     ]
                   };
                 })
@@ -101,27 +183,52 @@ route.post("/search", async (req, res) => {
               branches: [
                 // مطابقة تامة للاسم = 100 نقطة
                 {
-                  case: { $regexMatch: { input: "$name", regex: exactPattern, options: "i" } },
+                  case: {
+                    $or: [
+                      { $regexMatch: { input: "$name", regex: originalPatterns.exact, options: "i" } },
+                      { $regexMatch: { input: "$name", regex: normalizedPatterns.exact, options: "i" } }
+                    ]
+                  },
                   then: 100
                 },
                 // مطابقة تامة للنوع = 95 نقطة
                 {
-                  case: { $regexMatch: { input: "$storeType", regex: exactPattern, options: "i" } },
+                  case: {
+                    $or: [
+                      { $regexMatch: { input: "$storeType", regex: originalPatterns.exact, options: "i" } },
+                      { $regexMatch: { input: "$storeType", regex: normalizedPatterns.exact, options: "i" } }
+                    ]
+                  },
                   then: 95
                 },
                 // يبدأ بالكلمة في الاسم = 80 نقطة
                 {
-                  case: { $regexMatch: { input: "$name", regex: startsWithPattern, options: "i" } },
+                  case: {
+                    $or: [
+                      { $regexMatch: { input: "$name", regex: originalPatterns.startsWith, options: "i" } },
+                      { $regexMatch: { input: "$name", regex: normalizedPatterns.startsWith, options: "i" } }
+                    ]
+                  },
                   then: 80
                 },
                 // يبدأ بالكلمة في النوع = 75 نقطة
                 {
-                  case: { $regexMatch: { input: "$storeType", regex: startsWithPattern, options: "i" } },
+                  case: {
+                    $or: [
+                      { $regexMatch: { input: "$storeType", regex: originalPatterns.startsWith, options: "i" } },
+                      { $regexMatch: { input: "$storeType", regex: normalizedPatterns.startsWith, options: "i" } }
+                    ]
+                  },
                   then: 75
                 },
                 // يحتوي على الكلمة في الاسم = 60 نقطة
                 {
-                  case: { $regexMatch: { input: "$name", regex: containsPattern, options: "i" } },
+                  case: {
+                    $or: [
+                      { $regexMatch: { input: "$name", regex: originalPatterns.contains, options: "i" } },
+                      { $regexMatch: { input: "$name", regex: normalizedPatterns.contains, options: "i" } }
+                    ]
+                  },
                   then: 60
                 },
                 // يحتوي على الكلمة في الوصف = 50 نقطة
@@ -129,18 +236,28 @@ route.post("/search", async (req, res) => {
                   case: {
                     $and: [
                       { $ne: ["$discription", null] },
-                      { $regexMatch: { input: "$discription", regex: containsPattern, options: "i" } }
+                      {
+                        $or: [
+                          { $regexMatch: { input: "$discription", regex: originalPatterns.contains, options: "i" } },
+                          { $regexMatch: { input: "$discription", regex: normalizedPatterns.contains, options: "i" } }
+                        ]
+                      }
                     ]
                   },
                   then: 50
                 },
                 // يحتوي على الكلمة في النوع = 45 نقطة
                 {
-                  case: { $regexMatch: { input: "$storeType", regex: containsPattern, options: "i" } },
+                  case: {
+                    $or: [
+                      { $regexMatch: { input: "$storeType", regex: originalPatterns.contains, options: "i" } },
+                      { $regexMatch: { input: "$storeType", regex: normalizedPatterns.contains, options: "i" } }
+                    ]
+                  },
                   then: 45
                 }
               ],
-              default: 30 // أي تطابق آخر = 30 نقطة
+              default: 30
             }
           }
         }
@@ -150,8 +267,8 @@ route.post("/search", async (req, res) => {
           finalScore: {
             $add: [
               "$searchScore",
-              { $multiply: [{ $ifNull: ["$rating", 0] }, 2] }, // نقاط التقييم
-              { $divide: [{ $ifNull: ["$followersNumber", 0] }, 10] } // نقاط المتابعين
+              { $multiply: [{ $ifNull: ["$rating", 0] }, 2] },
+              { $divide: [{ $ifNull: ["$followersNumber", 0] }, 10] }
             ]
           }
         }
@@ -183,30 +300,51 @@ route.post("/search", async (req, res) => {
             {
               $or: [
                 // 1. مطابقة تامة
-                { name: { $regex: exactPattern, $options: "i" } },
-                { category: { $regex: exactPattern, $options: "i" } },
+                { name: { $regex: originalPatterns.exact, $options: "i" } },
+                { category: { $regex: originalPatterns.exact, $options: "i" } },
+                { name: { $regex: normalizedPatterns.exact, $options: "i" } },
+                { category: { $regex: normalizedPatterns.exact, $options: "i" } },
 
-                // 2. تبدأ بالكلمة
-                { name: { $regex: startsWithPattern, $options: "i" } },
-                { category: { $regex: startsWithPattern, $options: "i" } },
+                // 2. البحث في الأشكال المختلفة
+                ...searchVariations.map(variation => {
+                  const escaped = escapeRegex(variation);
+                  return {
+                    $or: [
+                      { name: { $regex: escaped, $options: "i" } },
+                      { category: { $regex: escaped, $options: "i" } },
+                      { description: { $regex: escaped, $options: "i" } }
+                    ]
+                  };
+                }),
 
-                // 3. تحتوي على الكلمة
-                { name: { $regex: containsPattern, $options: "i" } },
-                { description: { $regex: containsPattern, $options: "i" } },
-                { category: { $regex: containsPattern, $options: "i" } },
-                { storeName: { $regex: containsPattern, $options: "i" } },
+                // 3. تبدأ بالكلمة
+                { name: { $regex: originalPatterns.startsWith, $options: "i" } },
+                { category: { $regex: originalPatterns.startsWith, $options: "i" } },
+                { name: { $regex: normalizedPatterns.startsWith, $options: "i" } },
 
-                // 4. بحث مرن
-                { name: { $regex: flexiblePattern, $options: "i" } },
+                // 4. تحتوي على الكلمة
+                { name: { $regex: originalPatterns.contains, $options: "i" } },
+                { description: { $regex: originalPatterns.contains, $options: "i" } },
+                { category: { $regex: originalPatterns.contains, $options: "i" } },
+                { storeName: { $regex: originalPatterns.contains, $options: "i" } },
+                { name: { $regex: normalizedPatterns.contains, $options: "i" } },
 
-                // 5. بحث في الكلمات المنفصلة
+                // 5. بحث مرن
+                { name: { $regex: originalPatterns.flexible, $options: "i" } },
+                { name: { $regex: normalizedPatterns.flexible, $options: "i" } },
+
+                // 6. بحث في الكلمات المنفصلة
                 ...searchWords.map(word => {
+                  const normalizedWord = normalizeArabicText(word);
                   const escapedWord = escapeRegex(word);
+                  const escapedNormalized = escapeRegex(normalizedWord);
                   return {
                     $or: [
                       { name: { $regex: escapedWord, $options: "i" } },
                       { description: { $regex: escapedWord, $options: "i" } },
-                      { category: { $regex: escapedWord, $options: "i" } }
+                      { category: { $regex: escapedWord, $options: "i" } },
+                      { name: { $regex: escapedNormalized, $options: "i" } },
+                      { category: { $regex: escapedNormalized, $options: "i" } }
                     ]
                   };
                 })
@@ -221,26 +359,51 @@ route.post("/search", async (req, res) => {
             $switch: {
               branches: [
                 {
-                  case: { $regexMatch: { input: "$name", regex: exactPattern, options: "i" } },
+                  case: {
+                    $or: [
+                      { $regexMatch: { input: "$name", regex: originalPatterns.exact, options: "i" } },
+                      { $regexMatch: { input: "$name", regex: normalizedPatterns.exact, options: "i" } }
+                    ]
+                  },
                   then: 100
                 },
                 {
-                  case: { $regexMatch: { input: "$category", regex: exactPattern, options: "i" } },
+                  case: {
+                    $or: [
+                      { $regexMatch: { input: "$category", regex: originalPatterns.exact, options: "i" } },
+                      { $regexMatch: { input: "$category", regex: normalizedPatterns.exact, options: "i" } }
+                    ]
+                  },
                   then: 95
                 },
                 {
-                  case: { $regexMatch: { input: "$name", regex: startsWithPattern, options: "i" } },
+                  case: {
+                    $or: [
+                      { $regexMatch: { input: "$name", regex: originalPatterns.startsWith, options: "i" } },
+                      { $regexMatch: { input: "$name", regex: normalizedPatterns.startsWith, options: "i" } }
+                    ]
+                  },
                   then: 80
                 },
                 {
-                  case: { $regexMatch: { input: "$name", regex: containsPattern, options: "i" } },
+                  case: {
+                    $or: [
+                      { $regexMatch: { input: "$name", regex: originalPatterns.contains, options: "i" } },
+                      { $regexMatch: { input: "$name", regex: normalizedPatterns.contains, options: "i" } }
+                    ]
+                  },
                   then: 60
                 },
                 {
                   case: {
                     $and: [
                       { $ne: ["$description", null] },
-                      { $regexMatch: { input: "$description", regex: containsPattern, options: "i" } }
+                      {
+                        $or: [
+                          { $regexMatch: { input: "$description", regex: originalPatterns.contains, options: "i" } },
+                          { $regexMatch: { input: "$description", regex: normalizedPatterns.contains, options: "i" } }
+                        ]
+                      }
                     ]
                   },
                   then: 50
@@ -256,7 +419,7 @@ route.post("/search", async (req, res) => {
           finalScore: {
             $add: [
               "$searchScore",
-              { $divide: [{ $ifNull: ["$likes", 0] }, 5] } // نقاط الإعجابات
+              { $divide: [{ $ifNull: ["$likes", 0] }, 5] }
             ]
           }
         }
@@ -281,7 +444,6 @@ route.post("/search", async (req, res) => {
       allStores[i].isFollow = false;
       allStores[i].isFavorite = false;
 
-      // التحقق من أوقات العمل
       if (allStores[i].opentimeam && allStores[i].closetimeam &&
         allStores[i].opentimepm && allStores[i].closetimepm) {
 
@@ -339,7 +501,6 @@ route.post("/search", async (req, res) => {
       const user = await User.findOne({ _id: id });
 
       if (user) {
-        // إضافة خاصية المتابعة للمتاجر
         for (var i = 0; i < allStores.length; i++) {
           if (!allStores[i]) continue;
           allStores[i].isFollow = false;
@@ -351,7 +512,6 @@ route.post("/search", async (req, res) => {
           }
         }
 
-        // إضافة خاصية المفضلة للمتاجر
         for (var i = 0; i < allStores.length; i++) {
           if (!allStores[i]) continue;
           allStores[i].isFavorite = false;
@@ -364,7 +524,6 @@ route.post("/search", async (req, res) => {
           }
         }
 
-        // إضافة خاصية المفضلة للمنتجات
         for (var i = 0; i < allItems.length; i++) {
           if (!allItems[i]) continue;
           allItems[i].isFavorite = false;
@@ -377,7 +536,6 @@ route.post("/search", async (req, res) => {
           }
         }
 
-        // إضافة خاصية الإعجاب للمنتجات
         for (var i = 0; i < allItems.length; i++) {
           if (!allItems[i]) continue;
           allItems[i].like = false;
@@ -392,7 +550,6 @@ route.post("/search", async (req, res) => {
       }
     }
 
-    // ✅ الرد النهائي
     res.json({
       error: false,
       data: {
@@ -410,4 +567,4 @@ route.post("/search", async (req, res) => {
   }
 });
 
-module.exports = route
+module.exports = route;
