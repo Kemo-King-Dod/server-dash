@@ -6,6 +6,7 @@ const stores = new Schema(
     name: {
       type: String,
       require: [true, "الإسم مطلوب"],
+
     },
     phone: {
       type: String,
@@ -178,19 +179,29 @@ const stores = new Schema(
       type: Number,
       default: 0
     },
-    ratingUsers:{
-      type:Number,
+    ratingUsers: {
+      type: Number,
       default: 0
     },
-    rate:{
-      type:Number,
-      default:0
+    rate: {
+      type: Number,
+      default: 0
     }
   },
   {
     timestamps: true,
   }
 );
+
+// ✅ إضافة Text Index للبحث السريع
+// أضف هذا السطر قبل السطر الأخير (قبل module.exports)
+stores.index({
+  name: 'text',
+  discription: 'text',
+  storeType: 'text',
+  address: 'text'
+});
+
 
 const Store = mongoose.model("Store", stores);
 

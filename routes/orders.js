@@ -58,21 +58,21 @@ async function read() {
 // ***********************
 
 router.get("/getAllOrders", auth, async (req, res) => {
-   var Orders ;
-    var compOrders 
-  if(req.user.city == "All"){
-   Orders = await orders.find({});
-  compOrders = await OrderRecord.find({})
+  var Orders;
+  var compOrders
+  if (req.user.city == "All") {
+    Orders = await orders.find({});
+    compOrders = await OrderRecord.find({})
   }
-  else{
-     Orders = await orders.find({city:req.user.city});
-     compOrders = await OrderRecord.find({city:req.user.city})
+  else {
+    Orders = await orders.find({ city: req.user.city });
+    compOrders = await OrderRecord.find({ city: req.user.city })
   }
-  
+
   return res.status(200).json({
     error: false,
     data: {
-      orders: [...Orders,...compOrders],
+      orders: [...Orders, ...compOrders],
     },
   });
 });
@@ -94,17 +94,17 @@ router.post("/addOrder", auth, async (req, res) => {
     //     message: "خطأ داخلي في الخادم", 
     //   });
     // }
-    
+
     // console.log(req.body)
     const itemsdata = [];
     const userId = req.userId;
     const StoreId = req.body.storeId;
-    
 
 
-       const theAddress =req.body.addressId == 'current_location'?req.body.address: await Address.findById(req.body.addressId);
-    
-   
+
+    const theAddress = req.body.addressId == 'current_location' ? req.body.address : await Address.findById(req.body.addressId);
+
+
     const store = await Store.findById(StoreId);
     const admin = await Admin.findOne({ phone: "0910808060" });
     const user = await User.findById(userId);
@@ -116,7 +116,7 @@ router.post("/addOrder", auth, async (req, res) => {
         $in: ["waiting", "accepted", "ready", "driverAccepted", "onWay"],
       },
     });
-    
+
 
     if (activeOrderCount >= 3 && !admins.includes(req.userId)) {
       return res.status(500).json({
@@ -141,27 +141,27 @@ router.post("/addOrder", auth, async (req, res) => {
     for (var i = 0; i < user.cart.length; i++) {
       if (user.cart[i].cartItem.storeID == StoreId) {
         const item = await Item.findById(user.cart[i].cartItem.id);
-       
-        const quantity = user.cart[i].cartItem.quantity; 
-       console.log ("item.price: ", item.price*quantity);
-       console.log("price: ", user.cart[i].cartItem.price*quantity);
-       
-       
+
+        const quantity = user.cart[i].cartItem.quantity;
+        console.log("item.price: ", item.price * quantity);
+        console.log("price: ", user.cart[i].cartItem.price * quantity);
+
+
         itemsdata.push({
           id: item._id,
           name: item.name,
           image: item.imageUrl,
-          options: user.cart[i].cartItem.options,  
-          addOns: user.cart[i].cartItem.addOns, 
+          options: user.cart[i].cartItem.options,
+          addOns: user.cart[i].cartItem.addOns,
           quantity: user.cart[i].cartItem.quantity, // update later
           price: item.price,
         });
-        totalprice += item.price*user.cart[i].cartItem.quantity;
-      } 
+        totalprice += item.price * user.cart[i].cartItem.quantity;
+      }
     }
 
     if (itemsdata.length == 0) {
-      res.status( 500).json({
+      res.status(500).json({
         error: true,
         message: "ليس هناك عناصر",
       });
@@ -169,9 +169,9 @@ router.post("/addOrder", auth, async (req, res) => {
     }
     const addressCity = getCityName(theAddress).englishName;
     const storeCity = getCityName(store.location).englishName;
-    const isShatyRegion = (addressCity === "Alshaty" || addressCity === "East Alshaty") && 
-                          (storeCity === "Alshaty" || storeCity === "East Alshaty");
-    
+    const isShatyRegion = (addressCity === "Alshaty" || addressCity === "East Alshaty") &&
+      (storeCity === "Alshaty" || storeCity === "East Alshaty");
+
     if (!isShatyRegion && addressCity !== storeCity) {
       res.status(500).json({
         error: true,
@@ -266,7 +266,7 @@ router.post("/addOrder", auth, async (req, res) => {
         token: admin.fcmToken,
         title: "طلبية جديدة",
         body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
-        isAdmin:true
+        isAdmin: true
       });
     } catch (e) {
       console.log("الادمن لم يستلم الاشعار");
@@ -276,7 +276,7 @@ router.post("/addOrder", auth, async (req, res) => {
         topic: "admins",
         title: "طلبية جديدة",
         body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
-        isAdmin:true
+        isAdmin: true
       });
       sendNotificationToTopic({
         topic: "admins_" + req.headers.cityen,
@@ -298,7 +298,7 @@ router.post("/addOrder", auth, async (req, res) => {
     return res.status(200).json({
       error: false,
       message: "Order added successfully",
-      data: theorderId,
+      data: order,
     });
   } catch (error) {
     console.log(error);
@@ -475,8 +475,8 @@ router.get("/getReadyOrderForDriver", auth, async (req, res) => {
         $sample: { size: 10 },
       },
     ]);
-    
-    
+
+
 
     if (order.length == 0 && acceptedorders.length == 0) {
       return res.status(200).json({
@@ -804,7 +804,7 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
     const admin = await Admin.findById("67ab9be0c878f7ab0bec38f5");
     const store = await Store.findById(order.store.id);
     const driver = order.driver
-        ? await Driver.findById(order.driver.id)
+      ? await Driver.findById(order.driver.id)
       : null;
 
     await Promise.all([
@@ -824,11 +824,11 @@ router.post("/cancelOrderUser", auth, async (req, res) => {
         body: "",
       }),
       order.driver &&
-        sendNotification({
-          token: driver.fcmToken,
-          title: "تم الغاء الطلب رقم" + order.orderId,
-          body: "",
-        }),
+      sendNotification({
+        token: driver.fcmToken,
+        title: "تم الغاء الطلب رقم" + order.orderId,
+        body: "",
+      }),
     ]);
 
     const updatedUser = await User.findById(req.user._id);
@@ -860,11 +860,11 @@ router.post("/cancelOrderStore", auth, async (req, res) => {
       order.store.id.toString() !== req.userId &&
       req.user.userType != "Admin"
     ) {
-    
+
 
       throw new Error("صلاحيات غير كافية");
     }
-   order.city = order.city.englishName;
+    order.city = order.city.englishName;
     // Create order record
     await OrderRecord.create({
       ...order.toObject(),
@@ -1041,7 +1041,7 @@ router.post("/updateOrder", auth, async (req, res) => {
 
     // Prepare update object with only provided fields
     const updateData = {};
-    
+
     if (status !== undefined) updateData.status = status;
     if (type !== undefined) updateData.type = type;
     if (totalPrice !== undefined) updateData.totalPrice = totalPrice;

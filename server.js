@@ -294,40 +294,40 @@ async function updateProductsStatusFromStores() {
 setRatingToZero()
 async function setRatingToZero() {
   try {
-    const stores = await Store.updateMany({},{rating:parseFloat(0.0)});
+    const stores = await Store.updateMany({}, { rating: parseFloat(0.00001) });
     console.log("تم تحديث جميع المتاجر بنجاح");
   } catch (error) {
     console.log(error);
   }
 
-//updateProductsCityFromStores();
-async function updateProductsCityFromStores() {
-  try {
-    console.log("تم تحديث مدن المنتجات بنجاح");
-    // جلب جميع المنتجات
-    const products = await product.find({});
+  //updateProductsCityFromStores();
+  async function updateProductsCityFromStores() {
+    try {
+      console.log("تم تحديث مدن المنتجات بنجاح");
+      // جلب جميع المنتجات
+      const products = await product.find({});
 
-    let updatedCount = 0;
+      let updatedCount = 0;
 
-    for (const prod of products) {
-      // البحث عن المتجر الخاص بالمنتج
-      const store = await Store.findById(prod.storeID);
+      for (const prod of products) {
+        // البحث عن المتجر الخاص بالمنتج
+        const store = await Store.findById(prod.storeID);
 
-      if (store && (store.city != prod.city)) {
-        // تحديث مدينة المنتج بناءً على مدينة المتجر
-        prod.city = store.city;
-        await prod.save();
-        updatedCount++;
+        if (store && (store.city != prod.city)) {
+          // تحديث مدينة المنتج بناءً على مدينة المتجر
+          prod.city = store.city;
+          await prod.save();
+          updatedCount++;
 
-        console.log(`تم تحديث المنتج ${prod._id} إلى مدينة: ${store.city}`);
-      } else {
-        console.log(`لم يتم العثور على متجر للمنتج ${prod.name}`);
+          console.log(`تم تحديث المنتج ${prod._id} إلى مدينة: ${store.city}`);
+        } else {
+          console.log(`لم يتم العثور على متجر للمنتج ${prod.name}`);
+        }
       }
-    }
 
-    console.log(`تم تحديث ${updatedCount} منتجًا بنجاح.`);
-  } catch (err) {
-    console.error("خطأ أثناء تحديث المدن:", err);
+      console.log(`تم تحديث ${updatedCount} منتجًا بنجاح.`);
+    } catch (err) {
+      console.error("خطأ أثناء تحديث المدن:", err);
+    }
   }
-}
 }

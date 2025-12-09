@@ -53,7 +53,7 @@ const items = new Schema({
         type: Number,
         default: 0
     }
-    ,city: {
+    , city: {
         type: String,
     },
     storeName: {
@@ -67,5 +67,13 @@ const items = new Schema({
         default: true,
     }
 })
-const Items= mongoose.model('Item', items);
+// ✅ إضافة Text Index للبحث السريع
+items.index({
+    name: 'text',
+    description: 'text',
+    category: 'text',
+    storeName: 'text'
+});
+
+const Items = mongoose.model('Item', items);
 module.exports = Items
