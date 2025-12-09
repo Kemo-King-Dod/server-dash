@@ -91,6 +91,11 @@ route.post("/search", async (req, res) => {
     // ✅ توليد أشكال مختلفة من الكلمة
     const searchVariations = generateArabicVariations(cleanSearchTerm);
 
+    // 🔍 Debug: طباعة الأشكال المولدة
+    console.log('🔍 كلمة البحث الأصلية:', cleanSearchTerm);
+    console.log('🔍 الكلمة المطبّعة:', normalizedSearch);
+    console.log('🔍 جميع الأشكال المولدة:', searchVariations);
+
     // ✅ إنشاء أنماط بحث للكلمة الأصلية والمطبّعة
     const createPatterns = (term) => {
       const escaped = escapeRegex(term);
