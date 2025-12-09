@@ -571,6 +571,5 @@ route.post("/search", async (req, res) => {
     });
   }
 });
-//hello
 
 module.exports = route;
