@@ -23,13 +23,13 @@ route.get('/checkRating', auth, async (req, res) => {
 route.post('/submitRating', auth, async (req, res) => {
     try {
         console.log(req.body)
-        const { driverId, shopId, shopRateing, driverRateing, comment } = req.body
+        const { driverId, shopId, shopRating, driverRating, comment } = req.body
 
         const store = await Store.findById(shopId)
         const driver = await Driver.findOne({ phone: driverId })
 
-        store.rating += shopRateing
-        driver.rating += driverRateing
+        store.rating += shopRating
+        driver.rating += driverRating
 
         store.ratingUsers++
         driver.ratingUsers++
@@ -78,13 +78,13 @@ route.post('/submitRating', auth, async (req, res) => {
 
 route.get('/Rating', auth, async (req, res) => {
     try {
-        const { driverId, shopId, shopRateing, driverRateing } = req.body
+        const { driverId, shopId, shopRating, driverRating } = req.body
 
         const store = await Store.findById(shopId)
         const driver = await Driver.findById(driverId)
 
-        store.rating += shopRateing
-        driver.rating += driverRateing
+        store.rating += shopRating
+        driver.rating += driverRating
 
         store.ratingUsers++
         driver.ratingUsers++
