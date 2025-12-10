@@ -42,13 +42,14 @@ router.get("/getStores", async (req, res) => {
         message: "يرجى التحقق من تفعيل الموقع وإعطاء الإذن",
       });
     }
-    if(req.headers.cityen == "Alshaty" || req.headers.cityen == "East Alshaty"){
+    if (req.headers.cityen == "Alshaty" || req.headers.cityen == "East Alshaty") {
       req.headers.cityen = "Alshaty";
     }
-    const stores = await Store.find(
-      { city: req.headers.cityen, registerCondition: "accepted" },
-      { password: 0, items: 0, rating: 0 }
-    );
+    const stores = await Store.aggregate([
+      { $match: { city: req.headers.cityen, registerCondition: "accepted" } },
+      { $sample: { size: 10 } },
+      { $project: { password: 0, items: 0, rating: 0 } }
+    ]);
 
     // Check if current time is between opening and closing times
     for (let i = 0; i < stores.length; i++) {
@@ -99,7 +100,7 @@ router.get("/getStores", async (req, res) => {
       stores[i].save();
     }
 
-   
+
 
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
       return res.status(200).json({
@@ -172,17 +173,17 @@ router.post("/alterStorePassword", auth, async (req, res) => {
 router.post("/alterStore", auth, async (req, res) => {
   try {
     let userId = req.userId;
-    if(req.user.userType == "Admin"){
+    if (req.user.userType == "Admin") {
       userId = req.body.shopId;
     }
     const store = await Store.findById(userId);
     store.name = req.body.name;
     store.storeType = req.user.userType == "Admin" ? req.body.storeType : req.body.category;
-    if(req.body.picture && store.picture!==req.body.picture){
-      await deleteUploadedFile ( store.picture);
-    store.picture = req.body.picture;
+    if (req.body.picture && store.picture !== req.body.picture) {
+      await deleteUploadedFile(store.picture);
+      store.picture = req.body.picture;
     }
-    if(req.user.userType == "Admin"){
+    if (req.user.userType == "Admin") {
       store.phone = req.body.phone || store.phone;
       store.deliveryCostByKilo = req.body.deliveryCostByKilo || store.deliveryCostByKilo;
       store.ownerName = req.body.ownerName || store.ownerName;
