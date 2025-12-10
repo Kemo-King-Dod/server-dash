@@ -3,7 +3,7 @@ const { auth } = require("../middleware/auth");
 const router = express.Router()
 
 router.post("/applycoupon", auth, (req, res) => {
-
+    console.log(req.user)
     try {
         const { couponCode } = req.body;
         const coupons = [
