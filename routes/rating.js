@@ -29,14 +29,14 @@ route.post('/submitRating', auth, async (req, res) => {
         const store = await Store.findById(shopId)
         const driver = await Driver.findOne({ phone: driverId })
 
-        store.rating += shopRating
-        driver.rating += driverRating
+        store.rate += shopRating
+        driver.rate += driverRating
 
         store.ratingUsers++
         driver.ratingUsers++
 
-        store.rating = store.rating / 2
-        driver.rating = driver.rating / 2
+        store.rating = store.rate / store.ratingUsers
+        driver.rating = driver.rate / driver.ratingUsers
 
         await store.save()
         await driver.save()
