@@ -1,4 +1,5 @@
-const express = require("express")
+const express = require("express");
+const { auth } = require("../middleware/auth");
 const router = express.Router()
 
 router.post("/applycoupon", auth, (req, res) => {
