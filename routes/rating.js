@@ -20,7 +20,7 @@ route.get('/checkRating', auth, async (req, res) => {
         })
     }
 })
-route.post('//submitRating"', auth, async (req, res) => {
+route.post('/submitRating"', auth, async (req, res) => {
     try {
         const { driverId, shopId, shopRateing, driverRateing, comment } = req.body
 
