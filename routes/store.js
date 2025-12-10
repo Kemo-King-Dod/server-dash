@@ -106,6 +106,7 @@ router.get("/getStores", async (req, res) => {
       return res.status(200).json({
         error: false,
         data: stores,
+        length: stores.length
       });
     }
 
