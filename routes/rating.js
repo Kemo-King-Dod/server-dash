@@ -6,6 +6,7 @@ const Store = require("../database/store")
 const { auth } = require('../middleware/auth');
 const { sendNotification } = require("../firebase/notification")
 const User = require("../database/users")
+const Notification = require("../database/notification")
 
 route.get('/checkRating', auth, async (req, res) => {
     try {
