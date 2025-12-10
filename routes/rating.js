@@ -5,6 +5,7 @@ const Driver = require("../database/driver")
 const Store = require("../database/store")
 const { auth } = require('../middleware/auth');
 const { sendNotification } = require("../firebase/notification")
+const User = require("../database/users")
 
 route.get('/checkRating', auth, async (req, res) => {
     try {
