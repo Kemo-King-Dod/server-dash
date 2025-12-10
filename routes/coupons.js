@@ -24,7 +24,7 @@ router.post("/applycoupon", auth, (req, res) => {
             }
         ];
 
-        const coupon = coupons.find(coupon => coupon.couponCode === couponCode && !coupon.ids.includes(req.user._id));
+        const coupon = coupons.find(coupon => coupon.couponCode == couponCode && !coupon.ids.includes(req.user._id));
         if (!coupon) {
             return res.status(404).json({
                 error: true,
