@@ -51,54 +51,54 @@ router.get("/getStores", async (req, res) => {
       { $project: { password: 0, items: 0, rating: 0 } }
     ]);
 
-    // Check if current time is between opening and closing times
-    for (let i = 0; i < stores.length; i++) {
-      // Add isFavorite property to each item
-      stores[i].isFollow = false;
-      stores[i].isFavorite = false;
+    // // Check if current time is between opening and closing times
+    // for (let i = 0; i < stores.length; i++) {
+    //   // Add isFavorite property to each item
+    //   stores[i].isFollow = false;
+    //   stores[i].isFavorite = false;
 
-      // check openCondition
+    //   // check openCondition
 
-      const now = new Date();
-      let hours = now.getHours();
-      const minutes = now.getMinutes();
+    //   const now = new Date();
+    //   let hours = now.getHours();
+    //   const minutes = now.getMinutes();
 
-      // Parse store hours
-      const openAMHour = parseInt(stores[i].opentimeam.split(":")[0]);
-      const openAMMinute = parseInt(stores[i].opentimeam.split(":")[1]);
-      const closeAMHour = parseInt(stores[i].closetimeam.split(":")[0]);
-      const closeAMMinute = parseInt(stores[i].closetimeam.split(":")[1]);
-      const openPMHour = parseInt(stores[i].opentimepm.split(":")[0]);
-      const openPMMinute = parseInt(stores[i].opentimepm.split(":")[1]);
-      let closePMHour = parseInt(stores[i].closetimepm.split(":")[0]);
-      const closePMMinute = parseInt(stores[i].closetimepm.split(":")[1]);
+    //   // Parse store hours
+    //   const openAMHour = parseInt(stores[i].opentimeam.split(":")[0]);
+    //   const openAMMinute = parseInt(stores[i].opentimeam.split(":")[1]);
+    //   const closeAMHour = parseInt(stores[i].closetimeam.split(":")[0]);
+    //   const closeAMMinute = parseInt(stores[i].closetimeam.split(":")[1]);
+    //   const openPMHour = parseInt(stores[i].opentimepm.split(":")[0]);
+    //   const openPMMinute = parseInt(stores[i].opentimepm.split(":")[1]);
+    //   let closePMHour = parseInt(stores[i].closetimepm.split(":")[0]);
+    //   const closePMMinute = parseInt(stores[i].closetimepm.split(":")[1]);
 
-      // Handle after-midnight closing times (e.g., 2:00 AM becomes 26:00)
-      if (closePMHour < 7) {
-        closePMHour += 24;
-      }
-      if (hours < 7) {
-        if (closePMHour < 10) {
-          hours += 24;
-        }
-      }
+    //   // Handle after-midnight closing times (e.g., 2:00 AM becomes 26:00)
+    //   if (closePMHour < 7) {
+    //     closePMHour += 24;
+    //   }
+    //   if (hours < 7) {
+    //     if (closePMHour < 10) {
+    //       hours += 24;
+    //     }
+    //   }
 
-      // Convert current time to minutes for easier comparison
-      // the server time is 2 hours late from libya that is way i added + 120
-      const currentTimeInMinutes = hours * 60 + 120 + minutes;
-      const openAMInMinutes = openAMHour * 60 + openAMMinute;
-      const closeAMInMinutes = closeAMHour * 60 + closeAMMinute;
-      const openPMInMinutes = openPMHour * 60 + openPMMinute;
-      const closePMInMinutes = closePMHour * 60 + closePMMinute;
+    //   // Convert current time to minutes for easier comparison
+    //   // the server time is 2 hours late from libya that is way i added + 120
+    //   const currentTimeInMinutes = hours * 60 + 120 + minutes;
+    //   const openAMInMinutes = openAMHour * 60 + openAMMinute;
+    //   const closeAMInMinutes = closeAMHour * 60 + closeAMMinute;
+    //   const openPMInMinutes = openPMHour * 60 + openPMMinute;
+    //   const closePMInMinutes = closePMHour * 60 + closePMMinute;
 
-      // Check if current time falls within either AM or PM opening hours
-      stores[i].openCondition =
-        (currentTimeInMinutes >= openAMInMinutes &&
-          currentTimeInMinutes <= closeAMInMinutes) ||
-        (currentTimeInMinutes >= openPMInMinutes &&
-          currentTimeInMinutes <= closePMInMinutes);
-      stores[i].save();
-    }
+    //   // Check if current time falls within either AM or PM opening hours
+    //   stores[i].openCondition =
+    //     (currentTimeInMinutes >= openAMInMinutes &&
+    //       currentTimeInMinutes <= closeAMInMinutes) ||
+    //     (currentTimeInMinutes >= openPMInMinutes &&
+    //       currentTimeInMinutes <= closePMInMinutes);
+    //   stores[i].save();
+    // }
 
 
 
