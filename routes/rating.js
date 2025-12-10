@@ -26,7 +26,7 @@ route.post('/submitRating', auth, async (req, res) => {
         const { driverId, shopId, shopRateing, driverRateing, comment } = req.body
 
         const store = await Store.findById(shopId)
-        const driver = await Driver.findById(driverId)
+        const driver = await Driver.findOne({ phone: driverId })
 
         store.rating += shopRateing
         driver.rating += driverRateing
