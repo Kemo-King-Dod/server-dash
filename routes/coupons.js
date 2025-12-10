@@ -11,7 +11,7 @@ router.post("/applycoupon", auth, (req, res) => {
                 couponCode: "FASTO10",
                 discountPercentage: 10,
                 ids: [
-                    req.body.user._id
+                    req.user._id
                 ]
 
             },
