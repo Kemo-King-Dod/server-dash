@@ -65,6 +65,7 @@ route.post('/submitRating', auth, async (req, res) => {
         }
 
     } catch (error) {
+        console.log(error)
         res.status(200).json({
             error: true,
             message: 'حدث خطأ أثناء رفع التقييم'
