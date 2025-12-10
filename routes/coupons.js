@@ -3,9 +3,9 @@ const { auth } = require("../middleware/auth");
 const router = express.Router()
 
 router.post("/applycoupon", auth, (req, res) => {
-    console.log(req.user)
     try {
         const { couponCode } = req.body;
+        console.log(couponCode);
         const coupons = [
             {
                 couponCode: "FASTO10",
@@ -27,7 +27,7 @@ router.post("/applycoupon", auth, (req, res) => {
         const coupon = coupons.find(coupon => coupon.couponCode == couponCode && !coupon.ids.includes(req.user._id));
         if (!coupon) {
             return res.status(404).json({
-                error: true,
+                error: false,
                 data: {
                     operation: "FAILED",
                     message: "هذا الكود غير صالح",
