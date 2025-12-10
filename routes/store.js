@@ -105,8 +105,8 @@ router.get("/getStores", async (req, res) => {
     if (req.headers.isvisiter && req.headers.isvisiter == "true") {
       return res.status(200).json({
         error: false,
+        length: stores.length,
         data: stores,
-        length: stores.length
       });
     }
 
