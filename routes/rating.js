@@ -22,6 +22,7 @@ route.get('/checkRating', auth, async (req, res) => {
 })
 route.post('/submitRating', auth, async (req, res) => {
     try {
+        console.log(req.body)
         const { driverId, shopId, shopRateing, driverRateing, comment } = req.body
 
         const store = await Store.findById(shopId)
@@ -68,7 +69,8 @@ route.post('/submitRating', auth, async (req, res) => {
         console.log(error)
         res.status(200).json({
             error: true,
-            message: 'حدث خطأ أثناء رفع التقييم'
+            message: 'حدث خطأ أثناء رفع التقييم',
+            error: error
         })
     }
 })
