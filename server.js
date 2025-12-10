@@ -111,6 +111,8 @@ app.use(notification);
 
 const version = require("./routes/version.js");
 app.use(version);
+const coupons = require("./routes/coupons.js");
+app.use(coupons);
 
 const categoryManagement = require("./routes/category_mangement.js");
 app.use(categoryManagement);
