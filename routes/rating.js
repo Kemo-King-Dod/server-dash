@@ -34,8 +34,8 @@ route.post('/submitRating', auth, async (req, res) => {
         store.ratingUsers++
         driver.ratingUsers++
 
-        store.rate = store.ratingUsers / store.rating
-        driver.rate = driver.ratingUsers / driver.rating
+        store.rating = store.rating / store.ratingUsers
+        driver.rating = driver.rating / driver.ratingUsers
 
         await store.save()
         await driver.save()
