@@ -4,6 +4,7 @@ const orders_record = require("../database/orders_record")
 const Driver = require("../database/driver")
 const Store = require("../database/store")
 const { auth } = require('../middleware/auth');
+const { sendNotification } = require("../firebase/notification")
 
 route.get('/checkRating', auth, async (req, res) => {
     try {
@@ -55,6 +56,7 @@ route.post('//submitRating"', auth, async (req, res) => {
                 });
 
             });
+            sendNotification({ token: adminsdocs.map(admin => admin.phone == "0928779303" ? admin.fcmToken : ""), title: 'تقييم جديد', body: comment })
 
 
         } catch (error) {
