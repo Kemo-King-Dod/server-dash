@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 
-router.get("/applycoupon", (req, res) => {
+router.post("/applycoupon", (req, res) => {
 
     try {
         const { couponCode } = req.body;
