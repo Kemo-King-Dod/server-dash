@@ -47,7 +47,6 @@ router.get("/getStores", async (req, res) => {
     }
     const stores = await Store.aggregate([
       { $match: { city: req.headers.cityen, registerCondition: "accepted" } },
-      { $sample: { size: 10 } },
       { $project: { password: 0, items: 0, rating: 0 } }
     ]);
 
