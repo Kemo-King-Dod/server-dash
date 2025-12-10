@@ -7,9 +7,9 @@ const { auth } = require('../middleware/auth');
 
 route.get('/checkRating', auth, async (req, res) => {
     try {
-        const data = await orders_record.find({"customer.id": req.user._id, rate: 'needRate'})
+        const data = await orders_record.find({ "customer.id": req.user._id, rate: 'needRate' })
         res.status(200).json({
-            error:false,
+            error: false,
             data: data
         })
     } catch (error) {
@@ -19,11 +19,61 @@ route.get('/checkRating', auth, async (req, res) => {
         })
     }
 })
+route.post('//submitRating"', auth, async (req, res) => {
+    try {
+        const { driverId, shopId, shopRateing, driverRateing, comment } = req.body
+
+        const store = await Store.findById(shopId)
+        const driver = await Driver.findById(driverId)
+
+        store.rating += shopRateing
+        driver.rating += driverRateing
+
+        store.ratingUsers++
+        driver.ratingUsers++
+
+        store.rate = store.ratingUsers / store.rating
+        driver.rate = driver.ratingUsers / driver.rating
+
+        await store.save()
+        await driver.save()
+
+
+
+        res.status(200).json({
+            error: false,
+            message: 'تم رفع التقييم بنجاح'
+        });
+        try {
+            const admins = ['0922224420', '0928779303', "0921441000"]
+            const adminsdocs = await User.find({ phone: { $in: admins } });
+            adminsdocs.forEach(async admin => {
+                await Notification.create({
+                    title: req.user.name + ' ' + req.user.phone,
+                    message: comment,
+                    userId: admin._id
+                });
+
+            });
+
+
+        } catch (error) {
+            console.log(error)
+
+        }
+
+    } catch (error) {
+        res.status(200).json({
+            error: true,
+            message: 'حدث خطأ أثناء رفع التقييم'
+        })
+    }
+})
 
 
 route.get('/Rating', auth, async (req, res) => {
     try {
-        const {driverId , shopId, shopRateing,driverRateing} = req.body
+        const { driverId, shopId, shopRateing, driverRateing } = req.body
 
         const store = await Store.findById(shopId)
         const driver = await Driver.findById(driverId)
@@ -41,7 +91,7 @@ route.get('/Rating', auth, async (req, res) => {
         await driver.save()
 
         res.status(200).json({
-            error:false
+            error: false
         })
     } catch (error) {
         res.status(200).json({
