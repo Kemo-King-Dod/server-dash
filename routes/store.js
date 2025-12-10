@@ -54,8 +54,8 @@ router.get("/getStores", async (req, res) => {
     // Check if current time is between opening and closing times
     for (let i = 0; i < stores.length; i++) {
       // Add isFavorite property to each item
-      stores[i]._doc.isFollow = false;
-      stores[i]._doc.isFavorite = false;
+      stores[i].isFollow = false;
+      stores[i].isFavorite = false;
 
       // check openCondition
 
@@ -114,12 +114,12 @@ router.get("/getStores", async (req, res) => {
       for (var i = 0; i < stores.length; i++) {
         for (var j = 0; j < user.favorateStors.length; j++) {
           if (user.favorateStors[j].toString() == stores[i]._id.toString()) {
-            stores[i]._doc.isFavorite = true;
+            stores[i].isFavorite = true;
           }
         }
         for (var j = 0; j < user.followedStores.length; j++) {
           if (user.followedStores[j].toString() == stores[i]._id.toString()) {
-            stores[i]._doc.isFollow = true;
+            stores[i].isFollow = true;
           }
         }
       }
