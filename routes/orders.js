@@ -96,6 +96,7 @@ router.post("/addOrder", auth, async (req, res) => {
     // }
 
     // console.log(req.body)
+    console.log(req.body)
     const itemsdata = [];
     const userId = req.userId;
     const StoreId = req.body.storeId;
