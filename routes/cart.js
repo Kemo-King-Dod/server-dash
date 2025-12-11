@@ -753,7 +753,7 @@ router.post("/getCartNext", auth, async (req, res) => {
         );
         return res.status(200).json({
           error: false,
-          payment_method: require("../utils/payment_method.json").payment_method,
+          payment_methods: require("../utils/payment_method.json").payment_methods,
           data: shop,
         });
 

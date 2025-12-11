@@ -1,5 +1,5 @@
 {
-    "peyment_method": [
+    "payment_methods": [
         {
             "title": "جهاز البطاقة",
             "description": "الدفع بالطاقة عند مجيئ السائق!",
