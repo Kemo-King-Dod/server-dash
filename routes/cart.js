@@ -748,11 +748,15 @@ router.post("/getCartNext", auth, async (req, res) => {
 
     for (const shop of thedata) {
       if (shop.shopId.toString() === req.body.id.toString()) {
+        console.log(
+          require("../utils/payment_method.json").payment_method
+        );
         return res.status(200).json({
           error: false,
           payment_method: require("../utils/payment_method.json").payment_method,
           data: shop,
         });
+
       }
     }
     return res.status(404).json({
