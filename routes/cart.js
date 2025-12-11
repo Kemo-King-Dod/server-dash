@@ -750,8 +750,8 @@ router.post("/getCartNext", auth, async (req, res) => {
       if (shop.shopId.toString() === req.body.id.toString()) {
         return res.status(200).json({
           error: false,
-          data: shop,
           payment_method: require("../utils/payment_method.json").payment_method,
+          data: shop,
         });
       }
     }
