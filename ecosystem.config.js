@@ -14,7 +14,8 @@ module.exports = {
         "uploads",
         "logs",
         "data",
-        "utils/categories.json"
+        "utils/categories.json",
+        "utils/payment_method.json"
       ],
 
       env: {
