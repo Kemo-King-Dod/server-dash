@@ -1,15 +1,10 @@
 {
     "payment_methods": [
         {
+            "icon": "card_edit_bold",
             "title": "جهاز البطاقة",
             "description": "الدفع بالطاقة عند مجيئ السائق!",
             "color": "#FF0000",
-            "work": true
-        },
-        {
-            "title": "الدفع عند الاستلام - كاش",
-            "description": "ادفع نقداً عند استلام الطلب",
-            "color": "#059669",
             "work": true
         }
     ]
