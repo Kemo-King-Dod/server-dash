@@ -10,7 +10,7 @@ const Notification = require("../database/notification")
 
 route.get('/checkRating', auth, async (req, res) => {
     try {
-        const data = await orders_record.find({ "customer.id": req.user._id, rate: 'needRate' })
+        const data = await orders_record.find({ "customer.id": req.user._id, rate: 'needRate', status: 'confirmed' })
         res.status(200).json({
             error: false,
             data: data

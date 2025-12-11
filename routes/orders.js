@@ -96,7 +96,6 @@ router.post("/addOrder", auth, async (req, res) => {
     // }
 
     // console.log(req.body)
-    console.log(req.body)
     const itemsdata = [];
     const userId = req.userId;
     const StoreId = req.body.storeId;
@@ -253,40 +252,40 @@ router.post("/addOrder", auth, async (req, res) => {
     }
     await user.save();
 
-    // try {
-    //   sendNotification({
-    //     token: store.fcmToken,
-    //     title: "طلبية جديدة",
-    //     body: "قام زبون ما بطلب طلبية من متجرك",
-    //   });
-    // } catch (e) {
-    //   console.log("المتجر لم يستلم الاشعار");
-    // }
-    // try {
-    //   sendNotification({
-    //     token: admin.fcmToken,
-    //     title: "طلبية جديدة",
-    //     body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
-    //     isAdmin: true
-    //   });
-    // } catch (e) {
-    //   console.log("الادمن لم يستلم الاشعار");
-    // }
-    // try {
-    //   sendNotificationToTopic({
-    //     topic: "admins",
-    //     title: "طلبية جديدة",
-    //     body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
-    //     isAdmin: true
-    //   });
-    //   sendNotificationToTopic({
-    //     topic: "admins_" + req.headers.cityen,
-    //     title: "طلبية جديدة",
-    //     body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
-    //   });
-    // } catch (e) {
-    //   console.log("الادمن لم يستلم الاشعار");
-    // }
+    try {
+      sendNotification({
+        token: store.fcmToken,
+        title: "طلبية جديدة",
+        body: "قام زبون ما بطلب طلبية من متجرك",
+      });
+    } catch (e) {
+      console.log("المتجر لم يستلم الاشعار");
+    }
+    try {
+      sendNotification({
+        token: admin.fcmToken,
+        title: "طلبية جديدة",
+        body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+        isAdmin: true
+      });
+    } catch (e) {
+      console.log("الادمن لم يستلم الاشعار");
+    }
+    try {
+      sendNotificationToTopic({
+        topic: "admins",
+        title: "طلبية جديدة",
+        body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+        isAdmin: true
+      });
+      sendNotificationToTopic({
+        topic: "admins_" + req.headers.cityen,
+        title: "طلبية جديدة",
+        body: ` قام زبون ما بطلب طلبية من متجر ${store.name}`,
+      });
+    } catch (e) {
+      console.log("الادمن لم يستلم الاشعار");
+    }
 
     await notification.create({
       id: store._id,
